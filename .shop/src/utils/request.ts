@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { message } from "antd";
+import type { User } from "@/models/user";
 
 const SUCCESS_CODE = 0;
 const TIMEOUT = 10000;
@@ -12,11 +13,11 @@ const USER_INFO_KEY = "user_info";
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
 export const setToken = (token: string) => localStorage.setItem(TOKEN_KEY, token);
 export const removeToken = () => localStorage.removeItem(TOKEN_KEY);
-export const getUserInfo = () => {
+export const getUserInfo = (): User | null => {
   const info = localStorage.getItem(USER_INFO_KEY);
   return info ? JSON.parse(info) : null;
 };
-export const setUserInfo = (userInfo: any) => localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
+export const setUserInfo = (userInfo: User) => localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
 export const removeUserInfo = () => localStorage.removeItem(USER_INFO_KEY);
 
 export const instance = axios.create({

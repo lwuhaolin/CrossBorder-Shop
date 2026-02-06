@@ -1,11 +1,16 @@
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
 import { useState } from 'react';
+import { useNavigate } from 'umi';
+import { updatePassword } from '@/services/user';
+import { removeToken, removeUserInfo } from '@/utils/request';
+import type { PasswordUpdateDTO, PasswordChangeDTO } from '@/models/user';
 
 const ChangePassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (values: { oldPassword: string; newPassword: string; confirmPassword: string }) => {
+  const handleSubmit = async (values: PasswordUpdateDTO) => {
     if (values.newPassword !== values.confirmPassword) {
       message.error('两次输入的新密码不一致');
       return false;
@@ -13,10 +18,20 @@ const ChangePassword: React.FC = () => {
 
     setLoading(true);
     try {
-      // TODO: Call change password API
-      // await changePassword({ oldPassword: values.oldPassword, newPassword: values.newPassword });
+      const data: PasswordChangeDTO = {
+        oldPassword: values.oldPassword,
+        newPassword: values.newPassword,
+      };
+      await updatePassword(data);
       message.success('密码修改成功，请重新登录');
-      // TODO: Redirect to login
+      
+      // Clear auth and redirect to login
+      removeToken();
+      removeUserInfo();
+      setTimeout(() => {
+        navigate('/login');
+      }, 1000);
+      
       return true;
     } catch (error) {
       message.error('密码修改失败');

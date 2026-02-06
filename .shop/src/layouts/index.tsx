@@ -92,7 +92,8 @@ const XinLayout: React.FC<ProLayoutProps> = (props) => {
             avatarProps={{
               title: user.username || user.name,
               size: "default",
-              src: user.avatar || "https://q1.qlogo.cn/g?b=qq&nk=2198423533&s=640",
+              src: user.avatar,
+              style: user.avatar ? {} : { backgroundColor: '#78AA64' },
             }}
             actionsRender={(_props_) => {
               return _props_.isMobile
