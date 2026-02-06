@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.crossborder.shop.mapper.CartItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.CartItem">
+        <id column="id" property="id"/>
+        <result column="cart_id" property="cartId"/>
+        <result column="user_id" property="userId"/>
+        <result column="product_id" property="productId"/>
+        <result column="sku_id" property="skuId"/>
+        <result column="quantity" property="quantity"/>
+        <result column="selected" property="selected"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, cart_id, user_id, product_id, sku_id, quantity, selected,
+        create_time, update_time, deleted
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tb_cart_item
+        WHERE id = #{id}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectByCartId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tb_cart_item
+        WHERE cart_id = #{cartId}
+        AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectByCartIdAndProductId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tb_cart_item
+        WHERE cart_id = #{cartId}
+        AND product_id = #{productId}
+        <if test="skuId != null">
+            AND sku_id = #{skuId}
+        </if>
+        <if test="skuId == null">
+            AND sku_id IS NULL
+        </if>
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectSelectedByCartId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tb_cart_item
+        WHERE cart_id = #{cartId}
+        AND selected = 1
+        AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_cart_item (cart_id, user_id, product_id, sku_id, quantity, selected, create_time, update_time)
+        VALUES (#{cartId}, #{userId}, #{productId}, #{skuId}, #{quantity}, #{selected}, NOW(), NOW())
+    </insert>
+
+    <insert id="insertOrUpdate" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_cart_item (cart_id, user_id, product_id, sku_id, quantity, selected, create_time, update_time)
+        VALUES (#{cartId}, #{userId}, #{productId}, #{skuId}, #{quantity}, #{selected}, NOW(), NOW())
+        ON DUPLICATE KEY UPDATE
+        quantity = quantity + #{quantity},
+        selected = #{selected},
+        update_time = NOW()
+    </insert>
+
+    <update id="updateById">
+        UPDATE tb_cart_item
+        SET quantity = #{quantity},
+            selected = #{selected},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE tb_cart_item
+        SET deleted = 1,
+            update_time = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <update id="deleteByCartIdAndProductId">
+        UPDATE tb_cart_item
+        SET deleted = 1,
+            update_time = NOW()
+        WHERE cart_id = #{cartId}
+          AND product_id = #{productId}
+          AND deleted = 0
+    </update>
+
+    <update id="deleteByCartId">
+        UPDATE tb_cart_item
+        SET deleted = 1,
+            update_time = NOW()
+        WHERE cart_id = #{cartId}
+          AND deleted = 0
+    </update>
+
+    <update id="updateSelected">
+        UPDATE tb_cart_item
+        SET selected = #{selected},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <update id="updateSelectedByCartId">
+        UPDATE tb_cart_item
+        SET selected = #{selected},
+            update_time = NOW()
+        WHERE cart_id = #{cartId}
+          AND deleted = 0
+    </update>
+
+</mapper>

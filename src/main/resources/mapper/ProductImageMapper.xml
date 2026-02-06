@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crossborder.shop.mapper.ProductImageMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.ProductImage">
+        <id column="id" property="id"/>
+        <result column="product_id" property="productId"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="sort" property="sort"/>
+        <result column="is_main" property="isMain"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <insert id="batchInsert" parameterType="list">
+        INSERT INTO tb_product_image (product_id, image_url, sort, is_main)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.productId}, #{item.imageUrl}, #{item.sort}, #{item.isMain})
+        </foreach>
+    </insert>
+
+    <update id="deleteByProductId">
+        UPDATE tb_product_image SET deleted = 1 WHERE product_id = #{productId}
+    </update>
+
+    <select id="selectByProductId" resultMap="BaseResultMap">
+        SELECT * FROM tb_product_image 
+        WHERE product_id = #{productId} AND deleted = 0 
+        ORDER BY sort ASC
+    </select>
+
+    <select id="selectMainImage" resultMap="BaseResultMap">
+        SELECT * FROM tb_product_image 
+        WHERE product_id = #{productId} AND is_main = 1 AND deleted = 0 
+        LIMIT 1
+    </select>
+
+</mapper>

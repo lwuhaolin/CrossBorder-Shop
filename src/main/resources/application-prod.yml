@@ -1,0 +1,75 @@
+spring:
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://your-production-db-host:3306/crossborder_shop?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: your-db-username
+    password: your-db-password
+    druid:
+      initial-size: 10
+      min-idle: 20
+      max-active: 50
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      max-evictable-idle-time-millis: 900000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall,slf4j
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+      web-stat-filter:
+        enabled: false
+      stat-view-servlet:
+        enabled: false
+
+  # Redis配置
+  data:
+    redis:
+      host: your-redis-host
+      port: 6379
+      password: your-redis-password
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 500
+          max-wait: -1ms
+          max-idle: 20
+          min-idle: 5
+
+# Redisson配置（哨兵模式，可根据需要切换为集群模式）
+redisson:
+  # 哨兵模式
+  sentinel-servers-config:
+    master-name: mymaster
+    sentinel-addresses:
+      - redis://your-sentinel-host1:26379
+      - redis://your-sentinel-host2:26379
+      - redis://your-sentinel-host3:26379
+    database: 0
+    password: your-redis-password
+    connection-pool-size: 128
+    connection-minimum-idle-size: 20
+  # 集群模式（如需使用，注释掉哨兵模式，取消以下注释）
+  # cluster-servers-config:
+  #   node-addresses:
+  #     - redis://your-cluster-node1:6379
+  #     - redis://your-cluster-node2:6379
+  #     - redis://your-cluster-node3:6379
+  #   password: your-redis-password
+  #   scan-interval: 2000
+
+# 日志配置
+logging:
+  level:
+    root: warn
+    com.crossborder.shop: info
+  file:
+    name: logs/crossborder-shop-prod.log
+    max-size: 100MB
+    max-history: 30

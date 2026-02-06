@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.crossborder.shop.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.Order">
+        <id column="id" property="id"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="buyer_id" property="buyerId"/>
+        <result column="seller_id" property="sellerId"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="payment_status" property="paymentStatus"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="product_amount" property="productAmount"/>
+        <result column="freight_amount" property="freightAmount"/>
+        <result column="discount_amount" property="discountAmount"/>
+        <result column="currency" property="currency"/>
+        <result column="exchange_rate" property="exchangeRate"/>
+        <result column="converted_amount" property="convertedAmount"/>
+        <result column="target_currency" property="targetCurrency"/>
+        <result column="payment_method" property="paymentMethod"/>
+        <result column="payment_time" property="paymentTime"/>
+        <result column="payment_transaction_id" property="paymentTransactionId"/>
+        <result column="ship_time" property="shipTime"/>
+        <result column="complete_time" property="completeTime"/>
+        <result column="cancel_time" property="cancelTime"/>
+        <result column="cancel_reason" property="cancelReason"/>
+        <result column="remark" property="remark"/>
+        <result column="buyer_message" property="buyerMessage"/>
+        <result column="version" property="version"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM tb_order
+        WHERE id = #{id}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectByOrderNumber" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM tb_order
+        WHERE tb_order.order_number = #{orderNumber}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectByBuyerId" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM tb_order
+        WHERE buyer_id = #{buyerId}
+        <if test="orderStatus != null">
+            AND order_status = #{orderStatus}
+        </if>
+        AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectBySellerId" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM tb_order
+        WHERE seller_id = #{sellerId}
+        <if test="orderStatus != null">
+            AND order_status = #{orderStatus}
+        </if>
+        AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_order( order_number, buyer_id, seller_id, total_amount, product_amount, freight_amount,
+                     discount_amount, currency, exchange_rate, converted_amount, target_currency,
+                     order_status, payment_status, payment_method, payment_time, payment_transaction_id,
+                     ship_time, complete_time, remark, buyer_message, cancel_reason, cancel_time,
+                     version, create_time, update_time, create_by, update_by, deleted)
+        VALUES (#{orderNumber}, #{buyerId}, #{sellerId}, #{totalAmount}, #{productAmount}, #{freightAmount},
+            #{discountAmount}, #{currency}, #{exchangeRate}, #{convertedAmount}, #{targetCurrency},
+            #{orderStatus}, #{paymentStatus}, #{paymentMethod}, #{paymentTime}, #{paymentTransactionId},
+            #{shipTime}, #{completeTime}, #{remark}, #{buyerMessage}, #{cancelReason}, #{cancelTime},
+            #{version}, NOW(), NOW(), #{createBy}, #{updateBy}, #{deleted})
+    </insert>
+
+    <update id="updateById">
+        UPDATE tb_order
+        SET order_status = #{orderStatus},
+            payment_status = #{paymentStatus},
+            payment_method = #{paymentMethod},
+            payment_time = #{paymentTime},
+            payment_transaction_id = #{paymentTransactionId},
+            ship_time = #{shipTime},
+            complete_time = #{completeTime},
+            cancel_time = #{cancelTime},
+            cancel_reason = #{cancelReason},
+            remark = #{remark},
+            buyer_message = #{buyerMessage},
+            update_time = NOW(),
+            update_by = #{updateBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <update id="updateStatus">
+        UPDATE tb_order
+        SET order_status = #{orderStatus},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+</mapper>

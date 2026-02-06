@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crossborder.shop.mapper.ProductMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.Product">
+        <id column="id" property="id"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_code" property="productCode"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="seller_id" property="sellerId"/>
+        <result column="brand" property="brand"/>
+        <result column="price" property="price"/>
+        <result column="original_price" property="originalPrice"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="currency" property="currency"/>
+        <result column="stock" property="stock"/>
+        <result column="sales" property="sales"/>
+        <result column="unit" property="unit"/>
+        <result column="weight" property="weight"/>
+        <result column="volume" property="volume"/>
+        <result column="description" property="description"/>
+        <result column="detail" property="detail"/>
+        <result column="status" property="status"/>
+        <result column="is_recommend" property="isRecommend"/>
+        <result column="is_new" property="isNew"/>
+        <result column="is_hot" property="isHot"/>
+        <result column="version" property="version"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="VOResultMap" type="com.crossborder.shop.vo.ProductVO">
+        <id column="id" property="id"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_code" property="productCode"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="seller_id" property="sellerId"/>
+        <result column="seller_name" property="sellerName"/>
+        <result column="brand" property="brand"/>
+        <result column="price" property="price"/>
+        <result column="original_price" property="originalPrice"/>
+        <result column="currency" property="currency"/>
+        <result column="stock" property="stock"/>
+        <result column="sales" property="sales"/>
+        <result column="unit" property="unit"/>
+        <result column="weight" property="weight"/>
+        <result column="description" property="description"/>
+        <result column="detail" property="detail"/>
+        <result column="status" property="status"/>
+        <result column="is_recommend" property="isRecommend"/>
+        <result column="is_new" property="isNew"/>
+        <result column="is_hot" property="isHot"/>
+        <result column="create_time" property="createTime"/>
+        <result column="main_image" property="mainImage"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.crossborder.shop.entity.Product" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_product (
+            product_name, product_code, category_id, seller_id, brand, 
+            price, original_price, cost_price, currency, stock, sales, unit, weight, volume,
+            description, detail, status, is_recommend, is_new, is_hot, version
+        ) VALUES (
+            #{productName}, #{productCode}, #{categoryId}, #{sellerId}, #{brand},
+            #{price}, #{originalPrice}, #{costPrice}, #{currency}, #{stock}, #{sales}, #{unit}, #{weight}, #{volume},
+            #{description}, #{detail}, #{status}, #{isRecommend}, #{isNew}, #{isHot}, #{version}
+        )
+    </insert>
+
+    <update id="deleteById">
+        UPDATE tb_product SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <update id="updateById" parameterType="com.crossborder.shop.entity.Product">
+        UPDATE tb_product
+        <set>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="brand != null">brand = #{brand},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="originalPrice != null">original_price = #{originalPrice},</if>
+            <if test="costPrice != null">cost_price = #{costPrice},</if>
+            <if test="currency != null">currency = #{currency},</if>
+            <if test="stock != null">stock = #{stock},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="volume != null">volume = #{volume},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="isNew != null">is_new = #{isNew},</if>
+            <if test="isHot != null">is_hot = #{isHot},</if>
+            version = version + 1,
+            update_time = NOW()
+        </set>
+        WHERE id = #{id} AND version = #{version} AND deleted = 0
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM tb_product WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectVOById" resultMap="VOResultMap">
+        SELECT 
+            p.*, 
+            c.category_name,
+            u.username AS seller_name,
+            (SELECT image_url FROM tb_product_image WHERE product_id = p.id AND is_main = 1 AND deleted = 0 LIMIT 1) AS main_image
+        FROM tb_product p
+        LEFT JOIN tb_category c ON p.category_id = c.id
+        LEFT JOIN tb_user u ON p.seller_id = u.id
+        WHERE p.id = #{id} AND p.deleted = 0
+    </select>
+
+    <select id="selectPageList" resultMap="VOResultMap">
+        SELECT 
+            p.*, 
+            c.category_name,
+            u.username AS seller_name,
+            (SELECT image_url FROM tb_product_image WHERE product_id = p.id AND is_main = 1 AND deleted = 0 LIMIT 1) AS main_image
+        FROM tb_product p
+        LEFT JOIN tb_category c ON p.category_id = c.id
+        LEFT JOIN tb_user u ON p.seller_id = u.id
+        WHERE p.deleted = 0
+        <if test="categoryId != null">
+            AND p.category_id = #{categoryId}
+        </if>
+        <if test="status != null">
+            AND p.status = #{status}
+        </if>
+        <if test="sellerId != null">
+            AND p.seller_id = #{sellerId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (p.product_name LIKE CONCAT('%', #{keyword}, '%') 
+                 OR p.product_code LIKE CONCAT('%', #{keyword}, '%')
+                 OR p.brand LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY p.create_time DESC
+    </select>
+
+    <!-- 乐观锁扣减库存 -->
+    <update id="decreaseStock">
+        UPDATE tb_product 
+        SET stock = stock - #{quantity}, 
+            version = version + 1
+        WHERE id = #{id} 
+          AND stock >= #{quantity} 
+          AND version = #{version}
+          AND deleted = 0
+    </update>
+
+    <!-- 增加库存 -->
+    <update id="increaseStock">
+        UPDATE tb_product 
+        SET stock = stock + #{quantity},
+            version = version + 1
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 增加销量 -->
+    <update id="increaseSales">
+        UPDATE tb_product 
+        SET sales = sales + #{quantity}
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 更新商品状态 -->
+    <update id="updateStatus">
+        UPDATE tb_product 
+        SET status = #{status}
+        WHERE id = #{id} 
+          AND seller_id = #{sellerId}
+          AND deleted = 0
+    </update>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT * FROM tb_product WHERE product_code = #{productCode} AND deleted = 0
+    </select>
+
+</mapper>

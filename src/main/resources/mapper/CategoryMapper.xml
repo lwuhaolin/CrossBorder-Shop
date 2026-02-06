@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crossborder.shop.mapper.CategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.Category">
+        <id column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="category_code" property="categoryCode"/>
+        <result column="level" property="level"/>
+        <result column="sort" property="sort"/>
+        <result column="icon" property="icon"/>
+        <result column="status" property="status"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.crossborder.shop.entity.Category" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_category (parent_id, category_name, category_code, level, sort, icon, status, description, create_by)
+        VALUES (#{parentId}, #{categoryName}, #{categoryCode}, #{level}, #{sort}, #{icon}, #{status}, #{description}, #{createBy})
+    </insert>
+
+    <update id="deleteById">
+        UPDATE tb_category SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <update id="updateById" parameterType="com.crossborder.shop.entity.Category">
+        UPDATE tb_category
+        <set>
+            <if test="categoryName != null">category_name = #{categoryName},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            update_by = #{updateBy},
+            update_time = NOW()
+        </set>
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM tb_category WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM tb_category WHERE deleted = 0 ORDER BY sort ASC, id ASC
+    </select>
+
+    <select id="selectByParentId" resultMap="BaseResultMap">
+        SELECT * FROM tb_category WHERE parent_id = #{parentId} AND deleted = 0 ORDER BY sort ASC
+    </select>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT * FROM tb_category WHERE category_code = #{categoryCode} AND deleted = 0
+    </select>
+
+    <select id="countByParentId" resultType="int">
+        SELECT COUNT(*) FROM tb_category WHERE parent_id = #{parentId} AND deleted = 0
+    </select>
+
+</mapper>

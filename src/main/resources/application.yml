@@ -1,0 +1,119 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: crossborder-shop
+
+  profiles:
+    active: dev
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  # 任务调度线程池配置
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10
+        queue-capacity: 100
+        keep-alive: 60s
+      thread-name-prefix: async-task-
+  # 日志颜色
+  output:
+    ansi:
+      enabled: always
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.crossborder.shop.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    cache-enabled: true
+    lazy-loading-enabled: true
+    multiple-result-sets-enabled: true
+
+# PageHelper分页配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+# knife4j增强配置
+knife4j:
+  enable: false
+  setting:
+    language: zh_cn
+    enable-swagger-models: true
+    enable-document-manage: true
+    swagger-model-name: 实体类列表
+    enable-footer: false
+    enable-footer-custom: true
+    footer-custom-content: Copyright © 2026 CrossBorder Shop
+
+# JWT配置
+jwt:
+  # 密钥（生产环境请使用更复杂的密钥，至少256位）
+  secret: crossborder-shop-jwt-secret-key-2026-must-be-at-least-256-bits-long-for-security
+  # AccessToken过期时间（毫秒），默认2小时
+  access-token-expiration: 7200000
+  # RefreshToken过期时间（毫秒），默认7天
+  refresh-token-expiration: 604800000
+  # Token请求头
+  header: Authorization
+  # Token前缀
+  prefix: Bearer
+
+# 日志配置
+logging:
+  level:
+    root: info
+    com.crossborder.shop: debug
+    org.springframework.security: info
+    org.mybatis: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+
+# 文件上传配置
+file:
+  upload:
+    # 文件上传保存路径（请根据实际环境修改）
+    path: D:\ideaJavaContent\flower-shop-main\flower-shop\.backend\upload
+  access:
+    # 文件访问路径前缀
+    prefix: /upload
+
+# 缓存配置
+cache:
+  # 延迟双删时间间隔（毫秒）
+  delay-delete-millis: 500
+
+# 订单配置
+order:
+  # 订单超时时间（分钟）
+  timeout-minutes: 15
+  # 库存扣减重试次数
+  stock-retry-times: 3
+  # 订单自动完成天数
+  auto-complete-days: 7

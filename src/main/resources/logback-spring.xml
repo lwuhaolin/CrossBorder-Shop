@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n"/>
+    
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- 将 level 从 info 改为 debug -->
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+    
+    <!-- 可选：针对特定包设置日志级别 -->
+    <logger name="com.crossborder.shop" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    
+    <!-- 减少第三方框架的日志噪音 -->
+    <logger name="org.springframework" level="info"/>
+    <logger name="org.mybatis" level="info"/>
+    <logger name="com.zaxxer.hikari" level="info"/>
+</configuration>

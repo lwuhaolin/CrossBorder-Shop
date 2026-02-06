@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.crossborder.shop.mapper.OrderAddressMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.OrderAddress">
+        <id column="id" property="id"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="receiver_phone" property="receiverPhone"/>
+        <result column="country" property="country"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="detail_address" property="detailAddress"/>
+        <result column="postal_code" property="postalCode"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, order_id, order_number, receiver_name, receiver_phone, country, province, city, district,
+        detail_address, postal_code,
+        create_time, update_time, create_by, update_by, deleted
+    </sql>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tb_order_address
+        WHERE order_id = #{orderId}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_order_address
+        (order_id, order_number, receiver_name, receiver_phone, country, province, city, district,
+         detail_address, postal_code, create_time, update_time, create_by, update_by, deleted)
+        VALUES
+        (#{orderId}, #{orderNumber}, #{receiverName}, #{receiverPhone}, #{country}, #{province}, #{city}, #{district},
+         #{detailAddress}, #{postalCode}, NOW(), NOW(), #{createBy}, #{updateBy}, #{deleted})
+    </insert>
+
+</mapper>
