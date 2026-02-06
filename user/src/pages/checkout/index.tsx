@@ -1,10 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Radio, Button, message, Steps, Divider, List, Space } from 'antd';
-import { history } from 'umi';
-import { getAddressList } from '@/services/address';
-import { createOrder } from '@/services/order';
-import type { Address } from '@/models/address';
-import styles from './index.module.css';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Radio,
+  Button,
+  message,
+  Steps,
+  Divider,
+  List,
+  Space,
+} from "antd";
+import { history } from "umi";
+import { getAddressList } from "@/services/address";
+import { createOrder } from "@/services/order";
+import type { Address } from "@/models/address";
+import styles from "./index.module.css";
 
 const { Step } = Steps;
 
@@ -20,7 +29,7 @@ const CheckoutPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number>();
-  const [paymentMethod, setPaymentMethod] = useState('credit_card');
+  const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -38,15 +47,15 @@ const CheckoutPage: React.FC = () => {
         setSelectedAddress(defaultAddress?.id || response.data[0].id);
       }
     } catch (error) {
-      console.error('Failed to load addresses:', error);
+      console.error("Failed to load addresses:", error);
     }
   };
 
   const loadCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (cart.length === 0) {
-      message.warning('Your cart is empty');
-      history.push('/cart');
+      message.warning("Your cart is empty");
+      history.push("/cart");
       return;
     }
     setCartItems(cart);
@@ -66,13 +75,13 @@ const CheckoutPage: React.FC = () => {
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      message.error('Please select a delivery address');
+      message.error("Please select a delivery address");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       const orderData = {
         addressId: selectedAddress,
         items: cartItems.map((item) => ({
@@ -85,16 +94,16 @@ const CheckoutPage: React.FC = () => {
       };
 
       const order = await createOrder(orderData);
-      
+
       // Clear cart
-      localStorage.setItem('cart', JSON.stringify([]));
-      window.dispatchEvent(new Event('storage'));
-      
-      message.success('Order placed successfully!');
+      localStorage.setItem("cart", JSON.stringify([]));
+      window.dispatchEvent(new Event("storage"));
+
+      message.success("Order placed successfully!");
       history.push(`/user/orders/${order.id}`);
     } catch (error) {
-      console.error('Failed to place order:', error);
-      message.error('Failed to place order');
+      console.error("Failed to place order:", error);
+      message.error("Failed to place order");
     } finally {
       setLoading(false);
     }
@@ -102,7 +111,7 @@ const CheckoutPage: React.FC = () => {
 
   const steps = [
     {
-      title: 'Address',
+      title: "Address",
       content: (
         <div className={styles.stepContent}>
           <h3>Select Delivery Address</h3>
@@ -113,12 +122,19 @@ const CheckoutPage: React.FC = () => {
               className={styles.addressList}
             >
               {addresses.map((address) => (
-                <Radio key={address.id} value={address.id} className={styles.addressItem}>
+                <Radio
+                  key={address.id}
+                  value={address.id}
+                  className={styles.addressItem}
+                >
                   <div>
-                    <strong>{address.receiverName}</strong> - {address.receiverPhone}
+                    <strong>{address.receiverName}</strong> -{" "}
+                    {address.receiverPhone}
                     <br />
                     {address.detailAddress}, {address.city}, {address.province}
-                    {address.isDefault && <span className={styles.defaultBadge}>Default</span>}
+                    {address.isDefault && (
+                      <span className={styles.defaultBadge}>Default</span>
+                    )}
                   </div>
                 </Radio>
               ))}
@@ -126,7 +142,10 @@ const CheckoutPage: React.FC = () => {
           ) : (
             <div className={styles.noAddress}>
               <p>No delivery address found</p>
-              <Button type="primary" onClick={() => history.push('/user/addresses')}>
+              <Button
+                type="primary"
+                onClick={() => history.push("/user/addresses")}
+              >
                 Add Address
               </Button>
             </div>
@@ -135,7 +154,7 @@ const CheckoutPage: React.FC = () => {
       ),
     },
     {
-      title: 'Payment',
+      title: "Payment",
       content: (
         <div className={styles.stepContent}>
           <h3>Select Payment Method</h3>
@@ -161,7 +180,7 @@ const CheckoutPage: React.FC = () => {
       ),
     },
     {
-      title: 'Review',
+      title: "Review",
       content: (
         <div className={styles.stepContent}>
           <h3>Order Summary</h3>
@@ -172,9 +191,12 @@ const CheckoutPage: React.FC = () => {
                 <List.Item.Meta
                   avatar={
                     <img
-                      src={item.image || 'https://via.placeholder.com/80x80?text=Product'}
+                      src={
+                        item.image ||
+                        "https://via.placeholder.com/80x80?text=Product"
+                      }
                       alt={item.name}
-                      style={{ width: 60, height: 60, objectFit: 'cover' }}
+                      style={{ width: 60, height: 60, objectFit: "cover" }}
                     />
                   }
                   title={item.name}
@@ -203,20 +225,32 @@ const CheckoutPage: React.FC = () => {
                 ))}
               </Steps>
               <Divider />
-              <div className={styles.stepsContent}>{steps[currentStep].content}</div>
+              <div className={styles.stepsContent}>
+                {steps[currentStep].content}
+              </div>
               <div className={styles.stepsAction}>
                 {currentStep > 0 && (
-                  <Button style={{ margin: '0 8px' }} onClick={() => setCurrentStep(currentStep - 1)}>
+                  <Button
+                    style={{ margin: "0 8px" }}
+                    onClick={() => setCurrentStep(currentStep - 1)}
+                  >
                     Previous
                   </Button>
                 )}
                 {currentStep < steps.length - 1 && (
-                  <Button type="primary" onClick={() => setCurrentStep(currentStep + 1)}>
+                  <Button
+                    type="primary"
+                    onClick={() => setCurrentStep(currentStep + 1)}
+                  >
                     Next
                   </Button>
                 )}
                 {currentStep === steps.length - 1 && (
-                  <Button type="primary" onClick={handlePlaceOrder} loading={loading}>
+                  <Button
+                    type="primary"
+                    onClick={handlePlaceOrder}
+                    loading={loading}
+                  >
                     Place Order
                   </Button>
                 )}
@@ -236,7 +270,7 @@ const CheckoutPage: React.FC = () => {
                 <span>${calculateShipping().toFixed(2)}</span>
               </div>
               <Divider />
-              <div className={styles.summaryRow + ' ' + styles.total}>
+              <div className={styles.summaryRow + " " + styles.total}>
                 <span>Total:</span>
                 <span>${calculateTotal().toFixed(2)}</span>
               </div>

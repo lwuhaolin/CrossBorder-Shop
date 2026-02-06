@@ -5,6 +5,7 @@ export interface Product {
   description?: string;
   price: number;
   originalPrice?: number;
+  currency?: string;
   stock: number;
   categoryId?: number;
   categoryName?: string;
@@ -24,14 +25,15 @@ export enum ProductStatus {
 }
 
 export interface ProductCreateDTO {
-  name: string;
+  productName: string;
   description?: string;
   price: number;
   originalPrice?: number;
+  currency?: string;
   stock: number;
   categoryId?: number;
-  images?: string[];
-  mainImage?: string;
+  imageUrls?: string[];
+  mainImageIndex?: number;
 }
 
 export interface ProductUpdateDTO extends ProductCreateDTO {

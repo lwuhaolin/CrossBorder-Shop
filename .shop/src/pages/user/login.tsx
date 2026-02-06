@@ -4,28 +4,33 @@ import { message } from 'antd';
 import { useState } from 'react';
 import { useNavigate } from 'umi';
 import { login } from '@/services/user';
-import { setToken, setUserInfo } from '@/utils/request';
+import { setRefreshToken, setToken, setUserInfo } from '@/utils/request';
 import type { LoginDTO } from '@/models/user';
 import './index.less';
+import axios from 'axios';
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (values: LoginDTO) => {
+    console.log(values);
+    
     setLoading(true);
     try {
       const response = await login(values);
+      // const response = await axios.post('http://localhost:8080/api/user/login', values);
+      console.log(response);
+      
       if (response?.data) {
-        const { token, user } = response.data;
         
-        // Save token and user info
-        setToken(token);
-        setUserInfo(user);
+        
+        setToken(response.data.accessToken);
+        setRefreshToken(response.data.refreshToken);
+        setUserInfo(response.data.userInfo);
         
         message.success('登录成功');
         
-        // Redirect to dashboard
         navigate('/dashboard');
       }
     } catch (error: any) {
@@ -38,46 +43,42 @@ export default function Login() {
   return (
     <div className="login-container">
       <div className="login-content">
-        <div className="login-header">
-          <h1>跨境日用小商品订货系统</h1>
-          <p>管理端登录</p>
-        </div>
         <LoginForm
-          title=""
-          subTitle=""
+          title="跨境日用小商品订货系统"
+          subTitle="管理端登录"
           onFinish={handleSubmit}
           loading={loading}
           submitter={{
             searchConfig: {
-              submitText: '登录',
+              submitText: "登录",
             },
           }}
         >
           <ProFormText
             name="username"
             fieldProps={{
-              size: 'large',
+              size: "large",
               prefix: <UserOutlined />,
             }}
             placeholder="请输入用户名"
             rules={[
               {
                 required: true,
-                message: '请输入用户名',
+                message: "请输入用户名",
               },
             ]}
           />
           <ProFormText.Password
             name="password"
             fieldProps={{
-              size: 'large',
+              size: "large",
               prefix: <LockOutlined />,
             }}
             placeholder="请输入密码"
             rules={[
               {
                 required: true,
-                message: '请输入密码',
+                message: "请输入密码",
               },
             ]}
           />

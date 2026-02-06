@@ -31,15 +31,19 @@
     <update id="updateById" parameterType="com.crossborder.shop.entity.Category">
         UPDATE tb_category
         <set>
+            <if test="parentId != null">parent_id = #{parentId},</if>
             <if test="categoryName != null">category_name = #{categoryName},</if>
+            <if test="categoryCode != null">category_code = #{categoryCode},</if>
+            <if test="level != null">level = #{level},</if>
             <if test="sort != null">sort = #{sort},</if>
             <if test="icon != null">icon = #{icon},</if>
             <if test="status != null">status = #{status},</if>
             <if test="description != null">description = #{description},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
             update_by = #{updateBy},
             update_time = NOW()
         </set>
-        WHERE id = #{id} AND deleted = 0
+        WHERE id = #{id}
     </update>
 
     <select id="selectById" resultMap="BaseResultMap">
@@ -55,7 +59,7 @@
     </select>
 
     <select id="selectByCode" resultMap="BaseResultMap">
-        SELECT * FROM tb_category WHERE category_code = #{categoryCode} AND deleted = 0
+        SELECT * FROM tb_category WHERE category_code = #{categoryCode}
     </select>
 
     <select id="countByParentId" resultType="int">

@@ -78,22 +78,6 @@ public class OrderController {
         return Result.success();
     }
 
-    @GetMapping("/{orderId}")
-    @PreAuthorize("hasAnyRole('BUYER', 'SELLER', 'ADMIN')")
-    @Operation(summary = "查询订单详情", description = "根据订单ID查询详情")
-    public Result<OrderVO> getOrderById(@PathVariable Long orderId) {
-        OrderVO order = orderService.getOrderById(orderId);
-        return Result.success(order);
-    }
-
-    @GetMapping("/number/{orderNumber}")
-    @PreAuthorize("hasAnyRole('BUYER', 'SELLER', 'ADMIN')")
-    @Operation(summary = "根据订单号查询", description = "根据订单号查询订单详情")
-    public Result<OrderVO> getOrderByNumber(@PathVariable String orderNumber) {
-        OrderVO order = orderService.getOrderByNumber(orderNumber);
-        return Result.success(order);
-    }
-
     @GetMapping("/buyer/list")
     @PreAuthorize("hasRole('BUYER')")
     @Operation(summary = "买家订单列表", description = "查询当前买家的订单列表")
@@ -112,5 +96,21 @@ public class OrderController {
             @RequestParam(required = false) Integer orderStatus) {
         List<OrderVO> orders = orderService.getSellerOrders(principal.getUserId(), orderStatus);
         return Result.success(orders);
+    }
+
+    @GetMapping("/number/{orderNumber}")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER', 'ADMIN')")
+    @Operation(summary = "根据订单号查询", description = "根据订单号查询订单详情")
+    public Result<OrderVO> getOrderByNumber(@PathVariable String orderNumber) {
+        OrderVO order = orderService.getOrderByNumber(orderNumber);
+        return Result.success(order);
+    }
+
+    @GetMapping("/{orderId}")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER', 'ADMIN')")
+    @Operation(summary = "查询订单详情", description = "根据订单ID查询详情")
+    public Result<OrderVO> getOrderById(@PathVariable Long orderId) {
+        OrderVO order = orderService.getOrderById(orderId);
+        return Result.success(order);
     }
 }

@@ -21,7 +21,7 @@ export async function getCategoryList(): Promise<Result<Category[]>> {
 // Create category
 export async function createCategory(data: CategoryCreateDTO): Promise<Result<Category>> {
   return request({
-    url: '/category/create',
+    url: '/category',
     method: 'POST',
     data,
   });
@@ -30,9 +30,12 @@ export async function createCategory(data: CategoryCreateDTO): Promise<Result<Ca
 // Update category
 export async function updateCategory(id: number, data: CategoryUpdateDTO): Promise<Result<void>> {
   return request({
-    url: `/category/${id}`,
+    url: '/category',
     method: 'PUT',
-    data,
+    data: {
+      ...data,
+      id,
+    },
   });
 }
 

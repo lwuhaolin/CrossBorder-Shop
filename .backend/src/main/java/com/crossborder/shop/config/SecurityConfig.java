@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
  * Spring Security ?????
@@ -25,56 +26,61 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    
-    /**
-     * ?????
-     * ??BCrypt????
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-    
-    /**
-     * ????????
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // ??CSRF????????????JWT???
-                .csrf(csrf -> csrf.disable())
-                // ??????????????Session???JWT?
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // ??????
-                .authorizeHttpRequests(auth -> auth
-                        // ??Knife4j??????
-                        .requestMatchers(
-                                "/doc.html",
-                                "/webjars/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/favicon.ico")
-                        .permitAll()
-                        // ??Druid????
-                        .requestMatchers("/druid/**").permitAll()
-                        // ??????
-                        .requestMatchers("/health/**").permitAll()
-                        // ????????????Token??
-                        .requestMatchers(
-                                "/user/login",
-                                "/user/register",
-                                "/user/refresh")
-                        .permitAll()
-                        // ???????????
-                        .anyRequest().authenticated())
-                // ??JWT?????
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
-        return http.build();
-    }
+
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final CorsConfigurationSource corsConfigurationSource;
+
+        /**
+         * ?????
+         * ??BCrypt????
+         */
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
+
+        /**
+         * ????????
+         */
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                                // 启用 CORS
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                                // ??CSRF????????????JWT???
+                                .csrf(csrf -> csrf.disable())
+                                // ??????????????Session???JWT?
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                // ??????
+                                .authorizeHttpRequests(auth -> auth
+                                                // ??Knife4j??????
+                                                .requestMatchers(
+                                                                "/doc.html",
+                                                                "/webjars/**",
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html",
+                                                                "/swagger-resources/**",
+                                                                "/favicon.ico",
+                                                        "/upload/**",
+                                                        "/api/upload/**")
+                                                .permitAll()
+                                                // ??Druid????
+                                                .requestMatchers("/druid/**").permitAll()
+                                                // ??????
+                                                .requestMatchers("/health/**").permitAll()
+                                                // ????????????Token??
+                                                .requestMatchers(
+                                                                "/user/login",
+                                                                "/user/register",
+                                                                "/user/refresh")
+                                                .permitAll()
+                                                // ???????????
+                                                .anyRequest().authenticated())
+                                // ??JWT?????
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+                return http.build();
+        }
 }

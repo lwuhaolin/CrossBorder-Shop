@@ -1,14 +1,17 @@
 import request from '@/utils/request';
-import type { User, UserUpdateDTO, PasswordChangeDTO, LoginDTO, LoginResponse } from '@/models/user';
+import type { UserUpdateDTO, PasswordChangeDTO, LoginDTO, LoginResponse } from '@/models/user';
 import type { Result } from '@/models/common';
 
-// User login
-export async function login(data: LoginDTO): Promise<Result<LoginResponse>> {
-  return request({
+
+export async function login(data: LoginDTO): Promise<any> {
+  const response = await request({
     url: '/user/login',
     method: 'POST',
     data,
   });
+
+  return response;
+
 }
 
 // User logout
@@ -20,7 +23,7 @@ export async function logout(): Promise<Result<void>> {
 }
 
 // Get current user info
-export async function getCurrentUser(): Promise<Result<User>> {
+export async function getCurrentUser(): Promise<Result<any>> {
   return request({
     url: '/user/info',
     method: 'GET',

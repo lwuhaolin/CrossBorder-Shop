@@ -32,12 +32,29 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long create(Category category) {
-        // 校验分类编码是否已存在
+        // 检查是否存在同编码的分类（包括已删除的）
         Category existing = categoryMapper.selectByCode(category.getCategoryCode());
+
         if (existing != null) {
-            throw new BusinessException(ResultCode.CONFLICT, "分类编码已存在");
+            // 如果存在且未删除，抛出异常
+            if (existing.getDeleted() == 0) {
+                throw new BusinessException(ResultCode.CONFLICT, "分类编码已存在");
+            }
+
+            // 如果存在但已删除，则恢复该分类并更新信息
+            log.info("发现已删除的同编码分类，将恢复并更新: id={}, code={}",
+                    existing.getId(), category.getCategoryCode());
+
+            // 更新分类信息
+            category.setId(existing.getId());
+            category.setDeleted(0); // 恢复为未删除状态
+            categoryMapper.updateById(category);
+
+            log.info("分类恢复成功: id={}, name={}", category.getId(), category.getCategoryName());
+            return category.getId();
         }
 
+        // 不存在同编码分类，正常插入
         categoryMapper.insert(category);
         log.info("分类创建成功: id={}, name={}", category.getId(), category.getCategoryName());
         return category.getId();

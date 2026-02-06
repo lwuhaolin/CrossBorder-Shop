@@ -1,21 +1,32 @@
 // Category related types
 export interface Category {
   id: number;
-  name: string;
+  categoryName: string;
+  categoryCode?: string;
   parentId?: number;
-  level: number;
+  level?: number;
   sort?: number;
   icon?: string;
+  status?: number;
+  description?: string;
   children?: Category[];
+  createTime?: string;
+  updateTime?: string;
+  // 便捷属性，用于兼容
+  name?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface CategoryCreateDTO {
-  name: string;
+  categoryName: string;
+  categoryCode?: string;
   parentId?: number;
+  level?: number;
   sort?: number;
   icon?: string;
+  status?: number;
+  description?: string;
 }
 
 export interface CategoryUpdateDTO extends CategoryCreateDTO {

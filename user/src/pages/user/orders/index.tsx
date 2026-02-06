@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Tag, Button, message, Space } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
-import { history } from 'umi';
-import { getOrderList } from '@/services/order';
-import type { Order } from '@/models/order';
-import styles from './index.module.css';
+import React, { useEffect, useState } from "react";
+import { Card, Table, Tag, Button, message, Space } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
+import { history } from "umi";
+import { getOrderList } from "@/services/order";
+import type { Order } from "@/models/order";
+import styles from "./index.module.css";
 
 const OrderListPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -25,8 +25,8 @@ const OrderListPage: React.FC = () => {
       setOrders(data.list);
       setTotal(data.total);
     } catch (error) {
-      console.error('Failed to load orders:', error);
-      message.error('Failed to load orders');
+      console.error("Failed to load orders:", error);
+      message.error("Failed to load orders");
     } finally {
       setLoading(false);
     }
@@ -34,45 +34,45 @@ const OrderListPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
-      pending: 'orange',
-      confirmed: 'blue',
-      shipped: 'cyan',
-      delivered: 'green',
-      cancelled: 'red',
+      pending: "orange",
+      confirmed: "blue",
+      shipped: "cyan",
+      delivered: "green",
+      cancelled: "red",
     };
-    return colorMap[status] || 'default';
+    return colorMap[status] || "default";
   };
 
   const columns = [
     {
-      title: 'Order ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: "Order ID",
+      dataIndex: "id",
+      key: "id",
       render: (id: number) => `#${id}`,
     },
     {
-      title: 'Date',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: "Date",
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Total Amount',
-      dataIndex: 'totalAmount',
-      key: 'totalAmount',
+      title: "Total Amount",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
       render: (amount: number) => `$${amount.toFixed(2)}`,
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status: string) => (
         <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
       ),
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (record: Order) => (
         <Button
           type="link"

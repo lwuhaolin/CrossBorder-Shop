@@ -1,9 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'umi';
-import { Card, Descriptions, Steps, Table, Tag, Spin, Empty, message } from 'antd';
-import { getOrderDetail } from '@/services/order';
-import type { Order } from '@/models/order';
-import styles from './[id].module.css';
+import React, { useEffect, useState } from "react";
+import { useParams } from "umi";
+import {
+  Card,
+  Descriptions,
+  Steps,
+  Table,
+  Tag,
+  Spin,
+  Empty,
+  message,
+} from "antd";
+import { getOrderDetail } from "@/services/order";
+import type { Order } from "@/models/order";
+import styles from "./[id].module.css";
 
 const { Step } = Steps;
 
@@ -24,8 +33,8 @@ const OrderDetailPage: React.FC = () => {
       const response = await getOrderDetail(Number(id));
       setOrder(response.data);
     } catch (error) {
-      console.error('Failed to load order:', error);
-      message.error('Failed to load order');
+      console.error("Failed to load order:", error);
+      message.error("Failed to load order");
     } finally {
       setLoading(false);
     }
@@ -44,25 +53,26 @@ const OrderDetailPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Product',
-      dataIndex: 'productName',
-      key: 'productName',
+      title: "Product",
+      dataIndex: "productName",
+      key: "productName",
     },
     {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
-      title: 'Quantity',
-      dataIndex: 'quantity',
-      key: 'quantity',
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
     },
     {
-      title: 'Subtotal',
-      key: 'subtotal',
-      render: (record: any) => `$${(record.price * record.quantity).toFixed(2)}`,
+      title: "Subtotal",
+      key: "subtotal",
+      render: (record: any) =>
+        `$${(record.price * record.quantity).toFixed(2)}`,
     },
   ];
 
@@ -91,7 +101,7 @@ const OrderDetailPage: React.FC = () => {
           <Descriptions title="Order Information" bordered column={2}>
             <Descriptions.Item label="Order ID">#{order.id}</Descriptions.Item>
             <Descriptions.Item label="Status">
-              <Tag color={order.status === 'delivered' ? 'green' : 'blue'}>
+              <Tag color={order.status === "delivered" ? "green" : "blue"}>
                 {order.status.toUpperCase()}
               </Tag>
             </Descriptions.Item>
@@ -103,7 +113,7 @@ const OrderDetailPage: React.FC = () => {
             </Descriptions.Item>
           </Descriptions>
 
-          {order.status !== 'cancelled' && (
+          {order.status !== "cancelled" && (
             <div className={styles.steps}>
               <Steps current={getStatusStep(order.status)}>
                 <Step title="Pending" description="Order received" />
@@ -132,7 +142,7 @@ const OrderDetailPage: React.FC = () => {
                 <br />
                 {order.shippingAddress.streetAddress}
                 <br />
-                {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
+                {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
                 {order.shippingAddress.zipCode}
                 <br />
                 {order.shippingAddress.country}

@@ -42,3 +42,6 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+
+# 忽略文件上传
+upload/

@@ -3,29 +3,7 @@
 /**
  * User information
  */
-export interface User {
-  id: number;
-  /** Username for login */
-  username: string;
-  /** User's display name */
-  name?: string;
-  /** Email address */
-  email?: string;
-  /** Phone number */
-  phone?: string;
-  /** Avatar URL */
-  avatar?: string;
-  /** User role (e.g., 'admin', 'user') */
-  role?: string;
-  /** User status: 1 = active, 0 = inactive */
-  status?: number;
-  /** Account creation timestamp */
-  createdAt?: string;
-  /** Last update timestamp */
-  updatedAt?: string;
-  /** Last login timestamp */
-  lastLoginAt?: string;
-}
+
 
 export interface UserUpdateDTO {
   username?: string;
@@ -63,6 +41,10 @@ export interface RegisterDTO {
 }
 
 export interface LoginResponse {
-  token: string;
-  user: User;
+  accessToken: string;
+  accessTokenExpiresIn: string;
+  refreshToken: string;
+  refreshTokenExpiresIn: string;
+  tokenType: string;
+  userInfo: any;
 }

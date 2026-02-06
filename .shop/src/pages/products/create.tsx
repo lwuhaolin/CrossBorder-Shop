@@ -1,11 +1,18 @@
-import { ProForm, ProFormText, ProFormTextArea, ProFormDigit, ProFormSelect, ProFormUploadButton } from '@ant-design/pro-components';
-import { Card, message } from 'antd';
-import { useNavigate } from 'umi';
-import { createProduct, uploadProductImages } from '@/services/product';
-import { getCategoryList } from '@/services/category';
-import type { ProductCreateDTO } from '@/models/product';
-import type { UploadFile } from 'antd';
-import { useState } from 'react';
+import {
+  ProForm,
+  ProFormText,
+  ProFormTextArea,
+  ProFormDigit,
+  ProFormSelect,
+  ProFormUploadButton,
+} from "@ant-design/pro-components";
+import { Card, message } from "antd";
+import { useNavigate } from "umi";
+import { createProduct, uploadProductImages } from "@/services/product";
+import { getCategoryList } from "@/services/category";
+import type { ProductCreateDTO } from "@/models/product";
+import type { UploadFile } from "antd";
+import { useState } from "react";
 
 const CreateProduct: React.FC = () => {
   const navigate = useNavigate();
@@ -13,26 +20,33 @@ const CreateProduct: React.FC = () => {
 
   const handleSubmit = async (values: any) => {
     try {
-      const images = values.images?.map((file: UploadFile) => file.response?.data || file.url).filter(Boolean);
-      const mainImage = images?.[0] || undefined;
+      const imageUrls = values.images
+        ?.map((file: UploadFile) => file.response?.data || file.url)
+        .filter(Boolean);
+
+      if (!imageUrls || imageUrls.length === 0) {
+        message.error("请至少上传一张商品图片");
+        return false;
+      }
 
       const data: ProductCreateDTO = {
-        name: values.name,
+        productName: values.name,
         description: values.description,
         price: values.price,
         originalPrice: values.originalPrice,
+        currency: values.currency,
         stock: values.stock,
         categoryId: values.categoryId,
-        images,
-        mainImage,
+        imageUrls,
+        mainImageIndex: 0,
       };
 
       await createProduct(data);
-      message.success('商品创建成功');
-      navigate('/products');
+      message.success("商品创建成功");
+      navigate("/products");
       return true;
     } catch (error) {
-      message.error('商品创建失败');
+      message.error("商品创建失败");
       return false;
     }
   };
@@ -45,10 +59,10 @@ const CreateProduct: React.FC = () => {
       if (response.data) {
         return response.data;
       }
-      throw new Error('上传失败');
+      throw new Error("上传失败");
     } catch (error) {
       setUploading(false);
-      message.error('图片上传失败');
+      message.error("图片上传失败");
       throw error;
     }
   };
@@ -59,11 +73,11 @@ const CreateProduct: React.FC = () => {
         onFinish={handleSubmit}
         submitter={{
           searchConfig: {
-            submitText: '创建',
-            resetText: '取消',
+            submitText: "创建",
+            resetText: "取消",
           },
           resetButtonProps: {
-            onClick: () => navigate('/products'),
+            onClick: () => navigate("/products"),
           },
         }}
       >
@@ -72,8 +86,8 @@ const CreateProduct: React.FC = () => {
           label="商品名称"
           placeholder="请输入商品名称"
           rules={[
-            { required: true, message: '请输入商品名称' },
-            { max: 100, message: '商品名称不能超过100个字符' },
+            { required: true, message: "请输入商品名称" },
+            { max: 100, message: "商品名称不能超过100个字符" },
           ]}
         />
 
@@ -95,9 +109,9 @@ const CreateProduct: React.FC = () => {
           min={0}
           fieldProps={{
             precision: 2,
-            prefix: '¥',
+            prefix: "¥",
           }}
-          rules={[{ required: true, message: '请输入售价' }]}
+          rules={[{ required: true, message: "请输入售价" }]}
         />
 
         <ProFormDigit
@@ -107,8 +121,22 @@ const CreateProduct: React.FC = () => {
           min={0}
           fieldProps={{
             precision: 2,
-            prefix: '¥',
+            prefix: "¥",
           }}
+        />
+
+        <ProFormSelect
+          name="currency"
+          label="币种"
+          placeholder="请选择币种"
+          options={[
+            { label: "人民币 (CNY)", value: "CNY" },
+            { label: "美元 (USD)", value: "USD" },
+            { label: "欧元 (EUR)", value: "EUR" },
+            { label: "日元 (JPY)", value: "JPY" },
+          ]}
+          rules={[{ required: true, message: "请选择币种" }]}
+          initialValue="CNY"
         />
 
         <ProFormDigit
@@ -119,13 +147,14 @@ const CreateProduct: React.FC = () => {
           fieldProps={{
             precision: 0,
           }}
-          rules={[{ required: true, message: '请输入库存数量' }]}
+          rules={[{ required: true, message: "请输入库存数量" }]}
         />
 
         <ProFormSelect
           name="categoryId"
           label="商品分类"
           placeholder="请选择商品分类"
+          rules={[{ required: true, message: "请选择商品分类" }]}
           request={async () => {
             try {
               const response = await getCategoryList();
@@ -144,9 +173,10 @@ const CreateProduct: React.FC = () => {
           name="images"
           label="商品图片"
           max={5}
+          rules={[{ required: true, message: "请上传商品图片" }]}
           fieldProps={{
-            name: 'file',
-            listType: 'picture-card',
+            name: "file",
+            listType: "picture-card",
             customRequest: async ({ file, onSuccess, onError }) => {
               try {
                 const url = await handleUpload(file as File);
@@ -156,7 +186,7 @@ const CreateProduct: React.FC = () => {
               }
             },
           }}
-          extra="最多上传5张图片，第一张为主图"
+          extra="最多上传5张图片，第一张为主图（必填）"
         />
       </ProForm>
     </Card>
