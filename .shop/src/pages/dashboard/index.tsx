@@ -1,56 +1,169 @@
 import React from "react";
-import { PageContainer, ProCard } from "@ant-design/pro-components";
-import { Image } from "antd";
-import ResourcePool from "@/pages/dashboard/components/ResourcePool";
-import SaleStatistics from "@/pages/dashboard/components/SaleStatistics";
-import SimpleSide from "@/pages/dashboard/components/SimpleSide";
-import LossStatistics from "@/pages/dashboard/components/LossStatistics";
-import InventoryStatistics from "@/pages/dashboard/components/InventoryStatistics";
+import { ProCard, StatisticCard } from "@ant-design/pro-components";
+import { ShoppingOutlined, ShoppingCartOutlined, UserOutlined, DollarOutlined } from "@ant-design/icons";
+import { Col, Row } from "antd";
+import RcResizeObserver from "rc-resize-observer";
+
+const { Statistic } = StatisticCard;
 
 const Dashboard: React.FC = () => {
+  const [responsive, setResponsive] = React.useState(false);
+
   return (
-    <PageContainer
-      header={{
-        title: "仪表盘",
+    <RcResizeObserver
+      key="resize-observer"
+      onResize={(offset) => {
+        setResponsive(offset.width < 596);
       }}
     >
-      <ProCard ghost gutter={[24, 24]} direction="column">
-        <ProCard ghost>
-          <Image
-            preview={false}
-            src="//res.hc-cdn.com/tiny-pro-vue/1.0.82.20230310160618/vue-pro/pages/assets/woker.58473cfe.png"
-          />
-        </ProCard>
-        {/* (学习规划 && 学习辅导) && 生活小助手 */}
-        <ProCard ghost gutter={[6, 6]}>
-          <ProCard ghost direction="column" gutter={[24, 24]} colSpan={19}>
-            <ResourcePool title="自定义统计卡片 A" />
-            <InventoryStatistics title="库存预警 B" />
+      <ProCard
+        title="数据概览"
+        extra="今日实时数据"
+        split={responsive ? 'horizontal' : 'vertical'}
+        headerBordered
+        bordered
+      >
+        <ProCard split="horizontal">
+          <ProCard split="horizontal">
+            <StatisticCard
+              statistic={{
+                title: '商品总数',
+                value: 1234,
+                icon: (
+                  <ShoppingOutlined
+                    style={{
+                      color: '#1890ff',
+                      fontSize: '32px',
+                    }}
+                  />
+                ),
+              }}
+            />
           </ProCard>
-          <SimpleSide title="自定义统计卡片 C" headerBordered colSpan={5} />
-        </ProCard>
-        {/* (学习转正 && 学习实践) && 新员工之家 */}
-        <ProCard ghost gutter={[6, 6]}>
-          <ProCard ghost direction="column" gutter={[24, 24]} colSpan={19}>
-            <SaleStatistics title="销售统计 D" />
-            <ResourcePool title="自定义统计卡片 E" />
+          <ProCard split="vertical">
+            <StatisticCard
+              statistic={{
+                title: '在售商品',
+                value: 1156,
+                status: 'success',
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: '已下架',
+                value: 78,
+                status: 'default',
+              }}
+            />
           </ProCard>
-          <SimpleSide title="自定义统计卡片 F" headerBordered colSpan={5} />
         </ProCard>
-        {/* 学习集训 && 操作指导 */}
-        <ProCard ghost gutter={[6, 6]}>
-          <ProCard ghost colSpan={19}>
-            <LossStatistics title="损坏统计 G" />
+        <ProCard split="horizontal">
+          <ProCard split="horizontal">
+            <StatisticCard
+              statistic={{
+                title: '订单总数',
+                value: 5678,
+                icon: (
+                  <ShoppingCartOutlined
+                    style={{
+                      color: '#52c41a',
+                      fontSize: '32px',
+                    }}
+                  />
+                ),
+              }}
+            />
           </ProCard>
-          <SimpleSide
-            title="自定义统计卡片 H"
-            headerBordered
-            colSpan={5}
-            at={3}
-          />
+          <ProCard split="vertical">
+            <StatisticCard
+              statistic={{
+                title: '待发货',
+                value: 234,
+                status: 'processing',
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: '已完成',
+                value: 5234,
+                status: 'success',
+              }}
+            />
+          </ProCard>
+        </ProCard>
+        <ProCard split="horizontal">
+          <ProCard split="horizontal">
+            <StatisticCard
+              statistic={{
+                title: '用户总数',
+                value: 8901,
+                icon: (
+                  <UserOutlined
+                    style={{
+                      color: '#722ed1',
+                      fontSize: '32px',
+                    }}
+                  />
+                ),
+              }}
+            />
+          </ProCard>
+          <ProCard split="vertical">
+            <StatisticCard
+              statistic={{
+                title: '今日新增',
+                value: 34,
+                status: 'default',
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: '活跃用户',
+                value: 2341,
+                status: 'processing',
+              }}
+            />
+          </ProCard>
+        </ProCard>
+        <ProCard split="horizontal">
+          <ProCard split="horizontal">
+            <StatisticCard
+              statistic={{
+                title: '销售额（元）',
+                value: 1234567,
+                precision: 2,
+                icon: (
+                  <DollarOutlined
+                    style={{
+                      color: '#fa8c16',
+                      fontSize: '32px',
+                    }}
+                  />
+                ),
+              }}
+            />
+          </ProCard>
+          <ProCard split="vertical">
+            <StatisticCard
+              statistic={{
+                title: '今日销售',
+                value: 12345,
+                precision: 2,
+                status: 'default',
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: '本月销售',
+                value: 234567,
+                precision: 2,
+                status: 'success',
+              }}
+            />
+          </ProCard>
         </ProCard>
       </ProCard>
-    </PageContainer>
+    </RcResizeObserver>
   );
 };
 
