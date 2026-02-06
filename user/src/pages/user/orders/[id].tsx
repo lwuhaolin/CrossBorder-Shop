@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'umi';
 import { Card, Descriptions, Steps, Table, Tag, Spin, Empty, message } from 'antd';
-import { getOrderById } from '@/services/order';
+import { getOrderDetail } from '@/services/order';
 import type { Order } from '@/models/order';
 import styles from './[id].module.css';
 
@@ -21,8 +21,8 @@ const OrderDetailPage: React.FC = () => {
   const loadOrder = async () => {
     try {
       setLoading(true);
-      const data = await getOrderById(Number(id));
-      setOrder(data);
+      const response = await getOrderDetail(Number(id));
+      setOrder(response.data);
     } catch (error) {
       console.error('Failed to load order:', error);
       message.error('Failed to load order');

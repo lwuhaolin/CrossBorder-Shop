@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Carousel, Typography, Spin, Card } from 'antd';
-import { getProducts } from '@/services/product';
+import { getProductList } from '@/services/product';
 import ProductCard from '@/components/ProductCard';
 import CategoryNav from '@/components/CategoryNav';
 import type { Product } from '@/models/product';
@@ -20,13 +20,14 @@ const HomePage: React.FC = () => {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const data = await getProducts({ page: 1, pageSize: 8 });
+      const response = await getProductList({ page: 1, pageSize: 8 });
+      const data = response.data;
       
       // Simulate hot products (first 4)
-      setHotProducts(data.items.slice(0, 4));
+      setHotProducts(data.list.slice(0, 4));
       
       // Simulate new products (next 4)
-      setNewProducts(data.items.slice(4, 8));
+      setNewProducts(data.list.slice(4, 8));
     } catch (error) {
       console.error('Failed to load products:', error);
     } finally {

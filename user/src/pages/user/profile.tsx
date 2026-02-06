@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Descriptions, Button, message, Avatar } from 'antd';
 import { UserOutlined, EditOutlined } from '@ant-design/icons';
 import { history } from 'umi';
-import { getUserProfile } from '@/services/user';
+import { getCurrentUser } from '@/services/user';
 import type { User } from '@/models/user';
 import styles from './profile.module.css';
 
@@ -17,8 +17,8 @@ const ProfilePage: React.FC = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      const data = await getUserProfile();
-      setUser(data);
+      const response = await getCurrentUser();
+      setUser(response.data);
     } catch (error) {
       console.error('Failed to load profile:', error);
       message.error('Failed to load profile');

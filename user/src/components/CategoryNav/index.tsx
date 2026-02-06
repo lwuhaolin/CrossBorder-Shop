@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { AppstoreOutlined } from '@ant-design/icons';
 import { history, useLocation } from 'umi';
-import { getCategories } from '@/services/category';
+import { getCategoryList } from '@/services/category';
 import type { Category } from '@/models/category';
 import styles from './index.module.css';
 
@@ -16,8 +16,8 @@ const CategoryNav: React.FC = () => {
 
   const loadCategories = async () => {
     try {
-      const data = await getCategories();
-      setCategories(data);
+      const response = await getCategoryList();
+      setCategories(response.data);
     } catch (error) {
       console.error('Failed to load categories:', error);
     }

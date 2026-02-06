@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Radio, Button, message, Steps, Divider, List, Space } from 'antd';
 import { history } from 'umi';
-import { getAddresses } from '@/services/address';
+import { getAddressList } from '@/services/address';
 import { createOrder } from '@/services/order';
 import type { Address } from '@/models/address';
 import styles from './index.module.css';
@@ -31,11 +31,11 @@ const CheckoutPage: React.FC = () => {
 
   const loadAddresses = async () => {
     try {
-      const data = await getAddresses();
-      setAddresses(data);
-      if (data.length > 0) {
-        const defaultAddress = data.find((addr) => addr.isDefault);
-        setSelectedAddress(defaultAddress?.id || data[0].id);
+      const response = await getAddressList();
+      setAddresses(response.data);
+      if (response.data.length > 0) {
+        const defaultAddress = response.data.find((addr) => addr.isDefault);
+        setSelectedAddress(defaultAddress?.id || response.data[0].id);
       }
     } catch (error) {
       console.error('Failed to load addresses:', error);
@@ -115,11 +115,9 @@ const CheckoutPage: React.FC = () => {
               {addresses.map((address) => (
                 <Radio key={address.id} value={address.id} className={styles.addressItem}>
                   <div>
-                    <strong>{address.fullName}</strong> - {address.phone}
+                    <strong>{address.receiverName}</strong> - {address.receiverPhone}
                     <br />
-                    {address.streetAddress}, {address.city}, {address.state} {address.zipCode}
-                    <br />
-                    {address.country}
+                    {address.detailAddress}, {address.city}, {address.province}
                     {address.isDefault && <span className={styles.defaultBadge}>Default</span>}
                   </div>
                 </Radio>

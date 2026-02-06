@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Table, Tag, Button, message, Space } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import { history } from 'umi';
-import { getOrders } from '@/services/order';
+import { getOrderList } from '@/services/order';
 import type { Order } from '@/models/order';
 import styles from './index.module.css';
 
@@ -20,8 +20,9 @@ const OrderListPage: React.FC = () => {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const data = await getOrders({ page, pageSize });
-      setOrders(data.items);
+      const response = await getOrderList({ page, pageSize });
+      const data = response.data;
+      setOrders(data.list);
       setTotal(data.total);
     } catch (error) {
       console.error('Failed to load orders:', error);

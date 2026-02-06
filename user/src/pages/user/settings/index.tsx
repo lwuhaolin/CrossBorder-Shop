@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, message } from 'antd';
-import { updateUserProfile } from '@/services/user';
+import { updateUser } from '@/services/user';
 import type { User } from '@/models/user';
 import styles from './index.module.css';
 
@@ -19,7 +19,7 @@ const SettingsPage: React.FC = () => {
   const handleSubmit = async (values: any) => {
     try {
       setLoading(true);
-      await updateUserProfile(values);
+      await updateUser(values);
       
       // Update local storage
       const userStr = localStorage.getItem('user');

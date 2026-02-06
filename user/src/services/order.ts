@@ -54,3 +54,12 @@ export async function refundOrder(id: number, data: RefundDTO): Promise<Result<v
     data,
   });
 }
+
+// Create order (user-facing)
+export async function createOrder(data: any): Promise<any> {
+  return request({
+    url: '/order/create',
+    method: 'POST',
+    data,
+  });
+}

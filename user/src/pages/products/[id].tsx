@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, history } from 'umi';
 import { Row, Col, Button, InputNumber, message, Spin, Descriptions, Tabs, Card, Empty } from 'antd';
 import { ShoppingCartOutlined, HeartOutlined } from '@ant-design/icons';
-import { getProductById } from '@/services/product';
+import { getProductDetail } from '@/services/product';
 import type { Product } from '@/models/product';
 import styles from './[id].module.css';
 
@@ -21,8 +21,8 @@ const ProductDetailPage: React.FC = () => {
   const loadProduct = async () => {
     try {
       setLoading(true);
-      const data = await getProductById(Number(id));
-      setProduct(data);
+      const response = await getProductDetail(Number(id));
+      setProduct(response.data);
     } catch (error) {
       console.error('Failed to load product:', error);
       message.error('Failed to load product');
@@ -54,7 +54,7 @@ const ProductDetailPage: React.FC = () => {
         productId: product.id,
         name: product.name,
         price: product.price,
-        image: product.imageUrl,
+        image: product.mainImage,
         quantity,
       });
     }
@@ -84,7 +84,7 @@ const ProductDetailPage: React.FC = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      imageUrl: product.imageUrl,
+      imageUrl: product.mainImage,
     });
 
     localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -151,7 +151,7 @@ const ProductDetailPage: React.FC = () => {
             <Col xs={24} md={12}>
               <div className={styles.imageWrapper}>
                 <img
-                  src={product.imageUrl || 'https://via.placeholder.com/600x600?text=Product'}
+                  src={product.mainImage || 'https://via.placeholder.com/600x600?text=Product'}
                   alt={product.name}
                   className={styles.image}
                 />

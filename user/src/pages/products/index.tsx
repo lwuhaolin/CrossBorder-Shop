@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Pagination, Select, Spin, Empty, Input } from 'antd';
 import { useSearchParams } from 'umi';
-import { getProducts } from '@/services/product';
-import { getCategories } from '@/services/category';
+import { getProductList } from '@/services/product';
+import { getCategoryList } from '@/services/category';
 import ProductCard from '@/components/ProductCard';
 import type { Product } from '@/models/product';
 import type { Category } from '@/models/category';
@@ -45,8 +45,8 @@ const ProductListPage: React.FC = () => {
 
   const loadCategories = async () => {
     try {
-      const data = await getCategories();
-      setCategories(data);
+      const response = await getCategoryList();
+      setCategories(response.data);
     } catch (error) {
       console.error('Failed to load categories:', error);
     }
@@ -65,7 +65,7 @@ const ProductListPage: React.FC = () => {
       }
 
       if (searchText) {
-        params.search = searchText;
+        params.keyword = searchText;
       }
 
       if (sortBy) {
@@ -74,8 +74,9 @@ const ProductListPage: React.FC = () => {
         params.sortOrder = order;
       }
 
-      const data = await getProducts(params);
-      setProducts(data.items);
+      const response = await getProductList(params);
+      const data = response.data;
+      setProducts(data.list);
       setTotal(data.total);
     } catch (error) {
       console.error('Failed to load products:', error);

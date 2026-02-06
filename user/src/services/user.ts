@@ -44,3 +44,12 @@ export async function updatePassword(data: PasswordChangeDTO): Promise<Result<vo
     data,
   });
 }
+
+// Register user
+export async function register(data: any): Promise<Result<void>> {
+  return request({
+    url: '/user/register',
+    method: 'POST',
+    data,
+  });
+}

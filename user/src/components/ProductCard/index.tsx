@@ -32,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         productId: product.id,
         name: product.name,
         price: product.price,
-        image: product.imageUrl,
+        image: product.mainImage,
         quantity: 1,
       });
     }
@@ -60,7 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         <div className={styles.imageWrapper}>
           <img
             alt={product.name}
-            src={product.imageUrl || 'https://via.placeholder.com/300x300?text=Product'}
+            src={product.mainImage || 'https://via.placeholder.com/300x300?text=Product'}
             className={styles.image}
           />
           {product.stock === 0 && (

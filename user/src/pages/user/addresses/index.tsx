@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Button, Modal, Form, Input, Switch, message, Space } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { getAddresses, createAddress, updateAddress, deleteAddress } from '@/services/address';
+import { getAddressList, createAddress, updateAddress, deleteAddress } from '@/services/address';
 import type { Address } from '@/models/address';
 import styles from './index.module.css';
 
@@ -19,8 +19,8 @@ const AddressesPage: React.FC = () => {
   const loadAddresses = async () => {
     try {
       setLoading(true);
-      const data = await getAddresses();
-      setAddresses(data);
+      const response = await getAddressList();
+      setAddresses(response.data);
     } catch (error) {
       console.error('Failed to load addresses:', error);
       message.error('Failed to load addresses');
@@ -73,19 +73,19 @@ const AddressesPage: React.FC = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      dataIndex: 'receiverName',
+      key: 'receiverName',
     },
     {
       title: 'Phone',
-      dataIndex: 'phone',
-      key: 'phone',
+      dataIndex: 'receiverPhone',
+      key: 'receiverPhone',
     },
     {
       title: 'Address',
       key: 'address',
       render: (record: Address) =>
-        `${record.streetAddress}, ${record.city}, ${record.state} ${record.zipCode}, ${record.country}`,
+        `${record.detailAddress}, ${record.city}, ${record.province}`,
     },
     {
       title: 'Default',
@@ -147,23 +147,23 @@ const AddressesPage: React.FC = () => {
         >
           <Form form={form} layout="vertical">
             <Form.Item
-              name="fullName"
-              label="Full Name"
-              rules={[{ required: true, message: 'Please enter full name' }]}
+              name="receiverName"
+              label="Receiver Name"
+              rules={[{ required: true, message: 'Please enter receiver name' }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              name="phone"
+              name="receiverPhone"
               label="Phone"
               rules={[{ required: true, message: 'Please enter phone number' }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              name="streetAddress"
-              label="Street Address"
-              rules={[{ required: true, message: 'Please enter street address' }]}
+              name="detailAddress"
+              label="Detail Address"
+              rules={[{ required: true, message: 'Please enter detail address' }]}
             >
               <Input />
             </Form.Item>
@@ -175,23 +175,15 @@ const AddressesPage: React.FC = () => {
               <Input />
             </Form.Item>
             <Form.Item
-              name="state"
-              label="State"
-              rules={[{ required: true, message: 'Please enter state' }]}
+              name="province"
+              label="Province"
+              rules={[{ required: true, message: 'Please enter province' }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              name="zipCode"
-              label="Zip Code"
-              rules={[{ required: true, message: 'Please enter zip code' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="country"
-              label="Country"
-              rules={[{ required: true, message: 'Please enter country' }]}
+              name="district"
+              label="District"
             >
               <Input />
             </Form.Item>
