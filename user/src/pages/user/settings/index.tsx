@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, message } from 'antd';
 import { updateUser } from '@/services/user';
+import { getUserInfo, setUserInfo } from '@/utils/request';
 import type { User } from '@/models/user';
 import styles from './index.module.css';
 
@@ -9,9 +10,8 @@ const SettingsPage: React.FC = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      const user = JSON.parse(userStr);
+    const user = getUserInfo();
+    if (user) {
       form.setFieldsValue(user);
     }
   }, []);
@@ -22,11 +22,10 @@ const SettingsPage: React.FC = () => {
       await updateUser(values);
       
       // Update local storage
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
+      const user = getUserInfo();
+      if (user) {
         const updatedUser = { ...user, ...values };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUserInfo(updatedUser);
       }
       
       message.success('Profile updated successfully');

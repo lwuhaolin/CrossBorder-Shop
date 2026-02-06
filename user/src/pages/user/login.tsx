@@ -3,6 +3,7 @@ import { Card, Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import { login } from '@/services/user';
+import { setToken, setUserInfo } from '@/utils/request';
 import styles from './login.module.css';
 
 const LoginPage: React.FC = () => {
@@ -13,8 +14,8 @@ const LoginPage: React.FC = () => {
       setLoading(true);
       const response = await login(values);
       
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      setToken(response.token);
+      setUserInfo(response.user);
       
       message.success('Login successful!');
       history.push('/');

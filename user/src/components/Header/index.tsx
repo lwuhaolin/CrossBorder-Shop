@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Input, Badge, Dropdown, Space, Button } from 'antd';
 import { ShoppingCartOutlined, UserOutlined, SearchOutlined, MenuOutlined } from '@ant-design/icons';
 import { history } from 'umi';
+import { removeToken, removeUserInfo, getToken } from '@/utils/request';
 import type { MenuProps } from 'antd';
 import styles from './index.module.css';
 
@@ -14,7 +15,7 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    const token = localStorage.getItem('token');
+    const token = getToken();
     setIsLoggedIn(!!token);
     
     // Get cart count from localStorage
@@ -62,7 +63,8 @@ const Header: React.FC = () => {
           key: 'logout',
           label: 'Logout',
           onClick: () => {
-            localStorage.removeItem('token');
+            removeToken();
+            removeUserInfo();
             setIsLoggedIn(false);
             history.push('/');
           },
