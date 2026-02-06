@@ -1,0 +1,3445 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "跨境日用小商品订货系统API的文档",
+    "description": "提供用户管理、商品管理、订单管理、多币种支持等功能的REST API接口文档",
+    "contact": {
+      "name": "CrossBorder 开发团队",
+      "url": "https://www.crossborder.shop",
+      "email": "dev@crossborder.shop"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "JWT": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "收货地址管理",
+      "description": "收货地址相关接口"
+    },
+    {
+      "name": "用户管理",
+      "description": "用户相关接口"
+    },
+    {
+      "name": "文件管理",
+      "description": "文件上传和删除"
+    },
+    {
+      "name": "商品管理",
+      "description": "商品发布、上下架、查询等功能"
+    },
+    {
+      "name": "订单管理",
+      "description": "订单相关接口"
+    },
+    {
+      "name": "购物车管理",
+      "description": "购物车相关接口"
+    },
+    {
+      "name": "商品分类",
+      "description": "商品分类CRUD和树形查询"
+    },
+    {
+      "name": "系统健康检查",
+      "description": "系统健康检查相关接口"
+    }
+  ],
+  "paths": {
+    "/user/update": {
+      "put": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "更新用户信息",
+        "description": "更新当前用户个人信息",
+        "operationId": "updateUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/password": {
+      "put": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "修改密码",
+        "description": "修改当前用户密码",
+        "operationId": "changePassword",
+        "parameters": [
+          {
+            "name": "oldPassword",
+            "in": "query",
+            "description": "旧密码",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "newPassword",
+            "in": "query",
+            "description": "新密码",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/{id}/on-shelf": {
+      "put": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "商品上架",
+        "description": "上架商品",
+        "operationId": "onShelf",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/{id}/off-shelf": {
+      "put": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "商品下架",
+        "description": "下架商品",
+        "operationId": "offShelf",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/update": {
+      "put": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "更新商品",
+        "description": "卖家更新商品信息",
+        "operationId": "updateProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category": {
+      "put": {
+        "tags": [
+          "商品分类"
+        ],
+        "summary": "更新分类",
+        "description": "更新分类信息",
+        "operationId": "update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "商品分类"
+        ],
+        "summary": "创建分类",
+        "description": "管理员创建新分类",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/update": {
+      "put": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "更新购物车明细",
+        "description": "更新商品数量或选中状态",
+        "operationId": "updateCartItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCartItemDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/select/all": {
+      "put": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "全选/取消全选",
+        "description": "设置购物车所有商品的选中状态",
+        "operationId": "updateAllSelected",
+        "parameters": [
+          {
+            "name": "selected",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/address/{addressId}": {
+      "get": {
+        "tags": [
+          "收货地址管理"
+        ],
+        "summary": "查询地址详情",
+        "description": "根据ID查询收货地址",
+        "operationId": "getAddressById",
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultShippingAddressVO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "收货地址管理"
+        ],
+        "summary": "更新收货地址",
+        "description": "更新指定的收货地址",
+        "operationId": "updateAddress",
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShippingAddressDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "收货地址管理"
+        ],
+        "summary": "删除收货地址",
+        "description": "删除指定的收货地址",
+        "operationId": "deleteAddress",
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/address/{addressId}/default": {
+      "put": {
+        "tags": [
+          "收货地址管理"
+        ],
+        "summary": "设置默认地址",
+        "description": "将指定地址设为默认收货地址",
+        "operationId": "setDefaultAddress",
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/register": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "用户注册",
+        "description": "新用户注册，注册成功后需要登录",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/refresh": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "刷新Token",
+        "description": "使用RefreshToken刷新AccessToken和RefreshToken",
+        "operationId": "refreshToken",
+        "parameters": [
+          {
+            "name": "refreshToken",
+            "in": "query",
+            "description": "刷新令牌",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultLoginVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "用户登出",
+        "description": "用户登出，清除Token信息",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "用户登录",
+        "description": "用户登录，返回AccessToken和RefreshToken",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultLoginVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/publish": {
+      "post": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "发布商品",
+        "description": "卖家发布新商品",
+        "operationId": "publishProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/{orderId}/ship": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "卖家发货",
+        "description": "卖家标记订单已发货",
+        "operationId": "shipOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/{orderId}/pay": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "支付订单",
+        "description": "买家支付订单",
+        "operationId": "payOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/{orderId}/confirm": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "确认收货",
+        "description": "买家确认收货，订单完成",
+        "operationId": "confirmOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/{orderId}/cancel": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "买家取消订单",
+        "description": "待支付状态的订单可以取消",
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/create": {
+      "post": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "创建订单",
+        "description": "买家从购物车创建订单",
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/upload": {
+      "post": {
+        "tags": [
+          "文件管理"
+        ],
+        "summary": "上传文件",
+        "description": "上传图片，支持jpg/png/jpeg/gif，最多10MB",
+        "operationId": "uploadFile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/upload/batch": {
+      "post": {
+        "tags": [
+          "文件管理"
+        ],
+        "summary": "批量上传",
+        "description": "批量上传多个文件",
+        "operationId": "uploadFiles",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "files"
+                ],
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/add": {
+      "post": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "添加商品到购物车",
+        "description": "买家将商品添加到购物车",
+        "operationId": "addToCart",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCartDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/address": {
+      "post": {
+        "tags": [
+          "收货地址管理"
+        ],
+        "summary": "创建收货地址",
+        "description": "买家创建新的收货地址",
+        "operationId": "createAddress",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShippingAddressDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "根据ID查询用户",
+        "description": "管理员根据ID查询用户信息",
+        "operationId": "getById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "用户ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultUserVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/username/{username}": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "根据用户名查询用户",
+        "description": "管理员根据用户名查询用户信息",
+        "operationId": "getByUsername",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "用户名",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultUserVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/current": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "获取当前用户信息",
+        "description": "根据Token获取当前登录用户信息",
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultUserVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/{id}": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "查询商品",
+        "description": "查询商品详情",
+        "operationId": "getProductDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultProductVO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "删除商品",
+        "description": "卖家删除商品",
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/seller/my-products": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "我的商品",
+        "description": "卖家查询自己的商品列表",
+        "operationId": "getMyProducts",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "description": "分类ID",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "状态",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "关键字",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每页数量",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultPageResultProductVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/product/page": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "商品分页查询",
+        "description": "根据条件分页查询商品列表",
+        "operationId": "getProductPage",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "description": "分类ID",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "状态：0-下架，1-上架，2-删除",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sellerId",
+            "in": "query",
+            "description": "卖家ID",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "关键字搜索",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageNum",
+            "in": "query",
+            "description": "页码",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "每页数量",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultPageResultProductVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/{orderId}": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "查询订单详情",
+        "description": "根据订单ID查询详情",
+        "operationId": "getOrderById",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOrderVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/seller/list": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "卖家订单列表",
+        "description": "查询当前卖家的订单列表",
+        "operationId": "getSellerOrders",
+        "parameters": [
+          {
+            "name": "orderStatus",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListOrderVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/number/{orderNumber}": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "根据订单号查询",
+        "description": "根据订单号查询订单详情",
+        "operationId": "getOrderByNumber",
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultOrderVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order/buyer/list": {
+      "get": {
+        "tags": [
+          "订单管理"
+        ],
+        "summary": "买家订单列表",
+        "description": "查询当前买家的订单列表",
+        "operationId": "getBuyerOrders",
+        "parameters": [
+          {
+            "name": "orderStatus",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListOrderVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/info": {
+      "get": {
+        "tags": [
+          "系统健康检查"
+        ],
+        "summary": "系统信息",
+        "description": "获取系统基本信息",
+        "operationId": "getSystemInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultSystemInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/check": {
+      "get": {
+        "tags": [
+          "系统健康检查"
+        ],
+        "summary": "健康检查",
+        "description": "检查系统是否正常运行",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category/{id}": {
+      "get": {
+        "tags": [
+          "商品分类"
+        ],
+        "summary": "查询分类",
+        "description": "根据ID查询分类",
+        "operationId": "getById_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "商品分类"
+        ],
+        "summary": "删除分类",
+        "description": "删除指定分类",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category/tree": {
+      "get": {
+        "tags": [
+          "商品分类"
+        ],
+        "summary": "分类树",
+        "description": "获取分类树形结构",
+        "operationId": "getTree",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListCategoryVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category/list": {
+      "get": {
+        "tags": [
+          "商品分类"
+        ],
+        "summary": "分类列表",
+        "description": "获取所有分类",
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListCategory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/category/children/{parentId}": {
+      "get": {
+        "tags": [
+          "商品分类"
+        ],
+        "summary": "子分类列表",
+        "description": "根据ID查询子分类",
+        "operationId": "getChildren",
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListCategoryVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart": {
+      "get": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "获取购物车详情",
+        "description": "查询当前用户购物车",
+        "operationId": "getCart",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultCartVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/address/list": {
+      "get": {
+        "tags": [
+          "收货地址管理"
+        ],
+        "summary": "查询地址列表",
+        "description": "查询当前用户所有收货地址",
+        "operationId": "getAddressList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultListShippingAddressVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/address/default": {
+      "get": {
+        "tags": [
+          "收货地址管理"
+        ],
+        "summary": "获取默认地址",
+        "description": "查询当前用户默认收货地址",
+        "operationId": "getDefaultAddress",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultShippingAddressVO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file": {
+      "delete": {
+        "tags": [
+          "文件管理"
+        ],
+        "summary": "删除文件",
+        "description": "根据URL删除文件",
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "name": "fileUrl",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/selected": {
+      "delete": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "删除选中商品",
+        "description": "删除购物车中所有选中的商品",
+        "operationId": "removeSelectedItems",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/item/{itemId}": {
+      "delete": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "删除购物车明细",
+        "description": "删除购物车中的商品",
+        "operationId": "removeCartItem",
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/clear": {
+      "delete": {
+        "tags": [
+          "购物车管理"
+        ],
+        "summary": "清空购物车",
+        "description": "清空用户购物车所有商品",
+        "operationId": "clearCart",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserUpdateDTO": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "description": "昵称",
+            "example": "新昵称"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "newemail@example.com"
+          },
+          "phone": {
+            "pattern": "^1[3-9]\\d{9}$",
+            "type": "string",
+            "description": "手机号",
+            "example": "13900139000"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "头像URL"
+          },
+          "gender": {
+            "type": "integer",
+            "description": "性别\ufffd?:未知 1:\ufffd?2:女）",
+            "format": "int32",
+            "example": 1
+          },
+          "birthday": {
+            "type": "string",
+            "description": "生日",
+            "format": "date",
+            "example": "1990-01-01"
+          }
+        },
+        "description": "用户更新DTO"
+      },
+      "ResultVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "object",
+            "description": "响应数据"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ProductDTO": {
+        "required": [
+          "categoryId",
+          "currency",
+          "imageUrls",
+          "price",
+          "productName",
+          "stock"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "商品ID（更新时必填）",
+            "format": "int64",
+            "example": 1
+          },
+          "productName": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string",
+            "description": "商品名称",
+            "example": "玫瑰花束"
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "分类ID",
+            "format": "int64",
+            "example": 10
+          },
+          "brand": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "品牌",
+            "example": "花语"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "销售价格",
+            "example": 199
+          },
+          "originalPrice": {
+            "minimum": 0,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "原价",
+            "example": 259
+          },
+          "costPrice": {
+            "minimum": 0,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "成本价",
+            "example": 120
+          },
+          "currency": {
+            "type": "string",
+            "description": "币种",
+            "example": "CNY"
+          },
+          "stock": {
+            "minimum": 0,
+            "type": "integer",
+            "description": "库存数量",
+            "format": "int32",
+            "example": 100
+          },
+          "unit": {
+            "type": "string",
+            "description": "单位",
+            "example": "束"
+          },
+          "weight": {
+            "type": "number",
+            "description": "重量（克）",
+            "example": 500
+          },
+          "volume": {
+            "type": "number",
+            "description": "体积（立方厘米）",
+            "example": 1200
+          },
+          "description": {
+            "maxLength": 1000,
+            "minLength": 0,
+            "type": "string",
+            "description": "商品描述",
+            "example": "精选新鲜玫瑰花束"
+          },
+          "detail": {
+            "type": "string",
+            "description": "商品详情",
+            "example": "包含卡片与礼盒包装"
+          },
+          "imageUrls": {
+            "type": "array",
+            "description": "商品图片URL列表",
+            "example": "['https://example.com/1.jpg']",
+            "items": {
+              "type": "string",
+              "description": "商品图片URL列表",
+              "example": "['https://example.com/1.jpg']"
+            }
+          },
+          "mainImageIndex": {
+            "type": "integer",
+            "description": "主图索引（imageUrls列表中的索引）",
+            "format": "int32",
+            "example": 0
+          },
+          "version": {
+            "type": "integer",
+            "description": "版本号（更新时需要）",
+            "format": "int32",
+            "example": 0
+          }
+        },
+        "description": "商品发布/更新请求"
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time",
+            "refType": null
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time",
+            "refType": null
+          },
+          "createBy": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
+          },
+          "updateBy": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
+          },
+          "deleted": {
+            "type": "integer",
+            "format": "int32",
+            "refType": null
+          },
+          "parentId": {
+            "type": "integer",
+            "description": "父分类ID，0表示根分类",
+            "format": "int64",
+            "example": 0,
+            "refType": null
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "分类名称",
+            "example": "鲜花",
+            "refType": null
+          },
+          "categoryCode": {
+            "type": "string",
+            "description": "分类编码",
+            "example": "FLOWER",
+            "refType": null
+          },
+          "level": {
+            "type": "integer",
+            "description": "分类层级（1-一级分类，2-二级分类）",
+            "format": "int32",
+            "example": 1,
+            "refType": null
+          },
+          "sort": {
+            "type": "integer",
+            "description": "排序号",
+            "format": "int32",
+            "example": 1,
+            "refType": null
+          },
+          "icon": {
+            "type": "string",
+            "description": "分类图标URL",
+            "example": "https://example.com/icon.png",
+            "refType": null
+          },
+          "status": {
+            "type": "integer",
+            "description": "状态：0-禁用，1-启用",
+            "format": "int32",
+            "example": 1,
+            "refType": null
+          },
+          "description": {
+            "type": "string",
+            "description": "分类描述",
+            "example": "用于展示鲜花类商品",
+            "refType": null
+          },
+          "name": {
+            "type": "string",
+            "refType": null
+          }
+        }
+      },
+      "UpdateCartItemDTO": {
+        "required": [
+          "id",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "购物车明细ID",
+            "format": "int64",
+            "example": 1
+          },
+          "quantity": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "数量",
+            "format": "int32",
+            "example": 2
+          },
+          "selected": {
+            "type": "boolean",
+            "description": "是否选中",
+            "example": true
+          }
+        },
+        "description": "更新购物车明细请求"
+      },
+      "ShippingAddressDTO": {
+        "required": [
+          "city",
+          "country",
+          "detailAddress",
+          "province",
+          "receiverName",
+          "receiverPhone"
+        ],
+        "type": "object",
+        "properties": {
+          "receiverName": {
+            "type": "string",
+            "description": "收货人姓名",
+            "example": "张三"
+          },
+          "receiverPhone": {
+            "pattern": "^1[3-9]\\d{9}$",
+            "type": "string",
+            "description": "收货人电话",
+            "example": "13800138000"
+          },
+          "country": {
+            "type": "string",
+            "description": "国家",
+            "example": "中国"
+          },
+          "province": {
+            "type": "string",
+            "description": "省州",
+            "example": "广东"
+          },
+          "city": {
+            "type": "string",
+            "description": "城市",
+            "example": "深圳"
+          },
+          "district": {
+            "type": "string",
+            "description": "区县",
+            "example": "南山"
+          },
+          "detailAddress": {
+            "type": "string",
+            "description": "详细地址",
+            "example": "科技园南区XX路XX号"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "邮编",
+            "example": "518000"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "是否设为默认地址",
+            "example": true
+          }
+        },
+        "description": "收货地址请求"
+      },
+      "UserRegisterDTO": {
+        "required": [
+          "confirmPassword",
+          "password",
+          "roleId",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 50,
+            "minLength": 3,
+            "type": "string",
+            "description": "用户名",
+            "example": "testuser"
+          },
+          "password": {
+            "maxLength": 20,
+            "minLength": 6,
+            "type": "string",
+            "description": "密码",
+            "example": "123456"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "description": "确认密码",
+            "example": "123456"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "test@example.com"
+          },
+          "phone": {
+            "pattern": "^1[3-9]\\d{9}$",
+            "type": "string",
+            "description": "手机号",
+            "example": "13800138000"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称",
+            "example": "测试用户"
+          },
+          "roleId": {
+            "type": "integer",
+            "description": "角色ID(1:管理员 2:卖家 3:买家)",
+            "format": "int64",
+            "example": 3
+          }
+        },
+        "description": "用户注册DTO"
+      },
+      "LoginVO": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "访问令牌（有效期2小时）"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "刷新令牌（有效期7天）"
+          },
+          "tokenType": {
+            "type": "string",
+            "description": "令牌类型",
+            "example": "Bearer"
+          },
+          "accessTokenExpiresIn": {
+            "type": "integer",
+            "description": "访问令牌过期时间（毫秒）",
+            "format": "int64"
+          },
+          "refreshTokenExpiresIn": {
+            "type": "integer",
+            "description": "刷新令牌过期时间（毫秒）",
+            "format": "int64"
+          },
+          "userInfo": {
+            "$ref": "#/components/schemas/UserVO"
+          }
+        },
+        "description": "登录响应VO"
+      },
+      "ResultLoginVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LoginVO"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "RoleVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "角色ID",
+            "format": "int64"
+          },
+          "roleName": {
+            "type": "string",
+            "description": "角色名称"
+          },
+          "roleCode": {
+            "type": "string",
+            "description": "角色编码"
+          },
+          "description": {
+            "type": "string",
+            "description": "角色描述"
+          }
+        },
+        "description": "角色VO"
+      },
+      "UserVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "用户ID",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "头像URL"
+          },
+          "gender": {
+            "type": "integer",
+            "description": "性别（0:未知 1:男 2:女）",
+            "format": "int32"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "生日",
+            "format": "date"
+          },
+          "status": {
+            "type": "integer",
+            "description": "状态（0:禁用 1:正常 2:锁定）",
+            "format": "int32"
+          },
+          "lastLoginTime": {
+            "type": "string",
+            "description": "最后登录时间",
+            "format": "date-time"
+          },
+          "lastLoginIp": {
+            "type": "string",
+            "description": "最后登录IP"
+          },
+          "roles": {
+            "type": "array",
+            "description": "角色列表",
+            "items": {
+              "$ref": "#/components/schemas/RoleVO"
+            }
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time"
+          }
+        },
+        "description": "用户信息VO"
+      },
+      "UserLoginDTO": {
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "admin"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码",
+            "example": "123456"
+          }
+        },
+        "description": "用户登录DTO"
+      },
+      "ResultLong": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "integer",
+            "description": "响应数据",
+            "format": "int64"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "CreateOrderDTO": {
+        "required": [
+          "addressId",
+          "targetCurrency"
+        ],
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "type": "integer",
+            "description": "收货地址ID",
+            "format": "int64",
+            "example": 1
+          },
+          "targetCurrency": {
+            "type": "string",
+            "description": "目标币种（用于汇率转换）",
+            "example": "USD"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "productIds": {
+            "type": "array",
+            "description": "商品ID列表（如不传则使用购物车选中商品）",
+            "items": {
+              "type": "integer",
+              "description": "商品ID列表（如不传则使用购物车选中商品）",
+              "format": "int64"
+            }
+          }
+        },
+        "description": "创建订单请求"
+      },
+      "ResultString": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "string",
+            "description": "响应数据"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ResultListString": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据",
+            "items": {
+              "type": "string",
+              "description": "响应数据"
+            }
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "AddCartDTO": {
+        "required": [
+          "productId",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "description": "商品ID",
+            "format": "int64",
+            "example": 1
+          },
+          "skuId": {
+            "type": "integer",
+            "description": "商品SKU ID",
+            "format": "int64",
+            "example": 1
+          },
+          "quantity": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "数量",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "description": "添加购物车请求"
+      },
+      "ResultUserVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserVO"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ProductImageVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "图片ID",
+            "format": "int64",
+            "example": 1
+          },
+          "productId": {
+            "type": "integer",
+            "description": "商品ID",
+            "format": "int64",
+            "example": 1001
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "图片URL",
+            "example": "https://example.com/1.jpg"
+          },
+          "sort": {
+            "type": "integer",
+            "description": "排序号",
+            "format": "int32",
+            "example": 0
+          },
+          "isMain": {
+            "type": "integer",
+            "description": "是否主图：0-否，1-是",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "description": "商品图片视图对象"
+      },
+      "ProductVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "商品ID",
+            "format": "int64",
+            "example": 1
+          },
+          "productName": {
+            "type": "string",
+            "description": "商品名称",
+            "example": "玫瑰花束"
+          },
+          "productCode": {
+            "type": "string",
+            "description": "商品编码",
+            "example": "PRD202602060001"
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "分类ID",
+            "format": "int64",
+            "example": 10
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "分类名称",
+            "example": "鲜花"
+          },
+          "sellerId": {
+            "type": "integer",
+            "description": "卖家用户ID",
+            "format": "int64",
+            "example": 2001
+          },
+          "sellerName": {
+            "type": "string",
+            "description": "卖家用户名",
+            "example": "seller001"
+          },
+          "brand": {
+            "type": "string",
+            "description": "品牌",
+            "example": "花语"
+          },
+          "price": {
+            "type": "number",
+            "description": "销售价格",
+            "example": 199
+          },
+          "originalPrice": {
+            "type": "number",
+            "description": "原价",
+            "example": 259
+          },
+          "currency": {
+            "type": "string",
+            "description": "币种",
+            "example": "CNY"
+          },
+          "stock": {
+            "type": "integer",
+            "description": "库存数量",
+            "format": "int32",
+            "example": 100
+          },
+          "sales": {
+            "type": "integer",
+            "description": "销量",
+            "format": "int32",
+            "example": 20
+          },
+          "unit": {
+            "type": "string",
+            "description": "单位",
+            "example": "束"
+          },
+          "weight": {
+            "type": "number",
+            "description": "重量（克）",
+            "example": 500
+          },
+          "description": {
+            "type": "string",
+            "description": "商品描述",
+            "example": "精选新鲜玫瑰花束"
+          },
+          "detail": {
+            "type": "string",
+            "description": "商品详情",
+            "example": "包含卡片与礼盒包装"
+          },
+          "status": {
+            "type": "integer",
+            "description": "状态：0-草稿，1-上架，2-下架，3-售罄",
+            "format": "int32",
+            "example": 1
+          },
+          "isRecommend": {
+            "type": "integer",
+            "description": "是否推荐",
+            "format": "int32",
+            "example": 0
+          },
+          "isNew": {
+            "type": "integer",
+            "description": "是否新品",
+            "format": "int32",
+            "example": 0
+          },
+          "isHot": {
+            "type": "integer",
+            "description": "是否热销",
+            "format": "int32",
+            "example": 1
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time"
+          },
+          "images": {
+            "type": "array",
+            "description": "商品图片列表",
+            "items": {
+              "$ref": "#/components/schemas/ProductImageVO"
+            }
+          },
+          "mainImage": {
+            "type": "string",
+            "description": "主图URL",
+            "example": "https://example.com/1.jpg"
+          }
+        },
+        "description": "商品视图对象"
+      },
+      "ResultProductVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ProductVO"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "PageResultProductVO": {
+        "type": "object",
+        "properties": {
+          "pageNum": {
+            "type": "integer",
+            "description": "当前页码",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "每页数量",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "description": "总记录数",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "description": "总页数",
+            "format": "int32"
+          },
+          "list": {
+            "type": "array",
+            "description": "数据列表",
+            "items": {
+              "$ref": "#/components/schemas/ProductVO"
+            }
+          }
+        },
+        "description": "分页结果"
+      },
+      "ResultPageResultProductVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageResultProductVO"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "OrderAddressVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "订单地址ID",
+            "format": "int64"
+          },
+          "receiverName": {
+            "type": "string",
+            "description": "收货人姓名"
+          },
+          "receiverPhone": {
+            "type": "string",
+            "description": "收货人电话"
+          },
+          "country": {
+            "type": "string",
+            "description": "国家"
+          },
+          "province": {
+            "type": "string",
+            "description": "省份"
+          },
+          "city": {
+            "type": "string",
+            "description": "城市"
+          },
+          "district": {
+            "type": "string",
+            "description": "区县"
+          },
+          "detailAddress": {
+            "type": "string",
+            "description": "详细地址"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "邮编"
+          }
+        },
+        "description": "订单收货地址信息"
+      },
+      "OrderItemVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "订单明细ID",
+            "format": "int64"
+          },
+          "productId": {
+            "type": "integer",
+            "description": "商品ID",
+            "format": "int64"
+          },
+          "productName": {
+            "type": "string",
+            "description": "商品名称"
+          },
+          "productCode": {
+            "type": "string",
+            "description": "商品编码"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "商品图片"
+          },
+          "skuId": {
+            "type": "integer",
+            "description": "SKU ID",
+            "format": "int64"
+          },
+          "skuName": {
+            "type": "string",
+            "description": "SKU名称"
+          },
+          "price": {
+            "type": "number",
+            "description": "商品单价"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "购买数量",
+            "format": "int32"
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "小计金额"
+          }
+        },
+        "description": "订单明细信息"
+      },
+      "OrderVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "订单ID",
+            "format": "int64"
+          },
+          "orderNumber": {
+            "type": "string",
+            "description": "订单号"
+          },
+          "buyerId": {
+            "type": "integer",
+            "description": "买家ID",
+            "format": "int64"
+          },
+          "sellerId": {
+            "type": "integer",
+            "description": "卖家ID",
+            "format": "int64"
+          },
+          "orderStatus": {
+            "type": "integer",
+            "description": "订单状态",
+            "format": "int32"
+          },
+          "paymentStatus": {
+            "type": "integer",
+            "description": "支付状态",
+            "format": "int32"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "订单总金额"
+          },
+          "productAmount": {
+            "type": "number",
+            "description": "商品总金额"
+          },
+          "freightAmount": {
+            "type": "number",
+            "description": "运费"
+          },
+          "discountAmount": {
+            "type": "number",
+            "description": "优惠金额"
+          },
+          "currency": {
+            "type": "string",
+            "description": "原币种"
+          },
+          "exchangeRate": {
+            "type": "number",
+            "description": "汇率"
+          },
+          "convertedAmount": {
+            "type": "number",
+            "description": "换算后金额"
+          },
+          "targetCurrency": {
+            "type": "string",
+            "description": "目标币种"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "支付方式"
+          },
+          "paymentTime": {
+            "type": "string",
+            "description": "支付时间",
+            "format": "date-time"
+          },
+          "paymentTransactionId": {
+            "type": "string",
+            "description": "支付流水号"
+          },
+          "shipTime": {
+            "type": "string",
+            "description": "发货时间",
+            "format": "date-time"
+          },
+          "completeTime": {
+            "type": "string",
+            "description": "完成时间",
+            "format": "date-time"
+          },
+          "cancelTime": {
+            "type": "string",
+            "description": "取消时间",
+            "format": "date-time"
+          },
+          "cancelReason": {
+            "type": "string",
+            "description": "取消原因"
+          },
+          "remark": {
+            "type": "string",
+            "description": "备注"
+          },
+          "buyerMessage": {
+            "type": "string",
+            "description": "买家留言"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "description": "订单明细列表",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemVO"
+            }
+          },
+          "address": {
+            "$ref": "#/components/schemas/OrderAddressVO"
+          }
+        },
+        "description": "订单信息"
+      },
+      "ResultOrderVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/OrderVO"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ResultListOrderVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据",
+            "items": {
+              "$ref": "#/components/schemas/OrderVO"
+            }
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ResultSystemInfo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SystemInfo"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "SystemInfo": {
+        "type": "object",
+        "properties": {
+          "applicationName": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "description": "响应数据"
+      },
+      "ResultCategory": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "CategoryVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "分类ID",
+            "format": "int64",
+            "example": 1
+          },
+          "parentId": {
+            "type": "integer",
+            "description": "父分类ID",
+            "format": "int64",
+            "example": 0
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "分类名称",
+            "example": "鲜花"
+          },
+          "categoryCode": {
+            "type": "string",
+            "description": "分类编码",
+            "example": "FLOWER"
+          },
+          "level": {
+            "type": "integer",
+            "description": "分类层级",
+            "format": "int32",
+            "example": 1
+          },
+          "sort": {
+            "type": "integer",
+            "description": "排序号",
+            "format": "int32",
+            "example": 1
+          },
+          "icon": {
+            "type": "string",
+            "description": "分类图标URL",
+            "example": "https://example.com/icon.png"
+          },
+          "status": {
+            "type": "integer",
+            "description": "状态：0-禁用，1-启用",
+            "format": "int32",
+            "example": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "分类描述",
+            "example": "用于展示鲜花类商品"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time"
+          },
+          "children": {
+            "type": "array",
+            "description": "子分类列表",
+            "items": {
+              "$ref": "#/components/schemas/CategoryVO"
+            }
+          }
+        },
+        "description": "分类视图对象"
+      },
+      "ResultListCategoryVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据",
+            "items": {
+              "$ref": "#/components/schemas/CategoryVO"
+            }
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ResultListCategory": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据",
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            }
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "CartItemVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "购物车明细ID",
+            "format": "int64"
+          },
+          "productId": {
+            "type": "integer",
+            "description": "商品ID",
+            "format": "int64"
+          },
+          "productName": {
+            "type": "string",
+            "description": "商品名称"
+          },
+          "productImage": {
+            "type": "string",
+            "description": "商品图片"
+          },
+          "skuId": {
+            "type": "integer",
+            "description": "商品SKU ID",
+            "format": "int64"
+          },
+          "skuSpec": {
+            "type": "string",
+            "description": "SKU规格"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "商品数量",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "description": "商品单价"
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "小计金额"
+          },
+          "selected": {
+            "type": "boolean",
+            "description": "是否选中"
+          },
+          "stock": {
+            "type": "integer",
+            "description": "库存",
+            "format": "int32"
+          },
+          "onShelf": {
+            "type": "boolean",
+            "description": "是否上架"
+          }
+        },
+        "description": "购物车明细信息"
+      },
+      "CartVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "购物车ID",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "description": "用户ID",
+            "format": "int64"
+          },
+          "totalPrice": {
+            "type": "number",
+            "description": "购物车总价"
+          },
+          "totalQuantity": {
+            "type": "integer",
+            "description": "商品总数",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "description": "购物车明细列表",
+            "items": {
+              "$ref": "#/components/schemas/CartItemVO"
+            }
+          }
+        },
+        "description": "购物车信息"
+      },
+      "ResultCartVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CartVO"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ResultShippingAddressVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ShippingAddressVO"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      },
+      "ShippingAddressVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "地址ID",
+            "format": "int64"
+          },
+          "receiverName": {
+            "type": "string",
+            "description": "收货人姓名"
+          },
+          "receiverPhone": {
+            "type": "string",
+            "description": "收货人电话"
+          },
+          "country": {
+            "type": "string",
+            "description": "国家"
+          },
+          "province": {
+            "type": "string",
+            "description": "省份"
+          },
+          "city": {
+            "type": "string",
+            "description": "城市"
+          },
+          "district": {
+            "type": "string",
+            "description": "区县"
+          },
+          "detailAddress": {
+            "type": "string",
+            "description": "详细地址"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "邮编"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "是否默认地址"
+          },
+          "createTime": {
+            "type": "string",
+            "description": "创建时间",
+            "format": "date-time"
+          }
+        },
+        "description": "收货地址信息"
+      },
+      "ResultListShippingAddressVO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "响应码，200表示成功",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "响应消息"
+          },
+          "data": {
+            "type": "array",
+            "description": "响应数据",
+            "items": {
+              "$ref": "#/components/schemas/ShippingAddressVO"
+            }
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "时间戳",
+            "format": "int64"
+          }
+        },
+        "description": "统一响应结果"
+      }
+    },
+    "securitySchemes": {
+      "JWT": {
+        "type": "http",
+        "description": "请在下方输入JWT Token（无需添加Bearer前缀）",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
