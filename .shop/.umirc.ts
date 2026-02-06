@@ -7,48 +7,66 @@ export default defineConfig({
       redirect: "/dashboard",
     },
     {
+      path: "/login",
+      component: "user/login",
+      layout: false,
+    },
+    {
       path: "/dashboard",
       component: "dashboard",
     },
     {
-      path: "/order",
-      component: "order",
-    },
-    {
-      path: "/entity",
+      path: "/products",
       routes: [
         {
-          path: "supplier",
-          component: "entity/supplier",
+          path: "",
+          component: "products",
         },
         {
-          path: "staff",
-          component: "entity/staff",
+          path: "create",
+          component: "products/create",
         },
         {
-          path: "customer",
-          component: "entity/customer",
+          path: ":id",
+          component: "products/[id]",
         },
         {
-          path: "flower",
-          routes: [
-            {
-              path: "",
-              component: "entity/flower",
-            },
-            {
-              path: ":identifier/detail",
-              component: "entity/flower/detail",
-            },
-            {
-              path: "loss",
-              component: "entity/flower/loss",
-            },
-          ],
+          path: ":id/edit",
+          component: "products/[id]/edit",
+        },
+      ],
+    },
+    {
+      path: "/categories",
+      component: "categories",
+    },
+    {
+      path: "/orders",
+      routes: [
+        {
+          path: "",
+          component: "order",
         },
         {
-          path: "package",
-          component: "entity/package",
+          path: ":id",
+          component: "order/[id]",
+        },
+      ],
+    },
+    {
+      path: "/addresses",
+      component: "addresses",
+    },
+    {
+      path: "/user",
+      routes: [
+        {
+          path: "profile",
+          component: "user/profile",
+        },
+        {
+          path: "password",
+          component: "user/password",
         },
       ],
     },

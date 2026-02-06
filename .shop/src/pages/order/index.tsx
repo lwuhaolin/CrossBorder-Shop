@@ -1,155 +1,181 @@
-import React, { useRef } from "react";
-import {
-  ActionType,
-  PageContainer,
-  ProCard,
-  ProColumns,
-  ProTable,
-} from "@ant-design/pro-components";
-import { EditOutlined } from "@ant-design/icons";
-import { Button } from "antd";
-import request from "@/utils/request";
-import Changer from "@/pages/order/components/Changer";
-import OrderEntry from "@/pages/order/components/OrderEntry";
-import XinPrice from "@/pages/order/components/XinPrice";
-import XinStaff from "@/pages/order/components/XinStaff";
-import XinPeer from "@/pages/order/components/XinPeer";
+import { EyeOutlined } from '@ant-design/icons';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
+import { Button, Space, Tag } from 'antd';
+import { useRef } from 'react';
+import { useNavigate } from 'umi';
+import { getOrderList } from '@/services/order';
+import type { Order, OrderListParams } from '@/models/order';
+import { OrderStatus, PaymentStatus, ShippingStatus } from '@/models/order';
+import type { PageResult } from '@/models/common';
 
-export const OrderStatus: ProColumns["valueEnum"] = {
-  0: {
-    text: "打开",
-    status: "processing",
-  },
-  1: {
-    text: "关闭",
-    status: "error",
-  },
-  2: {
-    text: "已完成",
-    status: "success",
-  },
-};
+const OrderList: React.FC = () => {
+  const actionRef = useRef<ActionType>();
+  const navigate = useNavigate();
 
-export const ResourceType: ProColumns["valueEnum"] = {
-  0: {
-    text: "鲜花",
-    status: "success",
-  },
-  1: {
-    text: "包装材料",
-    status: "warning",
-  },
-};
+  const getOrderStatusTag = (status: OrderStatus) => {
+    const statusMap = {
+      [OrderStatus.PENDING]: { color: 'default', text: '待支付' },
+      [OrderStatus.PAID]: { color: 'processing', text: '已支付' },
+      [OrderStatus.SHIPPED]: { color: 'blue', text: '已发货' },
+      [OrderStatus.COMPLETED]: { color: 'success', text: '已完成' },
+      [OrderStatus.CANCELED]: { color: 'error', text: '已取消' },
+      [OrderStatus.REFUNDING]: { color: 'warning', text: '退款中' },
+      [OrderStatus.REFUNDED]: { color: 'default', text: '已退款' },
+    };
+    const config = statusMap[status];
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
 
-export const PeerType: ProColumns["valueEnum"] = {
-  0: {
-    text: "供应商",
-    status: "warning",
-  },
-  1: {
-    text: "顾客",
-    status: "processing",
-  },
-};
+  const getPaymentStatusTag = (status?: PaymentStatus) => {
+    if (status === undefined) return '-';
+    const statusMap = {
+      [PaymentStatus.UNPAID]: { color: 'default', text: '未支付' },
+      [PaymentStatus.PAID]: { color: 'success', text: '已支付' },
+      [PaymentStatus.REFUNDED]: { color: 'error', text: '已退款' },
+    };
+    const config = statusMap[status];
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
 
-const Order: React.FC = () => {
-  const holder = useRef<ActionType>();
+  const getShippingStatusTag = (status?: ShippingStatus) => {
+    if (status === undefined) return '-';
+    const statusMap = {
+      [ShippingStatus.PENDING]: { color: 'default', text: '待发货' },
+      [ShippingStatus.SHIPPED]: { color: 'processing', text: '已发货' },
+      [ShippingStatus.DELIVERED]: { color: 'success', text: '已送达' },
+    };
+    const config = statusMap[status];
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
 
-  const columns: ProColumns<Record<string, any>>[] = [
+  const columns: ProColumns<Order>[] = [
     {
-      title: "订单编号",
-      dataIndex: "id",
+      title: '订单编号',
+      dataIndex: 'orderNo',
+      width: 180,
+      copyable: true,
     },
     {
-      title: "校验码",
-      dataIndex: "uuid",
+      title: '用户',
+      dataIndex: 'username',
+      width: 120,
+      search: false,
     },
     {
-      title: "标题",
-      dataIndex: "title",
+      title: '订单金额',
+      dataIndex: 'totalAmount',
+      width: 120,
+      search: false,
+      render: (_, record) => `¥${record.totalAmount.toFixed(2)}`,
     },
     {
-      title: "对端类型",
-      dataIndex: "peerType",
-      valueType: "select",
-      valueEnum: PeerType,
+      title: '实付金额',
+      dataIndex: 'actualAmount',
+      width: 120,
+      search: false,
+      render: (_, record) => `¥${record.actualAmount.toFixed(2)}`,
     },
     {
-      key: "peer",
-      title: "对端名称",
-      render: (_, entity) => (
-        <XinPeer peerId={entity.peerId} peerType={entity.peerType} />
+      title: '订单状态',
+      dataIndex: 'status',
+      width: 100,
+      valueType: 'select',
+      valueEnum: {
+        [OrderStatus.PENDING]: { text: '待支付', status: 'Default' },
+        [OrderStatus.PAID]: { text: '已支付', status: 'Processing' },
+        [OrderStatus.SHIPPED]: { text: '已发货', status: 'Processing' },
+        [OrderStatus.COMPLETED]: { text: '已完成', status: 'Success' },
+        [OrderStatus.CANCELED]: { text: '已取消', status: 'Error' },
+        [OrderStatus.REFUNDING]: { text: '退款中', status: 'Warning' },
+        [OrderStatus.REFUNDED]: { text: '已退款', status: 'Default' },
+      },
+      render: (_, record) => getOrderStatusTag(record.status),
+    },
+    {
+      title: '支付状态',
+      dataIndex: 'paymentStatus',
+      width: 100,
+      search: false,
+      render: (_, record) => getPaymentStatusTag(record.paymentStatus),
+    },
+    {
+      title: '发货状态',
+      dataIndex: 'shippingStatus',
+      width: 100,
+      search: false,
+      render: (_, record) => getShippingStatusTag(record.shippingStatus),
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      width: 180,
+      valueType: 'dateTime',
+      search: false,
+    },
+    {
+      title: '操作',
+      width: 120,
+      fixed: 'right',
+      search: false,
+      render: (_, record) => (
+        <Space size="small">
+          <Button
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/orders/${record.id}`)}
+          >
+            查看详情
+          </Button>
+        </Space>
       ),
-    },
-    {
-      key: "staff",
-      title: "订单创建者",
-      tooltip: "员工名称",
-      render: (_, entity) => <XinStaff staffId={entity.staffId} />,
-    },
-    {
-      key: "price",
-      title: "总金额",
-      render: (_, entity) => <XinPrice orderId={entity.id} />,
-    },
-    {
-      title: "状态",
-      dataIndex: "status",
-      valueType: "select",
-      valueEnum: OrderStatus,
-    },
-    {
-      title: "创建于",
-      dataIndex: "createdAt",
-      valueType: "dateTime",
-    },
-    {
-      title: "更新于",
-      dataIndex: "updatedAt",
-      valueType: "dateTime",
-    },
-    {
-      title: "操作",
-      key: "option",
-      valueType: "option",
-      render: (_, entity) => [
-        <Changer
-          key="change"
-          holder={holder}
-          entity={entity}
-          trigger={<Button type="dashed" icon={<EditOutlined />} />}
-        />,
-      ],
     },
   ];
 
+  const fetchData = async (params: OrderListParams & { pageSize?: number; current?: number }) => {
+    try {
+      const { current, pageSize, ...rest } = params;
+      const response = await getOrderList({
+        page: current,
+        pageSize,
+        ...rest,
+      });
+
+      const data: PageResult<Order> = response.data || { list: [], total: 0, page: 1, pageSize: 10 };
+
+      return {
+        data: data.list || [],
+        success: true,
+        total: data.total || 0,
+      };
+    } catch (error) {
+      return {
+        data: [],
+        success: false,
+        total: 0,
+      };
+    }
+  };
+
   return (
-    <PageContainer
-      header={{
-        title: "订单",
+    <ProTable<Order>
+      columns={columns}
+      actionRef={actionRef}
+      cardBordered
+      request={fetchData}
+      rowKey="id"
+      search={{
+        labelWidth: 'auto',
       }}
-    >
-      <ProCard ghost gutter={[6, 6]} direction="column">
-        <ProTable<Record<string, any>>
-          actionRef={holder}
-          columns={columns}
-          request={(params) =>
-            request("/v1/order", {
-              params,
-            }).then((response) => response.data)
-          }
-          options={{
-            search: true,
-          }}
-          expandable={{
-            expandedRowRender: (entity) => <OrderEntry orderId={entity.id} />,
-          }}
-          rowKey="id"
-          search={false}
-        />
-      </ProCard>
-    </PageContainer>
+      pagination={{
+        pageSize: 10,
+        showSizeChanger: true,
+      }}
+      dateFormatter="string"
+      headerTitle="订单列表"
+    />
   );
 };
 
-export default Order;
+export default OrderList;
