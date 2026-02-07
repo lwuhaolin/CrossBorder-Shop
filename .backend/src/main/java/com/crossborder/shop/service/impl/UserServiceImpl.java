@@ -126,7 +126,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginVO refreshToken(String refreshToken) {
-        // 校验RefreshToken
+        // 校验RefreshToken是否过期
+        if (jwtUtil.isTokenExpired(refreshToken)) {
+            throw new BusinessException(ResultCode.TOKEN_EXPIRED);
+        }
+
+        // 校验RefreshToken是否有效
         if (!jwtUtil.validateToken(refreshToken)) {
             throw new BusinessException(ResultCode.TOKEN_INVALID);
         }

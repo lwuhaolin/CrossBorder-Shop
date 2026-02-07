@@ -102,6 +102,21 @@ public class Order extends BaseEntity {
     private String paymentTransactionId;
 
     /**
+     * 物流公司
+     */
+    private String logisticsCompany;
+
+    /**
+     * 物流单号
+     */
+    private String trackingNo;
+
+    /**
+     * 卖家地址
+     */
+    private String sellerAddress;
+
+    /**
      * 发货时间
      */
     private LocalDateTime shipTime;

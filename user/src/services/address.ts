@@ -1,6 +1,6 @@
-import request from '@/utils/request';
-import type { Address, AddressCreateDTO, AddressUpdateDTO } from '@/models/address';
-import type { Result } from '@/models/common';
+import { Address, AddressCreateDTO, AddressUpdateDTO } from "../models/address";
+import { Result } from "../models/common";
+import request from "../utils/request";
 
 // Get address list
 export async function getAddressList(): Promise<Result<Address[]>> {
@@ -13,7 +13,7 @@ export async function getAddressList(): Promise<Result<Address[]>> {
 // Create address
 export async function createAddress(data: AddressCreateDTO): Promise<Result<Address>> {
   return request({
-    url: '/address/create',
+    url: '/address',
     method: 'POST',
     data,
   });

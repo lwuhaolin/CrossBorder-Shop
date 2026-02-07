@@ -1,6 +1,7 @@
 package com.crossborder.shop.service;
 
 import com.crossborder.shop.dto.CreateOrderDTO;
+import com.crossborder.shop.dto.OrderShipDTO;
 import com.crossborder.shop.vo.OrderVO;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public interface OrderService {
      * @param sellerId 卖家ID
      * @param orderId  订单ID
      */
-    void shipOrder(Long sellerId, Long orderId);
+    void shipOrder(Long sellerId, Long orderId, OrderShipDTO dto);
 
     /**
      * 买家确认收货
@@ -81,8 +82,8 @@ public interface OrderService {
     /**
      * 查询买家订单列表
      * 
-     * @param buyerId 买家ID
-     * @param orderStatus  订单状态（可选）
+     * @param buyerId     买家ID
+     * @param orderStatus 订单状态（可选）
      * @return 订单列表
      */
     List<OrderVO> getBuyerOrders(Long buyerId, Integer orderStatus);
@@ -90,8 +91,8 @@ public interface OrderService {
     /**
      * 查询卖家订单列表
      * 
-     * @param sellerId 卖家ID
-     * @param orderStatus   订单状态（可选）
+     * @param sellerId    卖家ID
+     * @param orderStatus 订单状态（可选）
      * @return 订单列表
      */
     List<OrderVO> getSellerOrders(Long sellerId, Integer orderStatus);

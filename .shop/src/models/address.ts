@@ -4,6 +4,7 @@ export interface Address {
   userId?: number;
   receiverName: string;
   receiverPhone: string;
+  country: string;
   province: string;
   city: string;
   district: string;
@@ -17,6 +18,7 @@ export interface Address {
 export interface AddressCreateDTO {
   receiverName: string;
   receiverPhone: string;
+  country: string;
   province: string;
   city: string;
   district: string;

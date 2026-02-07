@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col, Pagination, Select, Spin, Empty, Input } from 'antd';
-import { useSearchParams } from 'umi';
-import { getProductList } from '@/services/product';
-import { getCategoryList } from '@/services/category';
-import ProductCard from '@/components/ProductCard';
-import type { Product } from '@/models/product';
-import type { Category } from '@/models/category';
-import styles from './index.module.css';
+import React, { useEffect, useState } from "react";
+import { Row, Col, Pagination, Select, Spin, Empty, Input } from "antd";
+import { useSearchParams } from "@umijs/renderer-react";
+import { getProductList } from "@/services/product";
+import { getCategoryList } from "@/services/category";
+import ProductCard from "@/components/ProductCard";
+import type { Product } from "@/models/product";
+import type { Category } from "@/models/category";
+import styles from "./index.module.css";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -20,17 +20,17 @@ const ProductListPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(12);
   const [categoryId, setCategoryId] = useState<number | undefined>();
-  const [searchText, setSearchText] = useState('');
-  const [sortBy, setSortBy] = useState<string>('');
+  const [searchText, setSearchText] = useState("");
+  const [sortBy, setSortBy] = useState<string>("");
 
   useEffect(() => {
     loadCategories();
   }, []);
 
   useEffect(() => {
-    const category = searchParams.get('category');
-    const search = searchParams.get('search');
-    
+    const category = searchParams.get("category");
+    const search = searchParams.get("search");
+
     if (category) {
       setCategoryId(Number(category));
     }
@@ -48,7 +48,7 @@ const ProductListPage: React.FC = () => {
       const response = await getCategoryList();
       setCategories(response.data);
     } catch (error) {
-      console.error('Failed to load categories:', error);
+      console.error("Failed to load categories:", error);
     }
   };
 
@@ -69,7 +69,7 @@ const ProductListPage: React.FC = () => {
       }
 
       if (sortBy) {
-        const [field, order] = sortBy.split('-');
+        const [field, order] = sortBy.split("-");
         params.sortBy = field;
         params.sortOrder = order;
       }
@@ -79,7 +79,7 @@ const ProductListPage: React.FC = () => {
       setProducts(data.list);
       setTotal(data.total);
     } catch (error) {
-      console.error('Failed to load products:', error);
+      console.error("Failed to load products:", error);
     } finally {
       setLoading(false);
     }
@@ -130,7 +130,7 @@ const ProductListPage: React.FC = () => {
               <Select
                 placeholder="Category"
                 allowClear
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 value={categoryId}
                 onChange={handleCategoryChange}
               >
@@ -145,7 +145,7 @@ const ProductListPage: React.FC = () => {
               <Select
                 placeholder="Sort by"
                 allowClear
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 value={sortBy}
                 onChange={handleSortChange}
               >
@@ -185,7 +185,7 @@ const ProductListPage: React.FC = () => {
           ) : (
             <Empty
               description="No products found"
-              style={{ margin: '64px 0' }}
+              style={{ margin: "64px 0" }}
             />
           )}
         </Spin>

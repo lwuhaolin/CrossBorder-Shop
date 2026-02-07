@@ -9,6 +9,21 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
   const params = useParams<{ id: string }>();
   const productId = parseInt(params.id || "0");
+  const apiBaseUrl =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
+  const staticBaseUrl = apiBaseUrl.endsWith("/api")
+    ? apiBaseUrl
+    : `${apiBaseUrl}/api`;
+
+  const normalizeImageUrl = (url?: string | null) => {
+    if (!url) {
+      return undefined;
+    }
+    if (url.startsWith("http")) {
+      return url;
+    }
+    return `${staticBaseUrl}${url}`;
+  };
 
   const { data: response, loading } = useRequest(
     () => getProductDetail(productId),
@@ -122,7 +137,7 @@ const ProductDetail: React.FC = () => {
                   key={index}
                   width={150}
                   height={150}
-                  src={img}
+                  src={normalizeImageUrl(img)}
                   fallback="/placeholder.png"
                   style={{ objectFit: "cover" }}
                 />

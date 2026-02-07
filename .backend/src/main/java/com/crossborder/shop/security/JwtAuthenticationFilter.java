@@ -1,6 +1,9 @@
 package com.crossborder.shop.security;
 
+import com.crossborder.shop.common.Result;
+import com.crossborder.shop.common.ResultCode;
 import com.crossborder.shop.util.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,11 +33,22 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
+
+        // Skip JWT processing for certain endpoints
+        String requestPath = request.getRequestURI();
+        if (requestPath.contains("/user/login") ||
+                requestPath.contains("/user/register") ||
+                requestPath.contains("/user/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             // 从请求头中获取 Token
             String token = jwtUtil.getTokenFromRequest(request);
@@ -69,11 +83,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     log.debug("JWT 认证成功: {}", username);
                 }
+            } else if (StringUtils.hasText(token)) {
+                // Token 存在但验证失败，检查是否过期
+                if (isTokenExpired(token)) {
+                    // Token 已过期，返回 1007 错误码
+                    log.warn("Token已过期，返回1007错误码");
+                    sendTokenExpiredResponse(response);
+                    return;
+                }
             }
         } catch (Exception e) {
             log.error("JWT 认证失败: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * 检查 Token 是否已过期
+     */
+    private boolean isTokenExpired(String token) {
+        return jwtUtil.isTokenExpired(token);
+    }
+
+    /**
+     * 发送 Token 已过期的响应
+     */
+    private void sendTokenExpiredResponse(HttpServletResponse response) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_OK); // 返回 200 状态码
+
+        Result<Void> result = Result.fail(ResultCode.TOKEN_EXPIRED);
+        response.getWriter().write(objectMapper.writeValueAsString(result));
     }
 }

@@ -2,6 +2,7 @@ package com.crossborder.shop.controller;
 
 import com.crossborder.shop.common.Result;
 import com.crossborder.shop.dto.CreateOrderDTO;
+import com.crossborder.shop.dto.OrderShipDTO;
 import com.crossborder.shop.security.UserPrincipal;
 import com.crossborder.shop.service.OrderService;
 import com.crossborder.shop.vo.OrderVO;
@@ -73,8 +74,9 @@ public class OrderController {
     @Operation(summary = "卖家发货", description = "卖家标记订单已发货")
     public Result<Void> shipOrder(
             @AuthenticationPrincipal UserPrincipal principal,
-            @PathVariable Long orderId) {
-        orderService.shipOrder(principal.getUserId(), orderId);
+            @PathVariable Long orderId,
+            @RequestBody(required = false) OrderShipDTO dto) {
+        orderService.shipOrder(principal.getUserId(), orderId, dto);
         return Result.success();
     }
 

@@ -85,7 +85,7 @@ const AddressesPage: React.FC = () => {
       title: 'Address',
       key: 'address',
       render: (record: Address) =>
-        `${record.detailAddress}, ${record.city}, ${record.province}`,
+        `${record.detailAddress}, ${record.city}, ${record.province}, ${record.country}`,
     },
     {
       title: 'Default',
@@ -161,6 +161,13 @@ const AddressesPage: React.FC = () => {
               <Input />
             </Form.Item>
             <Form.Item
+              name="country"
+              label="Country"
+              rules={[{ required: true, message: 'Please enter country' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
               name="detailAddress"
               label="Detail Address"
               rules={[{ required: true, message: 'Please enter detail address' }]}
@@ -171,6 +178,13 @@ const AddressesPage: React.FC = () => {
               name="city"
               label="City"
               rules={[{ required: true, message: 'Please enter city' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="country"
+              label="Country"
+              rules={[{ required: true, message: 'Please enter country' }]}
             >
               <Input />
             </Form.Item>

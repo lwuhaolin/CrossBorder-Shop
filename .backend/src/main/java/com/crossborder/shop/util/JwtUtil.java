@@ -190,8 +190,24 @@ public class JwtUtil {
             Claims claims = getClaimsFromToken(token);
             return claims != null && !isTokenExpired(claims);
         } catch (Exception e) {
-            log.error("Token验证失败: {}", e.getMessage());
+            log.error("Token验证失败: {}", e.getMessage())  ;
             return false;
+        }
+    }
+
+    /**
+     * 判断Token是否过期
+     *
+     * @param token Token字符串
+     * @return 是否过期
+     */
+    public boolean isTokenExpired(String token) {
+        try {
+            Claims claims = getClaimsFromToken(token);
+            return claims == null && isTokenExpired(claims);
+        } catch (Exception e) {
+            log.error("Token过期检查失败: {}", e.getMessage());
+            return true; // 如果解析失败，认为已过期
         }
     }
 

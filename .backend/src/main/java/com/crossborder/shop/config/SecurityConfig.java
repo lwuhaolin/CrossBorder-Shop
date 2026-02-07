@@ -54,6 +54,9 @@ public class SecurityConfig {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 // ??????
                                 .authorizeHttpRequests(auth -> auth
+                                                // ??OPTIONS????????
+                                                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**")
+                                                .permitAll()
                                                 // ??Knife4j??????
                                                 .requestMatchers(
                                                                 "/doc.html",
@@ -63,8 +66,8 @@ public class SecurityConfig {
                                                                 "/swagger-ui.html",
                                                                 "/swagger-resources/**",
                                                                 "/favicon.ico",
-                                                        "/upload/**",
-                                                        "/api/upload/**")
+                                                                "/upload/**",
+                                                                "/api/upload/**")
                                                 .permitAll()
                                                 // ??Druid????
                                                 .requestMatchers("/druid/**").permitAll()

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Empty, Button, Row, Col, message } from 'antd';
-import { DeleteOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { history } from 'umi';
-import styles from './index.module.css';
+import React, { useEffect, useState } from "react";
+import { Card, Empty, Button, Row, Col, message } from "antd";
+import { DeleteOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { useNavigate } from "@umijs/renderer-react";
+import styles from "./index.module.css";
 
 interface FavoriteItem {
   id: number;
@@ -13,26 +13,29 @@ interface FavoriteItem {
 
 const FavoritesPage: React.FC = () => {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadFavorites();
   }, []);
 
   const loadFavorites = () => {
-    const data = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const data = JSON.parse(localStorage.getItem("favorites") || "[]");
     setFavorites(data);
   };
 
   const handleRemove = (id: number) => {
     const updated = favorites.filter((item) => item.id !== id);
     setFavorites(updated);
-    localStorage.setItem('favorites', JSON.stringify(updated));
-    message.success('Removed from favorites');
+    localStorage.setItem("favorites", JSON.stringify(updated));
+    message.success("Removed from favorites");
   };
 
   const handleAddToCart = (item: FavoriteItem) => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find((cartItem: any) => cartItem.productId === item.id);
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const existingItem = cart.find(
+      (cartItem: any) => cartItem.productId === item.id,
+    );
 
     if (existingItem) {
       existingItem.quantity += 1;
@@ -46,9 +49,9 @@ const FavoritesPage: React.FC = () => {
       });
     }
 
-    localStorage.setItem('cart', JSON.stringify(cart));
-    message.success('Added to cart');
-    window.dispatchEvent(new Event('storage'));
+    localStorage.setItem("cart", JSON.stringify(cart));
+    message.success("Added to cart");
+    window.dispatchEvent(new Event("storage"));
   };
 
   if (favorites.length === 0) {
@@ -60,7 +63,7 @@ const FavoritesPage: React.FC = () => {
               description="No favorites yet"
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             >
-              <Button type="primary" onClick={() => history.push('/products')}>
+              <Button type="primary" onClick={() => navigate("/products")}>
                 Browse Products
               </Button>
             </Empty>
@@ -83,9 +86,12 @@ const FavoritesPage: React.FC = () => {
                 cover={
                   <img
                     alt={item.name}
-                    src={item.imageUrl || 'https://via.placeholder.com/300x300?text=Product'}
+                    src={
+                      item.imageUrl ||
+                      "https://via.placeholder.com/300x300?text=Product"
+                    }
                     className={styles.image}
-                    onClick={() => history.push(`/products/${item.id}`)}
+                    onClick={() => navigate(`/products/${item.id}`)}
                   />
                 }
                 actions={[

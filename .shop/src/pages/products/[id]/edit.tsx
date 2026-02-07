@@ -6,6 +6,7 @@ import {
   ProFormSelect,
   ProFormUploadButton,
   ProFormRadio,
+  type ProFormInstance,
 } from "@ant-design/pro-components";
 import { Card, message, Spin } from "antd";
 import { useNavigate, useParams, useLocation } from "umi";
@@ -19,7 +20,7 @@ import { getCategoryList } from "@/services/category";
 import type { ProductUpdateDTO, Product } from "@/models/product";
 import { ProductStatus } from "@/models/product";
 import type { UploadFile } from "antd";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const EditProduct: React.FC = () => {
   const navigate = useNavigate();
@@ -27,32 +28,82 @@ const EditProduct: React.FC = () => {
   const params = useParams<{ id: string }>();
   const productId = parseInt(params.id || "0");
   const [uploading, setUploading] = useState(false);
+  const formRef = useRef<ProFormInstance>();
   const [productData, setProductData] = useState<Product | null>(
     (location.state as any)?.product || null,
   );
+  const apiBaseUrl =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
+  const staticBaseUrl = apiBaseUrl.endsWith("/api")
+    ? apiBaseUrl
+    : `${apiBaseUrl}/api`;
 
-  // 仅在没有 state 数据时才请求
+  const normalizeImageUrl = (url?: string | null) => {
+    if (!url) {
+      return undefined;
+    }
+    if (url.startsWith("http")) {
+      return url;
+    }
+    return `${staticBaseUrl}${url}`;
+  };
+
+  const normalizeImageForSave = (url?: string | null) => {
+    if (!url) {
+      return undefined;
+    }
+    if (url.startsWith(staticBaseUrl)) {
+      return url.slice(staticBaseUrl.length);
+    }
+    // handle http base without /api
+    const altBaseUrl = apiBaseUrl.replace(/\/api$/, "");
+    if (url.startsWith(altBaseUrl)) {
+      return url.slice(altBaseUrl.length);
+    }
+    return url;
+  };
+
+  // 编辑页始终请求详情，确保图片等字段最新
   const { data: response, loading } = useRequest(
     () => getProductDetail(productId),
     {
-      ready: !!productId && !productData,
+      ready: !!productId,
       refreshDeps: [productId],
     },
   );
 
   useEffect(() => {
-    if (response?.data && !productData) {
+    if (response?.data) {
       setProductData(response.data);
     }
-  }, [response, productData]);
+  }, [response]);
 
   const product = productData;
 
+  useEffect(() => {
+    if (!product) return;
+    formRef.current?.setFieldsValue({
+      ...product,
+      name: product.name,
+      images: product.images?.map((url, index) => ({
+        uid: `${index}`,
+        name: `image-${index}`,
+        status: "done",
+        url: normalizeImageUrl(url),
+      })),
+    });
+  }, [product]);
+
   const handleSubmit = async (values: any) => {
     try {
-      const imageUrls = values.images
-        ?.map((file: UploadFile) => file.response?.data || file.url)
-        .filter(Boolean);
+      const imageUrls = Array.from(
+        new Set(
+          (values.images || [])
+            .map((file: UploadFile) => file.response?.data || file.url)
+            .map((url: string) => normalizeImageForSave(url))
+            .filter(Boolean),
+        ),
+      ) as string[];
 
       if (!imageUrls || imageUrls.length === 0) {
         message.error("请至少上传一张商品图片");
@@ -120,6 +171,7 @@ const EditProduct: React.FC = () => {
   return (
     <Card title="编辑商品" bordered={false}>
       <ProForm
+        formRef={formRef}
         initialValues={{
           ...product,
           images: product.images?.map((url, index) => ({

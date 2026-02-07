@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Table, Tag, Button, message, Space } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
-import { history } from "umi";
+import { useNavigate } from "@umijs/renderer-react";
 import { getOrderList } from "@/services/order";
 import type { Order } from "@/models/order";
 import styles from "./index.module.css";
@@ -12,6 +12,7 @@ const OrderListPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadOrders();
@@ -21,65 +22,89 @@ const OrderListPage: React.FC = () => {
     try {
       setLoading(true);
       const response = await getOrderList({ page, pageSize });
-      const data = response.data;
-      setOrders(data.list);
-      setTotal(data.total);
+      console.log("订单列表响应:", response);
+      if (response.data) {
+        setOrders(response.data.list || []);
+        setTotal(response.data.total || 0);
+      }
     } catch (error) {
       console.error("Failed to load orders:", error);
-      message.error("Failed to load orders");
+      message.error("加载订单列表失败");
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    const colorMap: Record<string, string> = {
-      pending: "orange",
-      confirmed: "blue",
-      shipped: "cyan",
-      delivered: "green",
-      cancelled: "red",
+  const getStatusText = (status: number) => {
+    const statusMap: Record<number, string> = {
+      0: "待支付",
+      1: "已支付",
+      2: "已发货",
+      3: "已完成",
+      4: "已取消",
+      5: "退款中",
+      6: "已退款",
+    };
+    return statusMap[status] || "未知";
+  };
+
+  const getStatusColor = (status: number) => {
+    const colorMap: Record<number, string> = {
+      0: "orange",
+      1: "blue",
+      2: "cyan",
+      3: "green",
+      4: "red",
+      5: "purple",
+      6: "default",
     };
     return colorMap[status] || "default";
   };
 
   const columns = [
     {
-      title: "Order ID",
-      dataIndex: "id",
-      key: "id",
-      render: (id: number) => `#${id}`,
+      title: "订单号",
+      dataIndex: "orderNo",
+      key: "orderNo",
+      render: (orderNo: string) => orderNo || "-",
     },
     {
-      title: "Date",
+      title: "创建时间",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      render: (date: string) =>
+        date ? new Date(date).toLocaleString("zh-CN") : "-",
     },
     {
-      title: "Total Amount",
+      title: "订单金额",
       dataIndex: "totalAmount",
       key: "totalAmount",
-      render: (amount: number) => `$${amount.toFixed(2)}`,
+      render: (amount: number) => `¥${(amount || 0).toFixed(2)}`,
     },
     {
-      title: "Status",
+      title: "实付金额",
+      dataIndex: "actualAmount",
+      key: "actualAmount",
+      render: (amount: number) => `¥${(amount || 0).toFixed(2)}`,
+    },
+    {
+      title: "订单状态",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => (
-        <Tag color={getStatusColor(status)}>{status.toUpperCase()}</Tag>
+      render: (status: number) => (
+        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
       ),
     },
     {
-      title: "Action",
+      title: "操作",
       key: "action",
       render: (record: Order) => (
         <Button
           type="link"
           icon={<EyeOutlined />}
-          onClick={() => history.push(`/user/orders/${record.id}`)}
+          onClick={() => navigate(`/user/orders/${record.id}`)}
         >
-          View Details
+          查看详情
         </Button>
       ),
     },
@@ -88,7 +113,7 @@ const OrderListPage: React.FC = () => {
   return (
     <div className={styles.orderListPage}>
       <div className={styles.container}>
-        <h1 className={styles.title}>My Orders</h1>
+        <h1 className={styles.title}>我的订单</h1>
 
         <Card className={styles.card}>
           <Table
@@ -101,7 +126,7 @@ const OrderListPage: React.FC = () => {
               pageSize,
               total,
               onChange: (p) => setPage(p),
-              showTotal: (total) => `Total ${total} orders`,
+              showTotal: (total) => `共 ${total} 条订单`,
             }}
           />
         </Card>

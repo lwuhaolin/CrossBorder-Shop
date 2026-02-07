@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Descriptions, Button, message, Avatar } from 'antd';
-import { UserOutlined, EditOutlined } from '@ant-design/icons';
-import { history } from 'umi';
-import { getCurrentUser } from '@/services/user';
-import type { User } from '@/models/user';
-import styles from './profile.module.css';
+import React, { useEffect, useState } from "react";
+import { Card, Descriptions, Button, message, Avatar } from "antd";
+import { UserOutlined, EditOutlined } from "@ant-design/icons";
+import { useNavigate } from "@umijs/renderer-react";
+import { getCurrentUser } from "@/services/user";
+import type { User } from "@/models/user";
+import styles from "./profile.module.css";
 
 const ProfilePage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadProfile();
@@ -20,8 +21,8 @@ const ProfilePage: React.FC = () => {
       const response = await getCurrentUser();
       setUser(response.data);
     } catch (error) {
-      console.error('Failed to load profile:', error);
-      message.error('Failed to load profile');
+      console.error("Failed to load profile:", error);
+      message.error("Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -39,18 +40,27 @@ const ProfilePage: React.FC = () => {
               <h2>{user?.username}</h2>
               <p>{user?.email}</p>
             </div>
-            <Button icon={<EditOutlined />} onClick={() => history.push('/user/settings')}>
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => navigate("/user/settings")}
+            >
               Edit Profile
             </Button>
           </div>
 
           <Descriptions bordered column={1} style={{ marginTop: 24 }}>
-            <Descriptions.Item label="Username">{user?.username}</Descriptions.Item>
+            <Descriptions.Item label="Username">
+              {user?.username}
+            </Descriptions.Item>
             <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
-            <Descriptions.Item label="Phone">{user?.phone || 'Not set'}</Descriptions.Item>
+            <Descriptions.Item label="Phone">
+              {user?.phone || "Not set"}
+            </Descriptions.Item>
             <Descriptions.Item label="Role">{user?.role}</Descriptions.Item>
             <Descriptions.Item label="Member Since">
-              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString()
+                : "-"}
             </Descriptions.Item>
           </Descriptions>
         </Card>

@@ -1,27 +1,34 @@
 // Order related types
 export interface Order {
   id: number;
-  orderNo: string;
-  userId: number;
-  username?: string;
-  totalAmount: number;
-  actualAmount: number;
-  shippingFee?: number;
-  discountAmount?: number;
-  status: OrderStatus;
-  paymentStatus?: PaymentStatus;
-  shippingStatus?: ShippingStatus;
-  shippingAddressId?: number;
-  shippingAddress?: ShippingAddress;
-  items?: OrderItem[];
-  remark?: string;
-  trackingNo?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  paidAt?: string;
-  shippedAt?: string;
-  completedAt?: string;
-  canceledAt?: string;
+  orderNumber: string; // 后端字段名
+  buyerId: number; // 买家ID
+  sellerId?: number; // 卖家ID
+  orderStatus: OrderStatus; // 订单状态
+  paymentStatus?: PaymentStatus; // 支付状态
+  totalAmount: number; // 订单总金额
+  productAmount?: number; // 商品总金额
+  freightAmount?: number; // 运费
+  discountAmount?: number; // 优惠金额
+  currency?: string; // 原币种
+  exchangeRate?: number; // 汇率
+  convertedAmount?: number; // 换算后金额
+  targetCurrency?: string; // 目标币种
+  paymentMethod?: string; // 支付方式
+  paymentTime?: string; // 支付时间
+  paymentTransactionId?: string; // 支付流水号
+  logisticsCompany?: string; // 物流公司
+  trackingNo?: string; // 物流单号
+  sellerAddress?: string; // 卖家退货地址
+  shipTime?: string; // 发货时间
+  completeTime?: string; // 完成时间
+  cancelTime?: string; // 取消时间
+  cancelReason?: string; // 取消原因
+  remark?: string; // 备注
+  buyerMessage?: string; // 买家留言
+  createTime?: string; // 创建时间
+  items?: OrderItem[]; // 订单明细
+  address?: ShippingAddress; // 收货地址
 }
 
 export enum OrderStatus {
@@ -97,8 +104,9 @@ export interface OrderStatusUpdateDTO {
 }
 
 export interface OrderShipDTO {
-  trackingNo: string;
+  trackingNo?: string;
   shippingCompany?: string;
+  shippingCompanyCode?: string;
   remark?: string;
 }
 

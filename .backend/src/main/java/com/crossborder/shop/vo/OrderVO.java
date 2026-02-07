@@ -72,6 +72,15 @@ public class OrderVO {
     @Schema(description = "支付流水号")
     private String paymentTransactionId;
 
+    @Schema(description = "物流公司")
+    private String logisticsCompany;
+
+    @Schema(description = "物流单号")
+    private String trackingNo;
+
+    @Schema(description = "卖家地址")
+    private String sellerAddress;
+
     @Schema(description = "发货时间")
     private LocalDateTime shipTime;
 

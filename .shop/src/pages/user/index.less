@@ -1,17 +1,31 @@
+
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* 背景移至根元素，容器本身透明，避免出现白边 */
+  background: transparent;
+}
+
+/* 让渐变铺满整个视口，覆盖可能的根容器（umi/react root） */
+html,
+body,
+#root,
+.umi-root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #9bd78a 0%, #78AA64 100%);
 }
 
 .login-content {
   width: 500px;
   padding: 40px;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  /* 与主系统统一的圆角 */
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .login-header {
@@ -30,4 +44,23 @@
     color: #999;
     margin: 0;
   }
+}
+
+/* 覆盖登录页主按钮颜色，使其与主系统主色一致 */
+.login-content .ant-btn-primary {
+  background-color: #78AA64;
+  border-color: #78AA64;
+}
+.login-content .ant-btn-primary:hover,
+.login-content .ant-btn-primary:focus {
+  background-color: darken(#78AA64, 5%);
+  border-color: darken(#78AA64, 8%);
+}
+
+/* 输入框 focus 时的主色 */
+.login-content .ant-input:focus,
+.login-content .ant-input-focused,
+.login-content .ant-input:hover {
+  border-color: #78AA64;
+  box-shadow: none;
 }

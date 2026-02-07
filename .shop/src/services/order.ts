@@ -19,12 +19,11 @@ export async function getOrderDetail(id: number): Promise<Result<Order>> {
   });
 }
 
-// Update order status
+// Update order status (confirm order)
 export async function updateOrderStatus(id: number, data: OrderStatusUpdateDTO): Promise<Result<void>> {
   return request({
-    url: `/order/${id}/status`,
-    method: 'PUT',
-    data,
+    url: `/order/${id}/confirm`,
+    method: 'POST',
   });
 }
 
@@ -32,7 +31,7 @@ export async function updateOrderStatus(id: number, data: OrderStatusUpdateDTO):
 export async function shipOrder(id: number, data: OrderShipDTO): Promise<Result<void>> {
   return request({
     url: `/order/${id}/ship`,
-    method: 'PUT',
+    method: 'POST',
     data,
   });
 }
@@ -41,8 +40,8 @@ export async function shipOrder(id: number, data: OrderShipDTO): Promise<Result<
 export async function cancelOrder(id: number, reason?: string): Promise<Result<void>> {
   return request({
     url: `/order/${id}/cancel`,
-    method: 'PUT',
-    data: { reason },
+    method: 'POST',
+    params: reason ? { reason } : {},
   });
 }
 

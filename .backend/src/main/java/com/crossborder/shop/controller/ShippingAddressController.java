@@ -32,8 +32,8 @@ public class ShippingAddressController {
     private final ShippingAddressService shippingAddressService;
 
     @PostMapping
-    @PreAuthorize("hasRole('BUYER')")
-    @Operation(summary = "创建收货地址", description = "买家创建新的收货地址")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
+    @Operation(summary = "创建收货地址", description = "创建新的收货地址")
     public Result<Void> createAddress(@AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody ShippingAddressDTO dto) {
         shippingAddressService.createAddress(principal.getUserId(), dto);
@@ -41,7 +41,7 @@ public class ShippingAddressController {
     }
 
     @PutMapping("/{addressId}")
-    @PreAuthorize("hasRole('BUYER')")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
     @Operation(summary = "更新收货地址", description = "更新指定的收货地址")
     public Result<Void> updateAddress(@AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long addressId,
@@ -51,7 +51,7 @@ public class ShippingAddressController {
     }
 
     @DeleteMapping("/{addressId}")
-    @PreAuthorize("hasRole('BUYER')")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
     @Operation(summary = "删除收货地址", description = "删除指定的收货地址")
     public Result<Void> deleteAddress(@AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long addressId) {
@@ -60,7 +60,7 @@ public class ShippingAddressController {
     }
 
     @PutMapping("/{addressId}/default")
-    @PreAuthorize("hasRole('BUYER')")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
     @Operation(summary = "设置默认地址", description = "将指定地址设为默认收货地址")
     public Result<Void> setDefaultAddress(@AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long addressId) {
@@ -69,7 +69,7 @@ public class ShippingAddressController {
     }
 
     @GetMapping("/{addressId}")
-    @PreAuthorize("hasRole('BUYER')")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
     @Operation(summary = "查询地址详情", description = "根据ID查询收货地址")
     public Result<ShippingAddressVO> getAddressById(@PathVariable Long addressId) {
         ShippingAddressVO address = shippingAddressService.getAddressById(addressId);
@@ -77,7 +77,7 @@ public class ShippingAddressController {
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole('BUYER')")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
     @Operation(summary = "查询地址列表", description = "查询当前用户所有收货地址")
     public Result<List<ShippingAddressVO>> getAddressList(@AuthenticationPrincipal UserPrincipal principal) {
         List<ShippingAddressVO> addresses = shippingAddressService.getAddressList(principal.getUserId());
@@ -85,7 +85,7 @@ public class ShippingAddressController {
     }
 
     @GetMapping("/default")
-    @PreAuthorize("hasRole('BUYER')")
+    @PreAuthorize("hasAnyRole('BUYER', 'SELLER')")
     @Operation(summary = "获取默认地址", description = "查询当前用户默认收货地址")
     public Result<ShippingAddressVO> getDefaultAddress(@AuthenticationPrincipal UserPrincipal principal) {
         ShippingAddressVO address = shippingAddressService.getDefaultAddress(principal.getUserId());

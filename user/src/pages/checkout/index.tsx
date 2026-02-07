@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Radio,
-  Button,
-  message,
-  Steps,
-  Divider,
-  List,
-  Space,
-} from "antd";
-import { history } from "umi";
+import { Card, Radio, Button, message, Steps, Divider, List } from "antd";
+import { useNavigate } from "@umijs/renderer-react";
 import { getAddressList } from "@/services/address";
 import { createOrder } from "@/services/order";
 import type { Address } from "@/models/address";
@@ -32,6 +23,7 @@ const CheckoutPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadAddresses();
@@ -55,7 +47,7 @@ const CheckoutPage: React.FC = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (cart.length === 0) {
       message.warning("Your cart is empty");
-      history.push("/cart");
+      navigate("/cart");
       return;
     }
     setCartItems(cart);
@@ -100,7 +92,7 @@ const CheckoutPage: React.FC = () => {
       window.dispatchEvent(new Event("storage"));
 
       message.success("Order placed successfully!");
-      history.push(`/user/orders/${order.id}`);
+      navigate(`/user/orders/${order.id}`);
     } catch (error) {
       console.error("Failed to place order:", error);
       message.error("Failed to place order");
@@ -144,7 +136,7 @@ const CheckoutPage: React.FC = () => {
               <p>No delivery address found</p>
               <Button
                 type="primary"
-                onClick={() => history.push("/user/addresses")}
+                onClick={() => navigate("/user/addresses")}
               >
                 Add Address
               </Button>
@@ -184,7 +176,7 @@ const CheckoutPage: React.FC = () => {
       content: (
         <div className={styles.stepContent}>
           <h3>Order Summary</h3>
-          <List
+          <List<CartItem>
             dataSource={cartItems}
             renderItem={(item) => (
               <List.Item>

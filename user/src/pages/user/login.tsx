@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
-import { Card, Form, Input, Button, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { history } from 'umi';
-import { login } from '@/services/user';
-import { setToken, setUserInfo } from '@/utils/request';
-import styles from './login.module.css';
+import React, { useState } from "react";
+import { Card, Form, Input, Button, message } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useNavigate } from "@umijs/renderer-react";
+import { login } from "@/services/user";
+import { setToken, setUserInfo } from "@/utils/request";
+import styles from "./login.module.css";
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
       const response = await login(values);
-      
-      setToken(response.token);
-      setUserInfo(response.user);
-      
-      message.success('Login successful!');
-      history.push('/');
+
+      setToken(response.data?.token || "");
+      if (response.data?.user) {
+        setUserInfo(response.data.user);
+      }
+
+      message.success("Login successful!");
+      navigate("/");
     } catch (error: any) {
-      message.error(error.message || 'Login failed');
+      message.error(error.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -45,19 +48,18 @@ const LoginPage: React.FC = () => {
             <Form.Item
               name="email"
               rules={[
-                { required: true, message: 'Please input your email!' },
-                { type: 'email', message: 'Please enter a valid email!' },
+                { required: true, message: "Please input your email!" },
+                { type: "email", message: "Please enter a valid email!" },
               ]}
             >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Email"
-              />
+              <Input prefix={<UserOutlined />} placeholder="Email" />
             </Form.Item>
 
             <Form.Item
               name="password"
-              rules={[{ required: true, message: 'Please input your password!' }]}
+              rules={[
+                { required: true, message: "Please input your password!" },
+              ]}
             >
               <Input.Password
                 prefix={<LockOutlined />}
@@ -74,7 +76,7 @@ const LoginPage: React.FC = () => {
 
           <div className={styles.footer}>
             <span>Don't have an account?</span>
-            <Button type="link" onClick={() => history.push('/user/register')}>
+            <Button type="link" onClick={() => navigate("/user/register")}>
               Register now
             </Button>
           </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "umi";
+import { useParams } from "@umijs/renderer-react";
 import {
   Card,
   Descriptions,
@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { getOrderDetail } from "@/services/order";
 import type { Order } from "@/models/order";
+import { OrderStatus } from "@/models/order";
 import styles from "./[id].module.css";
 
 const { Step } = Steps;
@@ -40,15 +41,43 @@ const OrderDetailPage: React.FC = () => {
     }
   };
 
-  const getStatusStep = (status: string) => {
-    const stepMap: Record<string, number> = {
-      pending: 0,
-      confirmed: 1,
-      shipped: 2,
-      delivered: 3,
-      cancelled: -1,
+  const getStatusStep = (status: OrderStatus) => {
+    const stepMap: Record<OrderStatus, number> = {
+      [OrderStatus.PENDING]: 0,
+      [OrderStatus.PAID]: 1,
+      [OrderStatus.SHIPPED]: 2,
+      [OrderStatus.COMPLETED]: 3,
+      [OrderStatus.CANCELED]: -1,
+      [OrderStatus.REFUNDING]: -1,
+      [OrderStatus.REFUNDED]: -1,
     };
-    return stepMap[status] || 0;
+    return stepMap[status] ?? 0;
+  };
+
+  const getStatusText = (status: OrderStatus) => {
+    const textMap: Record<OrderStatus, string> = {
+      [OrderStatus.PENDING]: "PENDING",
+      [OrderStatus.PAID]: "PAID",
+      [OrderStatus.SHIPPED]: "SHIPPED",
+      [OrderStatus.COMPLETED]: "COMPLETED",
+      [OrderStatus.CANCELED]: "CANCELED",
+      [OrderStatus.REFUNDING]: "REFUNDING",
+      [OrderStatus.REFUNDED]: "REFUNDED",
+    };
+    return textMap[status] || "UNKNOWN";
+  };
+
+  const getStatusColor = (status: OrderStatus) => {
+    const colorMap: Record<OrderStatus, string> = {
+      [OrderStatus.PENDING]: "orange",
+      [OrderStatus.PAID]: "blue",
+      [OrderStatus.SHIPPED]: "cyan",
+      [OrderStatus.COMPLETED]: "green",
+      [OrderStatus.CANCELED]: "red",
+      [OrderStatus.REFUNDING]: "purple",
+      [OrderStatus.REFUNDED]: "default",
+    };
+    return colorMap[status] || "default";
   };
 
   const columns = [
@@ -101,8 +130,8 @@ const OrderDetailPage: React.FC = () => {
           <Descriptions title="Order Information" bordered column={2}>
             <Descriptions.Item label="Order ID">#{order.id}</Descriptions.Item>
             <Descriptions.Item label="Status">
-              <Tag color={order.status === "delivered" ? "green" : "blue"}>
-                {order.status.toUpperCase()}
+              <Tag color={getStatusColor(order.status)}>
+                {getStatusText(order.status)}
               </Tag>
             </Descriptions.Item>
             <Descriptions.Item label="Order Date">
@@ -113,7 +142,7 @@ const OrderDetailPage: React.FC = () => {
             </Descriptions.Item>
           </Descriptions>
 
-          {order.status !== "cancelled" && (
+          {order.status !== OrderStatus.CANCELED && (
             <div className={styles.steps}>
               <Steps current={getStatusStep(order.status)}>
                 <Step title="Pending" description="Order received" />
@@ -138,14 +167,13 @@ const OrderDetailPage: React.FC = () => {
             <div className={styles.section}>
               <h3>Shipping Address</h3>
               <p>
-                {order.shippingAddress.fullName} - {order.shippingAddress.phone}
+                {order.shippingAddress.receiverName} -{" "}
+                {order.shippingAddress.receiverPhone}
                 <br />
-                {order.shippingAddress.streetAddress}
+                {order.shippingAddress.detailAddress}
                 <br />
-                {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                {order.shippingAddress.zipCode}
-                <br />
-                {order.shippingAddress.country}
+                {order.shippingAddress.city}, {order.shippingAddress.province}{" "}
+                {order.shippingAddress.district}
               </p>
             </div>
           )}

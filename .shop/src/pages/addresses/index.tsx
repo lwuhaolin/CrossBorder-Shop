@@ -1,28 +1,51 @@
-import { PlusOutlined, DeleteOutlined, EditOutlined, StarOutlined, StarFilled } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable, ModalForm, ProFormText, ProFormSwitch } from '@ant-design/pro-components';
-import { Button, Space, message, Modal, Tag } from 'antd';
-import { useRef, useState } from 'react';
-import { getAddressList, createAddress, updateAddress, deleteAddress, setDefaultAddress } from '@/services/address';
-import type { Address, AddressCreateDTO, AddressUpdateDTO } from '@/models/address';
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  StarOutlined,
+  StarFilled,
+} from "@ant-design/icons";
+import type { ActionType, ProColumns } from "@ant-design/pro-components";
+import {
+  ProTable,
+  ModalForm,
+  ProFormText,
+  ProFormSwitch,
+} from "@ant-design/pro-components";
+import { Button, Space, message, Modal, Tag } from "antd";
+import { useRef, useState } from "react";
+import {
+  getAddressList,
+  createAddress,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress,
+} from "@/services/address";
+import type {
+  Address,
+  AddressCreateDTO,
+  AddressUpdateDTO,
+} from "@/models/address";
 
 const AddressManagement: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<Address | undefined>(undefined);
+  const [currentAddress, setCurrentAddress] = useState<Address | undefined>(
+    undefined,
+  );
 
   const handleDelete = async (id: number) => {
     Modal.confirm({
-      title: '确认删除',
-      content: '确定要删除这个地址吗？',
+      title: "确认删除",
+      content: "确定要删除这个地址吗？",
       onOk: async () => {
         try {
           await deleteAddress(id);
-          message.success('删除成功');
+          message.success("删除成功");
           actionRef.current?.reload();
         } catch (error) {
-          message.error('删除失败');
+          message.error("删除失败");
         }
       },
     });
@@ -31,112 +54,108 @@ const AddressManagement: React.FC = () => {
   const handleSetDefault = async (id: number) => {
     try {
       await setDefaultAddress(id);
-      message.success('设置默认地址成功');
+      message.success("设置默认地址成功");
       actionRef.current?.reload();
     } catch (error) {
-      message.error('设置失败');
+      message.error("设置失败");
     }
   };
 
   const handleCreate = async (values: AddressCreateDTO) => {
     try {
       await createAddress(values);
-      message.success('创建成功');
+      message.success("创建成功");
       setCreateModalVisible(false);
       actionRef.current?.reload();
       return true;
     } catch (error) {
-      message.error('创建失败');
+      message.error("创建失败");
       return false;
     }
   };
 
   const handleUpdate = async (values: AddressUpdateDTO) => {
     if (!currentAddress) return false;
-    
+
     try {
       await updateAddress(currentAddress.id, values);
-      message.success('更新成功');
+      message.success("更新成功");
       setEditModalVisible(false);
       setCurrentAddress(undefined);
       actionRef.current?.reload();
       return true;
     } catch (error) {
-      message.error('更新失败');
+      message.error("更新失败");
       return false;
     }
   };
 
   const columns: ProColumns<Address>[] = [
     {
-      title: 'ID',
-      dataIndex: 'id',
+      title: "ID",
+      dataIndex: "id",
       width: 80,
       search: false,
     },
     {
-      title: '收货人',
-      dataIndex: 'receiverName',
+      title: "收货人",
+      dataIndex: "receiverName",
       width: 120,
     },
     {
-      title: '联系电话',
-      dataIndex: 'receiverPhone',
+      title: "联系电话",
+      dataIndex: "receiverPhone",
       width: 130,
     },
     {
-      title: '所在地区',
+      title: "所在地区",
       width: 200,
       search: false,
-      render: (_, record) => `${record.province} ${record.city} ${record.district}`,
+      render: (_, record) =>
+        `${record.country} ${record.province} ${record.city} ${record.district}`,
     },
     {
-      title: '详细地址',
-      dataIndex: 'detailAddress',
+      title: "详细地址",
+      dataIndex: "detailAddress",
       width: 250,
       ellipsis: true,
       search: false,
     },
     {
-      title: '标签',
-      dataIndex: 'label',
+      title: "标签",
+      dataIndex: "label",
       width: 100,
       search: false,
-      render: (label: string) => label ? <Tag>{label}</Tag> : '-',
+      render: (_, record: Address) => (record.label ? <Tag>{record.label}</Tag> : "-"),
     },
     {
-      title: '默认地址',
-      dataIndex: 'isDefault',
+      title: "默认地址",
+      dataIndex: "isDefault",
       width: 100,
       search: false,
-      render: (isDefault: boolean) => (
-        isDefault ? <Tag color="gold" icon={<StarFilled />}>默认</Tag> : '-'
-      ),
+      render: (_, record: Address) =>
+        record.isDefault ? (
+          <Tag color="gold" icon={<StarFilled />}>
+            默认
+          </Tag>
+        ) : (
+          "-"
+        ),
     },
     {
-      title: '创建时间',
-      dataIndex: 'createdAt',
+      title: "创建时间",
+      dataIndex: "createdAt",
       width: 180,
       search: false,
-      valueType: 'dateTime',
+      valueType: "dateTime",
     },
     {
-      title: '操作',
+      title: "操作",
       width: 200,
-      fixed: 'right',
+      fixed: "right",
       search: false,
       render: (_, record) => (
         <Space size="small">
-          {!record.isDefault && (
-            <Button
-              type="link"
-              size="small"
-              icon={<StarOutlined />}
-              onClick={() => handleSetDefault(record.id)}
-            >
-              设为默认
-            </Button>
-          )}
           <Button
             type="link"
             size="small"
@@ -188,7 +207,7 @@ const AddressManagement: React.FC = () => {
         request={fetchData}
         rowKey="id"
         search={{
-          labelWidth: 'auto',
+          labelWidth: "auto",
         }}
         pagination={{
           pageSize: 10,
@@ -221,7 +240,7 @@ const AddressManagement: React.FC = () => {
           name="receiverName"
           label="收货人"
           placeholder="请输入收货人姓名"
-          rules={[{ required: true, message: '请输入收货人姓名' }]}
+          rules={[{ required: true, message: "请输入收货人姓名" }]}
         />
 
         <ProFormText
@@ -229,37 +248,44 @@ const AddressManagement: React.FC = () => {
           label="联系电话"
           placeholder="请输入联系电话"
           rules={[
-            { required: true, message: '请输入联系电话' },
-            { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' },
+            { required: true, message: "请输入联系电话" },
+            { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号码" },
           ]}
+        />
+
+        <ProFormText
+          name="country"
+          label="国家"
+          placeholder="请输入国家"
+          rules={[{ required: true, message: "请输入国家" }]}
         />
 
         <ProFormText
           name="province"
           label="省份"
           placeholder="请输入省份"
-          rules={[{ required: true, message: '请输入省份' }]}
+          rules={[{ required: true, message: "请输入省份" }]}
         />
 
         <ProFormText
           name="city"
           label="城市"
           placeholder="请输入城市"
-          rules={[{ required: true, message: '请输入城市' }]}
+          rules={[{ required: true, message: "请输入城市" }]}
         />
 
         <ProFormText
           name="district"
           label="区/县"
           placeholder="请输入区/县"
-          rules={[{ required: true, message: '请输入区/县' }]}
+          rules={[{ required: true, message: "请输入区/县" }]}
         />
 
         <ProFormText
           name="detailAddress"
           label="详细地址"
           placeholder="请输入详细地址"
-          rules={[{ required: true, message: '请输入详细地址' }]}
+          rules={[{ required: true, message: "请输入详细地址" }]}
         />
 
         <ProFormText
@@ -292,7 +318,7 @@ const AddressManagement: React.FC = () => {
           name="receiverName"
           label="收货人"
           placeholder="请输入收货人姓名"
-          rules={[{ required: true, message: '请输入收货人姓名' }]}
+          rules={[{ required: true, message: "请输入收货人姓名" }]}
         />
 
         <ProFormText
@@ -300,37 +326,44 @@ const AddressManagement: React.FC = () => {
           label="联系电话"
           placeholder="请输入联系电话"
           rules={[
-            { required: true, message: '请输入联系电话' },
-            { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' },
+            { required: true, message: "请输入联系电话" },
+            { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号码" },
           ]}
+        />
+
+        <ProFormText
+          name="country"
+          label="国家"
+          placeholder="请输入国家"
+          rules={[{ required: true, message: "请输入国家" }]}
         />
 
         <ProFormText
           name="province"
           label="省份"
           placeholder="请输入省份"
-          rules={[{ required: true, message: '请输入省份' }]}
+          rules={[{ required: true, message: "请输入省份" }]}
         />
 
         <ProFormText
           name="city"
           label="城市"
           placeholder="请输入城市"
-          rules={[{ required: true, message: '请输入城市' }]}
+          rules={[{ required: true, message: "请输入城市" }]}
         />
 
         <ProFormText
           name="district"
           label="区/县"
           placeholder="请输入区/县"
-          rules={[{ required: true, message: '请输入区/县' }]}
+          rules={[{ required: true, message: "请输入区/县" }]}
         />
 
         <ProFormText
           name="detailAddress"
           label="详细地址"
           placeholder="请输入详细地址"
-          rules={[{ required: true, message: '请输入详细地址' }]}
+          rules={[{ required: true, message: "请输入详细地址" }]}
         />
 
         <ProFormText
@@ -339,10 +372,7 @@ const AddressManagement: React.FC = () => {
           placeholder="如：家、公司、学校"
         />
 
-        <ProFormSwitch
-          name="isDefault"
-          label="设为默认地址"
-        />
+        <ProFormSwitch name="isDefault" label="设为默认地址" />
       </ModalForm>
     </>
   );

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, InputNumber, Button, message, Empty, Space } from 'antd';
-import { DeleteOutlined, ShoppingOutlined } from '@ant-design/icons';
-import { history } from 'umi';
-import styles from './index.module.css';
+import React, { useEffect, useState } from "react";
+import { Card, Table, InputNumber, Button, message, Empty, Space } from "antd";
+import { DeleteOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { useNavigate } from "@umijs/renderer-react";
+import styles from "./index.module.css";
 
 interface CartItem {
   productId: number;
@@ -15,13 +15,14 @@ interface CartItem {
 const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadCart();
   }, []);
 
   const loadCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCartItems(cart);
   };
 
@@ -29,43 +30,45 @@ const CartPage: React.FC = () => {
     if (quantity < 1) return;
 
     const updatedCart = cartItems.map((item) =>
-      item.productId === productId ? { ...item, quantity } : item
+      item.productId === productId ? { ...item, quantity } : item,
     );
 
     setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event('storage'));
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    window.dispatchEvent(new Event("storage"));
   };
 
   const removeItem = (productId: number) => {
-    const updatedCart = cartItems.filter((item) => item.productId !== productId);
+    const updatedCart = cartItems.filter(
+      (item) => item.productId !== productId,
+    );
     setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    message.success('Item removed from cart');
-    window.dispatchEvent(new Event('storage'));
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    message.success("Item removed from cart");
+    window.dispatchEvent(new Event("storage"));
   };
 
   const clearCart = () => {
     setCartItems([]);
-    localStorage.setItem('cart', JSON.stringify([]));
-    message.success('Cart cleared');
-    window.dispatchEvent(new Event('storage'));
+    localStorage.setItem("cart", JSON.stringify([]));
+    message.success("Cart cleared");
+    window.dispatchEvent(new Event("storage"));
   };
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
-      message.warning('Your cart is empty');
+      message.warning("Your cart is empty");
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      message.warning('Please login to checkout');
-      history.push('/user/login');
+      message.warning("Please login to checkout");
+      navigate("/user/login");
       return;
     }
 
-    history.push('/checkout');
+    navigate("/checkout");
   };
 
   const calculateSubtotal = () => {
@@ -82,13 +85,15 @@ const CartPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Product',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Product",
+      dataIndex: "name",
+      key: "name",
       render: (name: string, record: CartItem) => (
         <div className={styles.productCell}>
           <img
-            src={record.image || 'https://via.placeholder.com/80x80?text=Product'}
+            src={
+              record.image || "https://via.placeholder.com/80x80?text=Product"
+            }
             alt={name}
             className={styles.productImage}
           />
@@ -97,15 +102,15 @@ const CartPage: React.FC = () => {
       ),
     },
     {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
-      title: 'Quantity',
-      dataIndex: 'quantity',
-      key: 'quantity',
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
       render: (quantity: number, record: CartItem) => (
         <InputNumber
           min={1}
@@ -115,13 +120,14 @@ const CartPage: React.FC = () => {
       ),
     },
     {
-      title: 'Subtotal',
-      key: 'subtotal',
-      render: (record: CartItem) => `$${(record.price * record.quantity).toFixed(2)}`,
+      title: "Subtotal",
+      key: "subtotal",
+      render: (record: CartItem) =>
+        `$${(record.price * record.quantity).toFixed(2)}`,
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (record: CartItem) => (
         <Button
           type="text"
@@ -144,7 +150,7 @@ const CartPage: React.FC = () => {
               description="Your cart is empty"
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             >
-              <Button type="primary" onClick={() => history.push('/products')}>
+              <Button type="primary" onClick={() => navigate("/products")}>
                 Start Shopping
               </Button>
             </Empty>
@@ -172,7 +178,7 @@ const CartPage: React.FC = () => {
             <Button danger onClick={clearCart}>
               Clear Cart
             </Button>
-            <Button onClick={() => history.push('/products')}>
+            <Button onClick={() => navigate("/products")}>
               Continue Shopping
             </Button>
           </div>
@@ -188,7 +194,7 @@ const CartPage: React.FC = () => {
             <span>Shipping:</span>
             <span>${calculateShipping().toFixed(2)}</span>
           </div>
-          <div className={styles.summaryRow + ' ' + styles.total}>
+          <div className={styles.summaryRow + " " + styles.total}>
             <span>Total:</span>
             <span>${calculateTotal().toFixed(2)}</span>
           </div>

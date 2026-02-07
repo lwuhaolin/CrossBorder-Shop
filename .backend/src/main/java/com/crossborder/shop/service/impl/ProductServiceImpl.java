@@ -10,6 +10,7 @@ import com.crossborder.shop.exception.BusinessException;
 import com.crossborder.shop.mapper.ProductImageMapper;
 import com.crossborder.shop.mapper.ProductMapper;
 import com.crossborder.shop.service.ProductService;
+import com.crossborder.shop.vo.ProductImageVO;
 import com.crossborder.shop.vo.ProductVO;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 商品服务实现类
@@ -146,6 +148,19 @@ public class ProductServiceImpl implements ProductService {
 
         if (productVO != null) {
             log.debug("从缓存获取商品详情: productId={}", id);
+            // 如果缓存中没有图片列表，则补充加载图片并回写缓存
+            if (productVO.getImages() == null || productVO.getImages().isEmpty()) {
+                List<ProductImage> images = productImageMapper.selectByProductId(id);
+                if (images != null && !images.isEmpty()) {
+                    List<ProductImageVO> imageVOs = images.stream().map(image -> {
+                        ProductImageVO vo = new ProductImageVO();
+                        BeanUtil.copyProperties(image, vo);
+                        return vo;
+                    }).collect(Collectors.toList());
+                    productVO.setImages(imageVOs);
+                    redisTemplate.opsForValue().set(cacheKey, productVO, PRODUCT_CACHE_EXPIRE, TimeUnit.MINUTES);
+                }
+            }
             return productVO;
         }
 
@@ -156,8 +171,15 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // 3. 查询商品图片
-        productImageMapper.selectByProductId(id);
-        // TODO: 转换为ProductImageVO并设置到productVO.images
+        List<ProductImage> images = productImageMapper.selectByProductId(id);
+        if (images != null && !images.isEmpty()) {
+            List<ProductImageVO> imageVOs = images.stream().map(image -> {
+                ProductImageVO vo = new ProductImageVO();
+                BeanUtil.copyProperties(image, vo);
+                return vo;
+            }).collect(Collectors.toList());
+            productVO.setImages(imageVOs);
+        }
 
         // 4. 缓存商品信息
         redisTemplate.opsForValue().set(cacheKey, productVO, PRODUCT_CACHE_EXPIRE, TimeUnit.MINUTES);

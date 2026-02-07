@@ -4,7 +4,7 @@ export default defineConfig({
   routes: [
     {
       path: "/",
-      component: "@/layouts/index",
+      // component: "@/layouts/index",
       routes: [
         {
           path: "/",

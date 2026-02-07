@@ -22,6 +22,9 @@
         <result column="payment_method" property="paymentMethod"/>
         <result column="payment_time" property="paymentTime"/>
         <result column="payment_transaction_id" property="paymentTransactionId"/>
+        <result column="logistics_company" property="logisticsCompany"/>
+        <result column="tracking_no" property="trackingNo"/>
+        <result column="seller_address" property="sellerAddress"/>
         <result column="ship_time" property="shipTime"/>
         <result column="complete_time" property="completeTime"/>
         <result column="cancel_time" property="cancelTime"/>
@@ -84,11 +87,13 @@
         INSERT INTO tb_order( order_number, buyer_id, seller_id, total_amount, product_amount, freight_amount,
                      discount_amount, currency, exchange_rate, converted_amount, target_currency,
                      order_status, payment_status, payment_method, payment_time, payment_transaction_id,
+                     logistics_company, tracking_no, seller_address,
                      ship_time, complete_time, remark, buyer_message, cancel_reason, cancel_time,
                      version, create_time, update_time, create_by, update_by, deleted)
         VALUES (#{orderNumber}, #{buyerId}, #{sellerId}, #{totalAmount}, #{productAmount}, #{freightAmount},
             #{discountAmount}, #{currency}, #{exchangeRate}, #{convertedAmount}, #{targetCurrency},
             #{orderStatus}, #{paymentStatus}, #{paymentMethod}, #{paymentTime}, #{paymentTransactionId},
+            #{logisticsCompany}, #{trackingNo}, #{sellerAddress},
             #{shipTime}, #{completeTime}, #{remark}, #{buyerMessage}, #{cancelReason}, #{cancelTime},
             #{version}, NOW(), NOW(), #{createBy}, #{updateBy}, #{deleted})
     </insert>
@@ -100,6 +105,9 @@
             payment_method = #{paymentMethod},
             payment_time = #{paymentTime},
             payment_transaction_id = #{paymentTransactionId},
+            logistics_company = #{logisticsCompany},
+            tracking_no = #{trackingNo},
+            seller_address = #{sellerAddress},
             ship_time = #{shipTime},
             complete_time = #{completeTime},
             cancel_time = #{cancelTime},

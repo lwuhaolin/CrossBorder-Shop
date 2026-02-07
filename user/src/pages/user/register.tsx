@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
-import { Card, Form, Input, Button, message } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
-import { history } from 'umi';
-import { register } from '@/services/user';
-import styles from './register.module.css';
+import React, { useState } from "react";
+import { Card, Form, Input, Button, message } from "antd";
+import {
+  UserOutlined,
+  LockOutlined,
+  MailOutlined,
+  PhoneOutlined,
+} from "@ant-design/icons";
+import { useNavigate } from "@umijs/renderer-react";
+import { register } from "@/services/user";
+import styles from "./register.module.css";
 
 const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
       await register(values);
-      
-      message.success('Registration successful! Please login.');
-      history.push('/user/login');
+
+      message.success("Registration successful! Please login.");
+      navigate("/user/login");
     } catch (error: any) {
-      message.error(error.message || 'Registration failed');
+      message.error(error.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -40,42 +46,37 @@ const RegisterPage: React.FC = () => {
           >
             <Form.Item
               name="username"
-              rules={[{ required: true, message: 'Please input your username!' }]}
+              rules={[
+                { required: true, message: "Please input your username!" },
+              ]}
             >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Username"
-              />
+              <Input prefix={<UserOutlined />} placeholder="Username" />
             </Form.Item>
 
             <Form.Item
               name="email"
               rules={[
-                { required: true, message: 'Please input your email!' },
-                { type: 'email', message: 'Please enter a valid email!' },
+                { required: true, message: "Please input your email!" },
+                { type: "email", message: "Please enter a valid email!" },
               ]}
             >
-              <Input
-                prefix={<MailOutlined />}
-                placeholder="Email"
-              />
+              <Input prefix={<MailOutlined />} placeholder="Email" />
             </Form.Item>
 
             <Form.Item
               name="phone"
-              rules={[{ required: true, message: 'Please input your phone number!' }]}
+              rules={[
+                { required: true, message: "Please input your phone number!" },
+              ]}
             >
-              <Input
-                prefix={<PhoneOutlined />}
-                placeholder="Phone Number"
-              />
+              <Input prefix={<PhoneOutlined />} placeholder="Phone Number" />
             </Form.Item>
 
             <Form.Item
               name="password"
               rules={[
-                { required: true, message: 'Please input your password!' },
-                { min: 6, message: 'Password must be at least 6 characters!' },
+                { required: true, message: "Please input your password!" },
+                { min: 6, message: "Password must be at least 6 characters!" },
               ]}
             >
               <Input.Password
@@ -86,15 +87,15 @@ const RegisterPage: React.FC = () => {
 
             <Form.Item
               name="confirmPassword"
-              dependencies={['password']}
+              dependencies={["password"]}
               rules={[
-                { required: true, message: 'Please confirm your password!' },
+                { required: true, message: "Please confirm your password!" },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
+                    if (!value || getFieldValue("password") === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(new Error('Passwords do not match!'));
+                    return Promise.reject(new Error("Passwords do not match!"));
                   },
                 }),
               ]}
@@ -114,7 +115,7 @@ const RegisterPage: React.FC = () => {
 
           <div className={styles.footer}>
             <span>Already have an account?</span>
-            <Button type="link" onClick={() => history.push('/user/login')}>
+            <Button type="link" onClick={() => navigate("/user/login")}>
               Login now
             </Button>
           </div>

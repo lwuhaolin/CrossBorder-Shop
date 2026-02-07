@@ -97,6 +97,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result<Void> handleAccessDeniedException(AccessDeniedException e) {
         log.error("权限不足: {}", e.getMessage());
+        // 如果是由于缺少认证信息导致的权限不足，返回TOKEN_EXPIRED而不是FORBIDDEN
+        if ("Access is denied".equals(e.getMessage()) ||
+                e.getMessage().contains("anonymous")) {
+            return Result.fail(ResultCode.TOKEN_EXPIRED);
+        }
         return Result.fail(ResultCode.FORBIDDEN);
     }
 

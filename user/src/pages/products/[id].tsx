@@ -1,13 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, history } from 'umi';
-import { Row, Col, Button, InputNumber, message, Spin, Descriptions, Tabs, Card, Empty } from 'antd';
-import { ShoppingCartOutlined, HeartOutlined } from '@ant-design/icons';
-import { getProductDetail } from '@/services/product';
-import type { Product } from '@/models/product';
-import styles from './[id].module.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "@umijs/renderer-react";
+import {
+  Row,
+  Col,
+  Button,
+  InputNumber,
+  message,
+  Spin,
+  Descriptions,
+  Tabs,
+  Card,
+  Empty,
+} from "antd";
+import { ShoppingCartOutlined, HeartOutlined } from "@ant-design/icons";
+import { getProductDetail } from "@/services/product";
+import type { Product } from "@/models/product";
+import styles from "./[id].module.css";
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -24,8 +36,8 @@ const ProductDetailPage: React.FC = () => {
       const response = await getProductDetail(Number(id));
       setProduct(response.data);
     } catch (error) {
-      console.error('Failed to load product:', error);
-      message.error('Failed to load product');
+      console.error("Failed to load product:", error);
+      message.error("Failed to load product");
     } finally {
       setLoading(false);
     }
@@ -35,7 +47,7 @@ const ProductDetailPage: React.FC = () => {
     if (!product) return;
 
     if (product.stock === 0) {
-      message.warning('Product is out of stock');
+      message.warning("Product is out of stock");
       return;
     }
 
@@ -44,8 +56,10 @@ const ProductDetailPage: React.FC = () => {
       return;
     }
 
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find((item: any) => item.productId === product.id);
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const existingItem = cart.find(
+      (item: any) => item.productId === product.id,
+    );
 
     if (existingItem) {
       existingItem.quantity += quantity;
@@ -59,24 +73,24 @@ const ProductDetailPage: React.FC = () => {
       });
     }
 
-    localStorage.setItem('cart', JSON.stringify(cart));
-    message.success('Added to cart');
-    window.dispatchEvent(new Event('storage'));
+    localStorage.setItem("cart", JSON.stringify(cart));
+    message.success("Added to cart");
+    window.dispatchEvent(new Event("storage"));
   };
 
   const handleBuyNow = () => {
     handleAddToCart();
-    history.push('/cart');
+    navigate("/cart");
   };
 
   const handleAddToFavorites = () => {
     if (!product) return;
 
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     const exists = favorites.find((item: any) => item.id === product.id);
 
     if (exists) {
-      message.info('Already in favorites');
+      message.info("Already in favorites");
       return;
     }
 
@@ -87,8 +101,8 @@ const ProductDetailPage: React.FC = () => {
       imageUrl: product.mainImage,
     });
 
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    message.success('Added to favorites');
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    message.success("Added to favorites");
   };
 
   if (loading) {
@@ -109,31 +123,37 @@ const ProductDetailPage: React.FC = () => {
 
   const tabItems = [
     {
-      key: 'description',
-      label: 'Description',
+      key: "description",
+      label: "Description",
       children: (
         <div className={styles.tabContent}>
-          <p>{product.description || 'No description available.'}</p>
+          <p>{product.description || "No description available."}</p>
         </div>
       ),
     },
     {
-      key: 'specifications',
-      label: 'Specifications',
+      key: "specifications",
+      label: "Specifications",
       children: (
         <div className={styles.tabContent}>
           <Descriptions bordered column={1}>
-            <Descriptions.Item label="Product ID">{product.id}</Descriptions.Item>
-            <Descriptions.Item label="Category">{product.categoryId}</Descriptions.Item>
+            <Descriptions.Item label="Product ID">
+              {product.id}
+            </Descriptions.Item>
+            <Descriptions.Item label="Category">
+              {product.categoryId}
+            </Descriptions.Item>
             <Descriptions.Item label="Stock">{product.stock}</Descriptions.Item>
-            <Descriptions.Item label="Price">${product.price.toFixed(2)}</Descriptions.Item>
+            <Descriptions.Item label="Price">
+              ${product.price.toFixed(2)}
+            </Descriptions.Item>
           </Descriptions>
         </div>
       ),
     },
     {
-      key: 'reviews',
-      label: 'Reviews',
+      key: "reviews",
+      label: "Reviews",
       children: (
         <div className={styles.tabContent}>
           <Empty description="No reviews yet" />
@@ -151,7 +171,10 @@ const ProductDetailPage: React.FC = () => {
             <Col xs={24} md={12}>
               <div className={styles.imageWrapper}>
                 <img
-                  src={product.mainImage || 'https://via.placeholder.com/600x600?text=Product'}
+                  src={
+                    product.mainImage ||
+                    "https://via.placeholder.com/600x600?text=Product"
+                  }
                   alt={product.name}
                   className={styles.image}
                 />
@@ -162,22 +185,26 @@ const ProductDetailPage: React.FC = () => {
             <Col xs={24} md={12}>
               <div className={styles.productInfo}>
                 <h1 className={styles.productName}>{product.name}</h1>
-                
+
                 <div className={styles.price}>
                   <span className={styles.priceLabel}>Price:</span>
-                  <span className={styles.priceValue}>${product.price.toFixed(2)}</span>
+                  <span className={styles.priceValue}>
+                    ${product.price.toFixed(2)}
+                  </span>
                 </div>
 
                 <div className={styles.stock}>
                   <span className={styles.stockLabel}>Stock:</span>
                   <span className={styles.stockValue}>
-                    {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
+                    {product.stock > 0
+                      ? `${product.stock} available`
+                      : "Out of stock"}
                   </span>
                 </div>
 
                 <div className={styles.description}>
                   <h3>Description</h3>
-                  <p>{product.description || 'No description available.'}</p>
+                  <p>{product.description || "No description available."}</p>
                 </div>
 
                 <div className={styles.quantity}>

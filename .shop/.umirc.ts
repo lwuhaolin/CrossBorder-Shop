@@ -54,6 +54,23 @@ export default defineConfig({
       ],
     },
     {
+      path: "/admin",
+      routes: [
+        {
+          path: "users",
+          component: "admin/users",
+        },
+        {
+          path: "rates",
+          component: "admin/rates",
+        },
+        {
+          path: "settings",
+          component: "admin/settings",
+        },
+      ],
+    },
+    {
       path: "/addresses",
       component: "addresses",
     },

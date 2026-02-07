@@ -3,11 +3,13 @@ package com.crossborder.shop.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.crossborder.shop.common.ResultCode;
 import com.crossborder.shop.dto.CreateOrderDTO;
+import com.crossborder.shop.dto.OrderShipDTO;
 import com.crossborder.shop.dto.OrderTimeoutTask;
 import com.crossborder.shop.entity.*;
 import com.crossborder.shop.exception.BusinessException;
 import com.crossborder.shop.mapper.*;
 import com.crossborder.shop.service.DelayQueueService;
+import com.crossborder.shop.service.LogisticsService;
 import com.crossborder.shop.service.OrderService;
 import com.crossborder.shop.util.OrderNumberGenerator;
 import com.crossborder.shop.vo.OrderAddressVO;
@@ -22,7 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -55,6 +59,8 @@ public class OrderServiceImpl implements OrderService {
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
     private final ProductMapper productMapper;
+    private final LogisticsCompanyMapper logisticsCompanyMapper;
+    private final LogisticsService logisticsService;
     private final OrderNumberGenerator orderNumberGenerator;
     private final DelayQueueService delayQueueService;
 
@@ -79,15 +85,21 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ResultCode.FORBIDDEN, "无权使用该地址");
         }
 
-        // 2. 查询购物车选中商品
-        Cart cart = cartMapper.selectByUserId(userId);
-        if (cart == null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "购物车为空");
-        }
+        boolean useProductIds = dto.getProductIds() != null && !dto.getProductIds().isEmpty();
 
-        List<CartItem> cartItems = cartItemMapper.selectSelectedByCartId(cart.getId());
-        if (cartItems.isEmpty()) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "请选择要购买的商品");
+        // 2. 查询购物车选中商品（当未传productIds时）
+        Cart cart = null;
+        List<CartItem> cartItems = new ArrayList<>();
+        if (!useProductIds) {
+            cart = cartMapper.selectByUserId(userId);
+            if (cart == null) {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "购物车为空");
+            }
+
+            cartItems = cartItemMapper.selectSelectedByCartId(cart.getId());
+            if (cartItems.isEmpty()) {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "请选择要购买的商品");
+            }
         }
 
         // 3. 生成订单号
@@ -98,71 +110,158 @@ public class OrderServiceImpl implements OrderService {
         Long sellerId = null;
         BigDecimal productAmount = BigDecimal.ZERO;
 
-        for (CartItem cartItem : cartItems) {
-            Product product = productMapper.selectById(cartItem.getProductId());
-            if (product == null) {
-                throw new BusinessException(ResultCode.PRODUCT_NOT_EXISTS);
+        if (useProductIds) {
+            Map<Long, Integer> quantityMap = new HashMap<>();
+            for (Long productId : dto.getProductIds()) {
+                if (productId == null) {
+                    continue;
+                }
+                quantityMap.put(productId, quantityMap.getOrDefault(productId, 0) + 1);
             }
 
-            // 校验商品状态
-            if (!product.getOnShelf()) {
-                throw new BusinessException(ResultCode.PRODUCT_OFF_SHELF, "商品已下架: " + product.getName());
+            if (quantityMap.isEmpty()) {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "商品列表为空");
             }
 
-            // 乐观锁扣减库存（带重试）
-            boolean success = false;
-            for (int i = 0; i < stockRetryTimes; i++) {
-                int updated = productMapper.decreaseStock(
-                        product.getId(),
-                        cartItem.getQuantity(),
-                        product.getVersion());
-
-                if (updated > 0) {
-                    success = true;
-                    break;
+            for (Map.Entry<Long, Integer> entry : quantityMap.entrySet()) {
+                Long productId = entry.getKey();
+                Integer quantity = entry.getValue();
+                Product product = productMapper.selectById(productId);
+                if (product == null) {
+                    throw new BusinessException(ResultCode.PRODUCT_NOT_EXISTS);
                 }
 
-                // 重新查询最新版本
-                product = productMapper.selectById(product.getId());
-                if (product.getStock() < cartItem.getQuantity()) {
-                    throw new BusinessException(ResultCode.PRODUCT_STOCK_NOT_ENOUGH, "商品库存不足: " + product.getName());
+                // 校验商品状态
+                if (!product.getOnShelf()) {
+                    throw new BusinessException(ResultCode.PRODUCT_OFF_SHELF, "商品已下架: " + product.getName());
                 }
 
-                // 指数退避
-                try {
-                    Thread.sleep(50 * (1L << i)); // 50ms, 100ms, 200ms
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "库存扣减失败");
+                // 记录卖家ID（简化处理：假设一个订单只有一个卖家）
+                if (sellerId == null) {
+                    sellerId = product.getSellerId();
+                } else if (!sellerId.equals(product.getSellerId())) {
+                    throw new BusinessException(ResultCode.BAD_REQUEST, "一次下单只能包含同一卖家的商品");
                 }
+
+                // 乐观锁扣减库存（带重试）
+                boolean success = false;
+                for (int i = 0; i < stockRetryTimes; i++) {
+                    int updated = productMapper.decreaseStock(
+                            product.getId(),
+                            quantity,
+                            product.getVersion());
+
+                    if (updated > 0) {
+                        success = true;
+                        break;
+                    }
+
+                    // 重新查询最新版本
+                    product = productMapper.selectById(product.getId());
+                    if (product.getStock() < quantity) {
+                        throw new BusinessException(ResultCode.PRODUCT_STOCK_NOT_ENOUGH,
+                                "商品库存不足: " + product.getName());
+                    }
+
+                    // 指数退避
+                    try {
+                        Thread.sleep(50 * (1L << i)); // 50ms, 100ms, 200ms
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "库存扣减失败");
+                    }
+                }
+
+                if (!success) {
+                    throw new BusinessException(ResultCode.PRODUCT_STOCK_NOT_ENOUGH, "库存扣减失败，请重试");
+                }
+
+                // 构建订单明细
+                OrderItem orderItem = new OrderItem();
+                orderItem.setProductId(product.getId());
+                orderItem.setProductName(product.getName());
+                orderItem.setOrderNumber(orderNumber);
+                orderItem.setProductCode(product.getProductCode());
+                orderItem.setImageUrl(product.getImage());
+                orderItem.setSkuId(null);
+                orderItem.setSkuName(null);
+                orderItem.setPrice(product.getPrice());
+                orderItem.setQuantity(quantity);
+                orderItem.setTotalPrice(product.getPrice().multiply(new BigDecimal(quantity)));
+                orderItem.setCreateBy(userId);
+                orderItem.setUpdateBy(userId);
+
+                orderItems.add(orderItem);
+                productAmount = productAmount.add(orderItem.getTotalPrice());
             }
+        } else {
+            for (CartItem cartItem : cartItems) {
+                Product product = productMapper.selectById(cartItem.getProductId());
+                if (product == null) {
+                    throw new BusinessException(ResultCode.PRODUCT_NOT_EXISTS);
+                }
 
-            if (!success) {
-                throw new BusinessException(ResultCode.PRODUCT_STOCK_NOT_ENOUGH, "库存扣减失败，请重试");
+                // 校验商品状态
+                if (!product.getOnShelf()) {
+                    throw new BusinessException(ResultCode.PRODUCT_OFF_SHELF, "商品已下架: " + product.getName());
+                }
+
+                // 乐观锁扣减库存（带重试）
+                boolean success = false;
+                for (int i = 0; i < stockRetryTimes; i++) {
+                    int updated = productMapper.decreaseStock(
+                            product.getId(),
+                            cartItem.getQuantity(),
+                            product.getVersion());
+
+                    if (updated > 0) {
+                        success = true;
+                        break;
+                    }
+
+                    // 重新查询最新版本
+                    product = productMapper.selectById(product.getId());
+                    if (product.getStock() < cartItem.getQuantity()) {
+                        throw new BusinessException(ResultCode.PRODUCT_STOCK_NOT_ENOUGH,
+                                "商品库存不足: " + product.getName());
+                    }
+
+                    // 指数退避
+                    try {
+                        Thread.sleep(50 * (1L << i)); // 50ms, 100ms, 200ms
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new BusinessException(ResultCode.INTERNAL_SERVER_ERROR, "库存扣减失败");
+                    }
+                }
+
+                if (!success) {
+                    throw new BusinessException(ResultCode.PRODUCT_STOCK_NOT_ENOUGH, "库存扣减失败，请重试");
+                }
+
+                // 记录卖家ID（简化处理：假设一个订单只有一个卖家）
+                if (sellerId == null) {
+                    sellerId = product.getSellerId();
+                }
+
+                // 构建订单明细
+                OrderItem orderItem = new OrderItem();
+                orderItem.setProductId(product.getId());
+                orderItem.setProductName(product.getName());
+                orderItem.setOrderNumber(orderNumber);
+                orderItem.setProductCode(product.getProductCode());
+                orderItem.setImageUrl(product.getImage());
+                orderItem.setSkuId(cartItem.getSkuId());
+                orderItem.setSkuName(null);
+                orderItem.setPrice(product.getPrice());
+                orderItem.setQuantity(cartItem.getQuantity());
+                orderItem.setTotalPrice(product.getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
+                orderItem.setCreateBy(userId);
+                orderItem.setUpdateBy(userId);
+
+                orderItems.add(orderItem);
+                productAmount = productAmount.add(orderItem.getTotalPrice());
             }
-
-            // 记录卖家ID（简化处理：假设一个订单只有一个卖家）
-            if (sellerId == null) {
-                sellerId = product.getSellerId();
-            }
-
-            // 构建订单明细
-            OrderItem orderItem = new OrderItem();
-            orderItem.setProductId(product.getId());
-            orderItem.setProductName(product.getName());
-            orderItem.setOrderNumber(orderNumber);
-            orderItem.setProductCode(product.getProductCode());
-            orderItem.setImageUrl(product.getImage());
-            orderItem.setSkuId(cartItem.getSkuId());
-            orderItem.setSkuName(null);
-            orderItem.setPrice(product.getPrice());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setTotalPrice(product.getPrice().multiply(new BigDecimal(cartItem.getQuantity())));
-            orderItem.setCreateBy(userId);
-            orderItem.setUpdateBy(userId);
-
-            orderItems.add(orderItem);
-            productAmount = productAmount.add(orderItem.getTotalPrice());
         }
 
         // 5. 计算汇率转换（简化处理：使用固定汇率，实际应查询汇率表）
@@ -191,6 +290,9 @@ public class OrderServiceImpl implements OrderService {
         order.setTargetCurrency(dto.getTargetCurrency());
         order.setRemark(dto.getRemark());
         order.setBuyerMessage(null);
+        order.setLogisticsCompany(null);
+        order.setTrackingNo(null);
+        order.setSellerAddress(buildSellerAddressSnapshot(sellerId));
         order.setVersion(0);
         order.setDeleted(0);
         order.setCreateBy(userId);
@@ -227,8 +329,10 @@ public class OrderServiceImpl implements OrderService {
         // 10. TODO: 保存超时任务记录到数据库（可选，用于持久化）
 
         // 11. 清空购物车选中商品
-        for (CartItem item : cartItems) {
-            cartItemMapper.deleteById(item.getId());
+        if (!useProductIds) {
+            for (CartItem item : cartItems) {
+                cartItemMapper.deleteById(item.getId());
+            }
         }
 
         // 购物车总价/总数改为查询时动态计算
@@ -358,9 +462,17 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 卖家发货
      */
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void shipOrder(Long sellerId, Long orderId) {
+        shipOrder(sellerId, orderId, null);
+    }
+
+    /**
+     * 卖家发货（带物流信息）
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void shipOrder(Long sellerId, Long orderId, OrderShipDTO dto) {
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
             throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
@@ -379,6 +491,31 @@ public class OrderServiceImpl implements OrderService {
         // 更新订单状态
         order.setOrderStatus(ORDER_STATUS_SHIPPED);
         order.setShipTime(LocalDateTime.now());
+        if (dto != null) {
+            String companyCode = dto.getShippingCompanyCode();
+            if (companyCode != null && !companyCode.isBlank()) {
+                LogisticsCompany company = logisticsCompanyMapper.selectByCode(companyCode);
+                if (company == null || company.getStatus() == null || company.getStatus() != 1) {
+                    throw new BusinessException(ResultCode.LOGISTICS_NOT_FOUND);
+                }
+                order.setLogisticsCompany(company.getCompanyName());
+                if (dto.getTrackingNo() == null || dto.getTrackingNo().isBlank()) {
+                    order.setTrackingNo(logisticsService.generateTrackingNo(companyCode));
+                } else {
+                    order.setTrackingNo(dto.getTrackingNo());
+                }
+            } else {
+                order.setLogisticsCompany(dto.getShippingCompany());
+                if (dto.getTrackingNo() == null || dto.getTrackingNo().isBlank()) {
+                    order.setTrackingNo("LOG" + System.currentTimeMillis());
+                } else {
+                    order.setTrackingNo(dto.getTrackingNo());
+                }
+            }
+            if (dto.getRemark() != null && !dto.getRemark().isBlank()) {
+                order.setRemark(dto.getRemark());
+            }
+        }
         orderMapper.updateById(order);
 
         log.info("订单发货成功: orderId={}, sellerId={}", orderId, sellerId);
@@ -480,5 +617,48 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return vo;
+    }
+
+    private String buildSellerAddressSnapshot(Long sellerId) {
+        if (sellerId == null) {
+            return null;
+        }
+        ShippingAddress sellerAddress = shippingAddressMapper.selectDefaultByUserId(sellerId);
+        if (sellerAddress == null) {
+            List<ShippingAddress> sellerAddresses = shippingAddressMapper.selectByUserId(sellerId);
+            if (sellerAddresses == null || sellerAddresses.isEmpty()) {
+                return null;
+            }
+            sellerAddress = sellerAddresses.get(0);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (sellerAddress.getReceiverName() != null) {
+            sb.append(sellerAddress.getReceiverName());
+        }
+        if (sellerAddress.getReceiverPhone() != null) {
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(sellerAddress.getReceiverPhone());
+        }
+        if (sellerAddress.getCountry() != null) {
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(sellerAddress.getCountry());
+        }
+        if (sellerAddress.getProvince() != null) {
+            sb.append(" ").append(sellerAddress.getProvince());
+        }
+        if (sellerAddress.getCity() != null) {
+            sb.append(" ").append(sellerAddress.getCity());
+        }
+        if (sellerAddress.getDistrict() != null) {
+            sb.append(" ").append(sellerAddress.getDistrict());
+        }
+        if (sellerAddress.getDetailAddress() != null) {
+            sb.append(" ").append(sellerAddress.getDetailAddress());
+        }
+        String result = sb.toString().trim();
+        return result.isEmpty() ? null : result;
     }
 }

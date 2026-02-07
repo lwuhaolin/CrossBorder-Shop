@@ -30,22 +30,138 @@ const XinLayout: React.FC<ProLayoutProps> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const user = getUserInfo();
+  const roleCodes = (user?.roles || []).map((role: any) => role.roleCode);
+  const isAdmin = roleCodes.includes("ADMIN");
+  const isSeller = roleCodes.includes("SELLER");
+
+  const adminRoutes = [
+    {
+      name: "用户管理",
+      path: "admin/users",
+      icon: <UserOutlined />,
+    },
+    {
+      name: "商品管理",
+      path: "products",
+      icon: <ShoppingOutlined />,
+    },
+    {
+      name: "汇率管理",
+      path: "admin/rates",
+      icon: <LinkOutlined />,
+    },
+    {
+      name: "系统配置",
+      path: "admin/settings",
+      icon: <ExperimentOutlined />,
+    },
+    {
+      name: "个人中心",
+      path: "user",
+      icon: <UserOutlined />,
+      routes: [
+        {
+          name: "个人信息",
+          path: "profile",
+        },
+        {
+          name: "修改密码",
+          path: "password",
+        },
+      ],
+    },
+  ];
+
+  const sellerRoutes = [
+    {
+      name: "仪表盘",
+      path: "dashboard",
+      icon: <DashboardOutlined />,
+    },
+    {
+      name: "商品管理",
+      path: "products",
+      icon: <ShoppingOutlined />,
+    },
+    {
+      name: "分类管理",
+      path: "categories",
+      icon: <AppstoreOutlined />,
+    },
+    {
+      name: "订单管理",
+      path: "orders",
+      icon: <ShoppingCartOutlined />,
+    },
+    {
+      name: "地址管理",
+      path: "addresses",
+      icon: <EnvironmentOutlined />,
+    },
+    {
+      name: "个人中心",
+      path: "user",
+      icon: <UserOutlined />,
+      routes: [
+        {
+          name: "个人信息",
+          path: "profile",
+        },
+        {
+          name: "修改密码",
+          path: "password",
+        },
+      ],
+    },
+  ];
+
+  const allowedPrefixes = isAdmin
+    ? [
+        "/admin/users",
+        "/products",
+        "/admin/rates",
+        "/admin/settings",
+        "/user/profile",
+        "/user/password",
+      ]
+    : [
+        "/dashboard",
+        "/products",
+        "/categories",
+        "/orders",
+        "/addresses",
+        "/user/profile",
+        "/user/password",
+      ];
 
   // Redirect to login if no user and not on login page
   React.useEffect(() => {
-    if (!user && location.pathname !== '/login') {
-      navigate('/login');
+    if (!user && location.pathname !== "/login") {
+      navigate("/login");
     }
   }, [user, location.pathname, navigate]);
+
+  // Role-based route guard
+  React.useEffect(() => {
+    if (!user || location.pathname === "/login") return;
+    const isAllowed = allowedPrefixes.some(
+      (prefix) =>
+        location.pathname === prefix ||
+        location.pathname.startsWith(`${prefix}/`),
+    );
+    if (!isAllowed) {
+      navigate(isAdmin ? "/admin/users" : "/dashboard");
+    }
+  }, [user, location.pathname, navigate, isAdmin]);
 
   const handleLogout = () => {
     removeToken();
     removeUserInfo();
-    navigate('/login');
+    navigate("/login");
   };
 
   // Don't show layout on login page
-  if (location.pathname === '/login') {
+  if (location.pathname === "/login") {
     return <Outlet />;
   }
 
@@ -93,17 +209,12 @@ const XinLayout: React.FC<ProLayoutProps> = (props) => {
               title: user.username || user.name,
               size: "default",
               src: user.avatar,
-              style: user.avatar ? {} : { backgroundColor: '#78AA64' },
+              style: user.avatar ? {} : { backgroundColor: "#78AA64" },
             }}
             actionsRender={(_props_) => {
               return _props_.isMobile
                 ? []
-                : [
-                    <XinMenu
-                      key="menu"
-                      onLogout={handleLogout}
-                    />,
-                  ];
+                : [<XinMenu key="menu" onLogout={handleLogout} />];
             }}
             menuItemRender={(item, element) => (
               <div
@@ -118,48 +229,7 @@ const XinLayout: React.FC<ProLayoutProps> = (props) => {
             collapsedButtonRender={() => []}
             route={{
               path: "/",
-              routes: [
-                {
-                  name: "仪表盘",
-                  path: "dashboard",
-                  icon: <DashboardOutlined />,
-                },
-                {
-                  name: "商品管理",
-                  path: "products",
-                  icon: <ShoppingOutlined />,
-                },
-                {
-                  name: "分类管理",
-                  path: "categories",
-                  icon: <AppstoreOutlined />,
-                },
-                {
-                  name: "订单管理",
-                  path: "orders",
-                  icon: <ShoppingCartOutlined />,
-                },
-                {
-                  name: "地址管理",
-                  path: "addresses",
-                  icon: <EnvironmentOutlined />,
-                },
-                {
-                  name: "个人中心",
-                  path: "user",
-                  icon: <UserOutlined />,
-                  routes: [
-                    {
-                      name: "个人信息",
-                      path: "profile",
-                    },
-                    {
-                      name: "修改密码",
-                      path: "password",
-                    },
-                  ],
-                },
-              ],
+              routes: isAdmin ? adminRoutes : sellerRoutes,
             }}
             {...props}
           >
