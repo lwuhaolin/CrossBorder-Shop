@@ -48,6 +48,19 @@ INSERT INTO tb_system_config (config_key, config_value, config_type, description
 ('exchange.rate.update.interval', '60', 'number', '汇率更新间隔（分钟）', 'currency'),
 ('system.maintenance', 'false', 'boolean', '系统维护模式', 'system');
 
+-- 应用配置默认值
+INSERT INTO tb_system_config (config_key, config_value, config_type, description, group_name) VALUES
+('app.name', 'CrossBorder Shop', 'string', '应用名称', 'basic'),
+('app.version', '1.0.0', 'string', '应用版本', 'basic'),
+('app.description', '跨境电商平台', 'string', '应用描述', 'basic'),
+('support.email', 'support@crossborder.shop', 'string', '客服邮箱', 'contact'),
+('support.phone', '+86-123-4567-8900', 'string', '客服电话', 'contact'),
+('default.currency', 'USD', 'string', '默认币种', 'transaction'),
+('shipping.free.threshold', '0', 'number', '满额免运费金额', 'transaction'),
+('shipping.fee', '10', 'number', '默认运费', 'transaction'),
+('user.registration.enable', 'true', 'boolean', '启用用户注册', 'feature'),
+('seller.registration.enable', 'true', 'boolean', '启用卖家注册', 'feature');
+
 -- 每日销售统计表
 DROP TABLE IF EXISTS tb_daily_statistics;
 CREATE TABLE tb_daily_statistics (

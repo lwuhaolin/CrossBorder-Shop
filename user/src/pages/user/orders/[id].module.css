@@ -17,33 +17,57 @@
 }
 
 .card {
+  margin-bottom: 24px;
   border-radius: 8px;
-}
-
-.loading,
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .steps {
-  margin: 32px 0;
+  margin: 24px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 4px;
 }
 
 .section {
-  margin-top: 32px;
+  margin-top: 24px;
+  padding: 16px 0;
+  border-top: 1px solid #f0f0f0;
 }
 
 .section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 12px;
 }
 
 .section p {
+  color: #666;
   line-height: 1.8;
+  margin: 0;
+}
+
+.actions {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px - 200px);
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px - 200px);
 }
 
 @media (max-width: 768px) {
@@ -53,5 +77,23 @@
 
   .title {
     font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+
+  .section {
+    margin-top: 16px;
+    padding: 12px 0;
+  }
+
+  .section h3 {
+    font-size: 14px;
   }
 }

@@ -12,9 +12,9 @@ export async function addToCart(data: CartAddDTO): Promise<Result<void>> {
 }
 
 // Get cart
-export async function getCart(userId: number): Promise<Result<Cart>> {
+export async function getCart(): Promise<Result<Cart>> {
   return request({
-    url: `/cart/${userId}`,
+    url: `/cart`,
     method: 'GET',
   });
 }

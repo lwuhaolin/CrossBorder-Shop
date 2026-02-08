@@ -127,6 +127,7 @@ export default {
   "checkout.orderPlaced": "订单已成功提交",
   "checkout.emptyCart": "购物车为空",
   "checkout.loginRequired": "请登录后继续结账",
+  "checkout.currency": "结算币种",
   "checkout.estimatedAmount": "预计金额，具体支付金额以实际结算为准",
 
   // Orders
@@ -160,6 +161,19 @@ export default {
   "order.notFound": "订单未找到",
   "order.orderInformation": "订单信息",
   "order.orderItems": "订单商品",
+  "order.pay": "支付",
+  "order.confirmPay": "确认支付",
+  "order.paymentConfirm": "确定要支付此订单吗？",
+  "order.paymentSuccess": "支付成功",
+  "order.paymentFailed": "支付失败",
+  "order.confirmCancel": "确认取消",
+  "order.cancelConfirm": "确定要取消此订单吗？",
+  "order.cancelSuccess": "订单已取消",
+  "order.cancelFailed": "取消订单失败",
+  "order.confirmReceipt": "确认收货",
+  "order.receiptConfirm": "确定已收到商品吗？",
+  "order.confirmSuccess": "确认收货成功，订单已完成",
+  "order.confirmFailed": "确认收货失败",
 
   // Profile
   "profile.title": "个人信息",

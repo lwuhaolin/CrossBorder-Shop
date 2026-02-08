@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crossborder.shop.mapper.SystemStatsMapper">
+
+    <select id="countTotalUsers" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE deleted = 0
+    </select>
+
+    <select id="countActiveUsers" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE deleted = 0 AND status = 1
+    </select>
+
+    <select id="countNewUsersToday" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE deleted = 0
+          AND DATE(create_time) = CURDATE()
+    </select>
+
+    <select id="countTotalProducts" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_product
+        WHERE deleted = 0
+    </select>
+
+    <select id="countActiveProducts" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_product
+        WHERE deleted = 0 AND status = 1
+    </select>
+
+    <select id="countTotalOrders" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_order
+        WHERE deleted = 0
+    </select>
+
+    <select id="countPendingOrders" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_order
+        WHERE deleted = 0 AND order_status IN (0, 1)
+    </select>
+
+    <select id="sumTotalRevenue" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(total_amount), 0)
+        FROM tb_order
+        WHERE deleted = 0 AND payment_status = 1
+    </select>
+
+    <select id="sumRevenueToday" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(total_amount), 0)
+        FROM tb_order
+        WHERE deleted = 0 AND payment_status = 1
+          AND DATE(payment_time) = CURDATE()
+    </select>
+
+</mapper>

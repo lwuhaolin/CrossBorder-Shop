@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 订单超时任务消息
@@ -33,4 +34,24 @@ public class OrderTimeoutTask implements Serializable {
 
     @Schema(description = "创建时间", example = "2026-02-06T12:00:00")
     private LocalDateTime createTime;
+
+    /**
+     * 自定义equals方法，只基于orderId进行比较
+     * 这样可以正确地从Redis延迟队列中移除任务
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderTimeoutTask that = (OrderTimeoutTask) o;
+        return Objects.equals(orderId, that.orderId);
+    }
+
+    /**
+     * 自定义hashCode方法，只基于orderId
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(orderId);
+    }
 }

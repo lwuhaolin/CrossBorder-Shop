@@ -1,17 +1,39 @@
-import React, { useEffect } from 'react';
-import { Card, Form, Input, InputNumber, Select, Switch, Button, Divider, message, Row, Col, Statistic, Space } from 'antd';
-import { getAppConfig, updateAppConfig, getSystemStats } from '@/services/settings';
-import type { AppConfig, SystemStats } from '@/models/settings';
-import dayjs from 'dayjs';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Switch,
+  Button,
+  Divider,
+  message,
+  Row,
+  Col,
+  Statistic,
+  Space,
+} from "antd";
+import {
+  getAppConfig,
+  updateAppConfig,
+  getSystemStats,
+} from "@/services/settings";
+import { getCurrencies } from "@/services/rate";
+import type { AppConfig, SystemStats } from "@/models/settings";
+import type { Currency } from "@/models/rate";
+import dayjs from "dayjs";
 
 const AdminSettings: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = React.useState(false);
   const [stats, setStats] = React.useState<SystemStats | null>(null);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
 
   useEffect(() => {
     loadSettings();
     loadStats();
+    loadCurrencies();
   }, []);
 
   const loadSettings = async () => {
@@ -20,7 +42,7 @@ const AdminSettings: React.FC = () => {
       const response = await getAppConfig();
       form.setFieldsValue(response.data);
     } catch (error) {
-      message.error('加载配置失败');
+      message.error("加载配置失败");
     } finally {
       setLoading(false);
     }
@@ -29,9 +51,20 @@ const AdminSettings: React.FC = () => {
   const loadStats = async () => {
     try {
       const response = await getSystemStats();
-      setStats(response.data);
+      setStats(response.data || null);
     } catch (error) {
-      console.error('Failed to load stats:', error);
+      console.error("Failed to load stats:", error);
+    }
+  };
+
+  const loadCurrencies = async () => {
+    try {
+      const response = await getCurrencies();
+      if (response.data) {
+        setCurrencies(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to load currencies:", error);
     }
   };
 
@@ -40,9 +73,9 @@ const AdminSettings: React.FC = () => {
       const values = await form.validateFields();
       setLoading(true);
       await updateAppConfig(values);
-      message.success('配置已保存');
+      message.success("配置已保存");
     } catch (error) {
-      message.error('保存失败');
+      message.error("保存失败");
     } finally {
       setLoading(false);
     }
@@ -76,15 +109,25 @@ const AdminSettings: React.FC = () => {
               <Statistic title="待处理订单" value={stats.pendingOrders} />
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Statistic title="总营收" value={`$${stats.totalRevenue.toFixed(2)}`} />
+              <Statistic
+                title="总营收"
+                value={`$${stats.totalRevenue.toFixed(2)}`}
+              />
             </Col>
             <Col xs={24} sm={12} md={6}>
-              <Statistic title="今日营收" value={`$${stats.revenueToday.toFixed(2)}`} />
+              <Statistic
+                title="今日营收"
+                value={`$${stats.revenueToday.toFixed(2)}`}
+              />
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="最后更新"
-                value={stats.lastUpdateTime ? dayjs(stats.lastUpdateTime).format('HH:mm') : '-'}
+                value={
+                  stats.lastUpdateTime
+                    ? dayjs(stats.lastUpdateTime).format("HH:mm")
+                    : "-"
+                }
               />
             </Col>
           </Row>
@@ -140,11 +183,10 @@ const AdminSettings: React.FC = () => {
               <Form.Item label="默认币种" name="defaultCurrency">
                 <Select
                   placeholder="选择默认币种"
-                  options={[
-                    { label: '人民币 (CNY)', value: 'CNY' },
-                    { label: '美元 (USD)', value: 'USD' },
-                    { label: '欧元 (EUR)', value: 'EUR' },
-                  ]}
+                  options={currencies.map((currency) => ({
+                    label: `${currency.currencyName} (${currency.currencyCode})`,
+                    value: currency.currencyCode,
+                  }))}
                 />
               </Form.Item>
             </Col>
@@ -169,12 +211,20 @@ const AdminSettings: React.FC = () => {
 
           <Row gutter={16}>
             <Col xs={24} md={12}>
-              <Form.Item label="启用用户注册" name="enableUserRegistration" valuePropName="checked">
+              <Form.Item
+                label="启用用户注册"
+                name="enableUserRegistration"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="启用卖家注册" name="enableSellerRegistration" valuePropName="checked">
+              <Form.Item
+                label="启用卖家注册"
+                name="enableSellerRegistration"
+                valuePropName="checked"
+              >
                 <Switch />
               </Form.Item>
             </Col>
@@ -185,9 +235,7 @@ const AdminSettings: React.FC = () => {
               <Button type="primary" htmlType="submit" loading={loading}>
                 保存配置
               </Button>
-              <Button onClick={loadSettings}>
-                重置
-              </Button>
+              <Button onClick={loadSettings}>重置</Button>
             </Space>
           </Form.Item>
         </Form>

@@ -8,9 +8,11 @@ import com.crossborder.shop.dto.UpdateCartItemDTO;
 import com.crossborder.shop.entity.Cart;
 import com.crossborder.shop.entity.CartItem;
 import com.crossborder.shop.entity.Product;
+import com.crossborder.shop.entity.ProductImage;
 import com.crossborder.shop.exception.BusinessException;
 import com.crossborder.shop.mapper.CartItemMapper;
 import com.crossborder.shop.mapper.CartMapper;
+import com.crossborder.shop.mapper.ProductImageMapper;
 import com.crossborder.shop.mapper.ProductMapper;
 import com.crossborder.shop.service.CartService;
 import com.crossborder.shop.vo.CartItemVO;
@@ -37,6 +39,7 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
     private final ProductMapper productMapper;
+    private final ProductImageMapper productImageMapper;
     private final RedissonClient redissonClient;
 
     @Value("${cache.delay-delete-millis:500}")
@@ -245,11 +248,15 @@ public class CartServiceImpl implements CartService {
                 continue;
             }
 
+            // 查询商品的主图
+            ProductImage mainImage = productImageMapper.selectMainImage(item.getProductId());
+            String imageUrl = mainImage != null ? mainImage.getImageUrl() : product.getImage();
+
             CartItemVO itemVO = new CartItemVO();
             itemVO.setId(item.getId());
             itemVO.setProductId(item.getProductId());
             itemVO.setProductName(product.getName());
-            itemVO.setProductImage(product.getImage());
+            itemVO.setProductImage(imageUrl);
             itemVO.setSkuId(item.getSkuId());
             itemVO.setQuantity(item.getQuantity());
             itemVO.setPrice(product.getPrice());

@@ -79,6 +79,11 @@ public class SecurityConfig {
                                                                 "/user/register",
                                                                 "/user/refresh")
                                                 .permitAll()
+                                                // 公共接口
+                                                .requestMatchers(
+                                                                "/exchange-rate/currencies",
+                                                                "/settings/config")
+                                                .permitAll()
                                                 // ???????????
                                                 .anyRequest().authenticated())
                                 // ??JWT?????

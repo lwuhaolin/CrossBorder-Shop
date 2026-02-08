@@ -52,6 +52,8 @@ public class OrderServiceImpl implements OrderService {
     private static final int PAYMENT_STATUS_PAID = 1;
     private static final int PAYMENT_STATUS_REFUNDED = 2;
 
+    private static final String ORDER_TIMEOUT_QUEUE = "order:timeout:queue";
+
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final OrderAddressMapper orderAddressMapper;
@@ -60,6 +62,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemMapper cartItemMapper;
     private final ProductMapper productMapper;
     private final LogisticsCompanyMapper logisticsCompanyMapper;
+    private final ExchangeRateMapper exchangeRateMapper;
     private final LogisticsService logisticsService;
     private final OrderNumberGenerator orderNumberGenerator;
     private final DelayQueueService delayQueueService;
@@ -264,9 +267,24 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        // 5. 计算汇率转换（简化处理：使用固定汇率，实际应查询汇率表）
-        BigDecimal exchangeRate = BigDecimal.ONE; // TODO: 从汇率表查询
-        BigDecimal convertedAmount = productAmount.multiply(exchangeRate);
+        // 5. 计算汇率转换 - 从汇率表查询并转换
+        BigDecimal exchangeRate = BigDecimal.ONE;
+        BigDecimal convertedAmount = productAmount;
+
+        if (dto.getTargetCurrency() != null && !dto.getTargetCurrency().equals("CNY")) {
+            // 从CNY转换到目标币种，查询CNY->目标币种的汇率
+            ExchangeRate rate = exchangeRateMapper.selectByPair("CNY", dto.getTargetCurrency());
+            if (rate != null) {
+                exchangeRate = rate.getRate();
+                convertedAmount = productAmount.multiply(exchangeRate);
+                log.debug("汇率转换: productAmount={}, exchangeRate={}, convertedAmount={}",
+                        productAmount, exchangeRate, convertedAmount);
+            } else {
+                log.warn("未找到汇率: CNY -> {}", dto.getTargetCurrency());
+                // 如果未找到汇率，使用原金额
+                convertedAmount = productAmount;
+            }
+        }
 
         // 6. 计算订单总金额（商品金额 + 运费 - 优惠）
         BigDecimal freightAmount = BigDecimal.ZERO;
@@ -324,7 +342,7 @@ public class OrderServiceImpl implements OrderService {
         timeoutTask.setUserId(userId);
         timeoutTask.setCreateTime(LocalDateTime.now());
 
-        delayQueueService.offer("order-timeout", timeoutTask, orderTimeoutMinutes, TimeUnit.MINUTES);
+        delayQueueService.offer(ORDER_TIMEOUT_QUEUE, timeoutTask, orderTimeoutMinutes, TimeUnit.MINUTES);
 
         // 10. TODO: 保存超时任务记录到数据库（可选，用于持久化）
 
@@ -419,6 +437,11 @@ public class OrderServiceImpl implements OrderService {
         order.setCancelReason(reason);
         orderMapper.updateById(order);
 
+        // 移除超时任务
+        OrderTimeoutTask task = new OrderTimeoutTask();
+        task.setOrderId(orderId);
+        delayQueueService.remove(ORDER_TIMEOUT_QUEUE, task);
+
         log.info("买家取消订单成功: orderId={}, userId={}, reason={}", orderId, userId, reason);
     }
 
@@ -454,7 +477,7 @@ public class OrderServiceImpl implements OrderService {
         // 支付成功后可触发发货、通知等后续操作
         OrderTimeoutTask task = new OrderTimeoutTask();
         task.setOrderId(orderId);
-        delayQueueService.remove("order-timeout", task);
+        delayQueueService.remove(ORDER_TIMEOUT_QUEUE, task);
 
         log.info("订单支付成功: orderId={}, userId={}", orderId, userId);
     }
@@ -546,6 +569,11 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(ORDER_STATUS_COMPLETED);
         order.setCompleteTime(LocalDateTime.now());
         orderMapper.updateById(order);
+
+        // 移除超时任务（确保不会再次处理）
+        OrderTimeoutTask task = new OrderTimeoutTask();
+        task.setOrderId(orderId);
+        delayQueueService.remove(ORDER_TIMEOUT_QUEUE, task);
 
         log.info("订单确认收货成功: orderId={}, userId={}", orderId, userId);
     }

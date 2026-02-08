@@ -90,8 +90,8 @@ const OrderListPage: React.FC = () => {
     },
     {
       title: t("order.createdAt"),
-      dataIndex: "createdAt",
-      key: "createdAt",
+      dataIndex: "createTime",
+      key: "createTime",
       render: (date: string) =>
         date ? new Date(date).toLocaleString("zh-CN") : "-",
     },
@@ -99,13 +99,13 @@ const OrderListPage: React.FC = () => {
       title: t("order.amount"),
       dataIndex: "totalAmount",
       key: "totalAmount",
-      render: (amount: number) => `¥${(amount || 0).toFixed(2)}`,
+      render: (amount: number) => `${amount ? amount.toFixed(2) : "0.00"}`,
     },
     {
       title: t("order.actualAmount"),
-      dataIndex: "actualAmount",
-      key: "actualAmount",
-      render: (amount: number) => `¥${(amount || 0).toFixed(2)}`,
+      dataIndex: "convertedAmount",
+      key: "convertedAmount",
+      render: (amount: number) => `${amount ? amount.toFixed(2) : "0.00"}`,
     },
     {
       title: t("order.status"),

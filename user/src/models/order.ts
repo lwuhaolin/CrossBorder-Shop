@@ -1,27 +1,34 @@
 // Order related types
 export interface Order {
   id: number;
-  orderNo: string;
-  userId: number;
-  username?: string;
+  orderNumber: string;
+  buyerId: number;
+  sellerId: number;
+  orderStatus: number;  // 0=待支付, 1=已支付, 2=已发货, 3=已完成, 4=已取消
+  paymentStatus: number;  // 0=未支付, 1=已支付, 2=已退款
   totalAmount: number;
-  actualAmount: number;
-  shippingFee?: number;
-  discountAmount?: number;
-  status: OrderStatus;
-  paymentStatus?: PaymentStatus;
-  shippingStatus?: ShippingStatus;
-  shippingAddressId?: number;
-  shippingAddress?: ShippingAddress;
-  items?: OrderItem[];
-  remark?: string;
+  productAmount: number;
+  freightAmount: number;
+  discountAmount: number;
+  currency: string;
+  exchangeRate: number;
+  convertedAmount: number;
+  targetCurrency?: string;
+  paymentMethod?: string;
+  paymentTime?: string;
+  paymentTransactionId?: string;
+  logisticsCompany?: string;
   trackingNo?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  paidAt?: string;
-  shippedAt?: string;
-  completedAt?: string;
-  canceledAt?: string;
+  sellerAddress?: string;
+  shipTime?: string;
+  completeTime?: string;
+  cancelTime?: string;
+  cancelReason?: string;
+  remark?: string;
+  buyerMessage?: string;
+  createTime: string;
+  items?: OrderItem[];
+  address?: OrderAddress;
 }
 
 export enum OrderStatus {
@@ -48,47 +55,27 @@ export enum ShippingStatus {
 
 export interface OrderItem {
   id: number;
-  orderId: number;
   productId: number;
   productName: string;
-  productImage?: string;
+  productCode: string;
+  imageUrl: string;
+  skuId?: number;
+  skuName?: string;
   price: number;
   quantity: number;
-  totalAmount: number;
+  totalPrice: number;
 }
 
-export interface OrderListParams {
-  page?: number;
-  pageSize?: number;
-  orderNo?: string;
-  userId?: number;
-  status?: OrderStatus;
-  paymentStatus?: PaymentStatus;
-  shippingStatus?: ShippingStatus;
-  startDate?: string;
-  endDate?: string;
-  minAmount?: number;
-  maxAmount?: number;
-}
-
-export interface OrderListResponse {
-  list: Order[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-export interface ShippingAddress {
+export interface OrderAddress {
   id: number;
-  userId?: number;
   receiverName: string;
   receiverPhone: string;
+  country?: string;
   province: string;
   city: string;
   district: string;
   detailAddress: string;
-  isDefault?: boolean;
-  label?: string;
+  postalCode?: string;
 }
 
 export interface OrderStatusUpdateDTO {

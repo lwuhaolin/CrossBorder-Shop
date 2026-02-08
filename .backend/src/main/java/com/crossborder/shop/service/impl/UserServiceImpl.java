@@ -11,6 +11,7 @@ import com.crossborder.shop.entity.User;
 import com.crossborder.shop.exception.BusinessException;
 import com.crossborder.shop.mapper.UserMapper;
 import com.crossborder.shop.security.UserPrincipal;
+import com.crossborder.shop.service.SettingsService;
 import com.crossborder.shop.service.UserService;
 import com.crossborder.shop.util.JwtUtil;
 import com.crossborder.shop.vo.LoginVO;
@@ -41,10 +42,14 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final SettingsService settingsService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void register(UserRegisterDTO dto) {
+        if (!settingsService.getBooleanConfig("user.registration.enable", true)) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "当前不允许用户注册");
+        }
         // 校验两次密码是否一致
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "两次输入的密码不一致");

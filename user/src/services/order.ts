@@ -41,7 +41,7 @@ export async function shipOrder(id: number, data: OrderShipDTO): Promise<Result<
 export async function cancelOrder(id: number, reason?: string): Promise<Result<void>> {
   return request({
     url: `/order/${id}/cancel`,
-    method: 'PUT',
+    method: 'POST',
     data: { reason },
   });
 }
@@ -61,5 +61,21 @@ export async function createOrder(data: any): Promise<any> {
     url: '/order/create',
     method: 'POST',
     data,
+  });
+}
+
+// Pay order
+export async function payOrder(id: number): Promise<Result<void>> {
+  return request({
+    url: `/order/${id}/pay`,
+    method: 'POST',
+  });
+}
+
+// Confirm order (confirm receipt)
+export async function confirmOrder(id: number): Promise<Result<void>> {
+  return request({
+    url: `/order/${id}/confirm`,
+    method: 'POST',
   });
 }

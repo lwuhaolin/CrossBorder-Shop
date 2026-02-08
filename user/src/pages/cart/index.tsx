@@ -3,27 +3,50 @@ import { Card, Table, InputNumber, Button, message, Empty } from "antd";
 import { DeleteOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@umijs/renderer-react";
 import { useTranslation } from "react-i18next";
-import { getImageUrl } from "@/utils/request";
+import { getImageUrl, getUserInfo, getToken } from "@/utils/request";
+import { getCart } from "@/services/cart";
 import styles from "./index.module.css";
 
 interface CartItem {
   productId: number;
-  name: string;
+  productName: string;
   price: number;
-  image: string;
+  productImage: string;
   quantity: number;
 }
 
 const CartPage: React.FC = () => {
   const { t } = useTranslation();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<any>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadCart();
   }, []);
 
-  const loadCart = () => {
+  const loadCart = async () => {
+    try {
+      const userInfo = getUserInfo();
+
+      if (userInfo && userInfo.id) {
+        // Load cart from backend
+        const response = await getCart();
+        if (response.data) {
+          // Handle both direct array and wrapped data
+          const cartData = Array.isArray(response.data)
+            ? response.data
+            : response.data.items || [];
+          setCartItems(cartData);
+          // Sync with localStorage
+          localStorage.setItem("cart", JSON.stringify(cartData));
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load cart from backend:", error);
+    }
+
+    // Fallback to localStorage if backend fails
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCartItems(cart);
   };
@@ -63,7 +86,7 @@ const CartPage: React.FC = () => {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = getToken();
     if (!token) {
       message.warning(t("checkout.loginRequired"));
       navigate("/user/login");
@@ -93,14 +116,15 @@ const CartPage: React.FC = () => {
       render: (name: string, record: CartItem) => (
         <div className={styles.productCell}>
           <img
-            src={getImageUrl(record.image)}
+            src={getImageUrl(record.productImage)}
             alt={name}
             className={styles.productImage}
           />
-          <span className={styles.productName}>{name}</span>
+          <span className={styles.productName}>{record.productName}</span>
         </div>
       ),
     },
+    {},
     {
       title: t("cart.price"),
       dataIndex: "price",

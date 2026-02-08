@@ -127,6 +127,7 @@ export default {
   "checkout.orderPlaced": "Order placed successfully!",
   "checkout.emptyCart": "Your cart is empty",
   "checkout.loginRequired": "Please login to checkout",
+  "checkout.currency": "Currency",
   "checkout.estimatedAmount": "Estimated amount, actual payment amount is subject to final settlement",
 
   // Orders
@@ -160,6 +161,19 @@ export default {
   "order.notFound": "Order not found",
   "order.orderInformation": "Order Information",
   "order.orderItems": "Order Items",
+  "order.pay": "Pay",
+  "order.confirmPay": "Confirm Payment",
+  "order.paymentConfirm": "Are you sure you want to pay for this order?",
+  "order.paymentSuccess": "Payment successful",
+  "order.paymentFailed": "Payment failed",
+  "order.confirmCancel": "Confirm Cancellation",
+  "order.cancelConfirm": "Are you sure you want to cancel this order?",
+  "order.cancelSuccess": "Order cancelled",
+  "order.cancelFailed": "Failed to cancel order",
+  "order.confirmReceipt": "Confirm Receipt",
+  "order.receiptConfirm": "Have you received the product?",
+  "order.confirmSuccess": "Receipt confirmed, order completed",
+  "order.confirmFailed": "Failed to confirm receipt",
 
   // Profile
   "profile.title": "Profile",
