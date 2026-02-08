@@ -98,6 +98,7 @@ export default {
   "cart.updateQuantity": "更新数量",
   "cart.proceedToCheckout": "前往结账",
   "cart.orderSummary": "订单摘要",
+  "cart.estimatedAmount": "预计金额，具体支付金额以实际结算为准",
   "cart.startShopping": "开始购物",
 
   // Checkout
@@ -126,6 +127,7 @@ export default {
   "checkout.orderPlaced": "订单已成功提交",
   "checkout.emptyCart": "购物车为空",
   "checkout.loginRequired": "请登录后继续结账",
+  "checkout.estimatedAmount": "预计金额，具体支付金额以实际结算为准",
 
   // Orders
   "order.title": "我的订单",

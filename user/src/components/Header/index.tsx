@@ -8,7 +8,12 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "@umijs/renderer-react";
 import { useTranslation } from "react-i18next";
-import { removeToken, removeUserInfo, getToken } from "@/utils/request";
+import {
+  removeToken,
+  removeRefreshToken,
+  removeUserInfo,
+  getToken,
+} from "@/utils/request";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import type { MenuProps } from "antd";
 import styles from "./index.module.css";
@@ -30,6 +35,20 @@ const Header: React.FC = () => {
     // Get cart count from localStorage
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCartCount(cart.length);
+  }, []);
+
+  useEffect(() => {
+    // Listen for cart updates
+    const handleCartUpdate = () => {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      setCartCount(cart.length);
+    };
+
+    window.addEventListener("storage", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener("storage", handleCartUpdate);
+    };
   }, []);
 
   const handleSearch = (value: string) => {
@@ -73,6 +92,7 @@ const Header: React.FC = () => {
           label: t("nav.logout"),
           onClick: () => {
             removeToken();
+            removeRefreshToken();
             removeUserInfo();
             setIsLoggedIn(false);
             navigate("/");

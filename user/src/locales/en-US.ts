@@ -98,6 +98,7 @@ export default {
   "cart.updateQuantity": "Update Quantity",
   "cart.proceedToCheckout": "Proceed to Checkout",
   "cart.orderSummary": "Order Summary",
+  "cart.estimatedAmount": "Estimated amount, actual payment amount is subject to final settlement",
   "cart.startShopping": "Start Shopping",
 
   // Checkout
@@ -126,6 +127,7 @@ export default {
   "checkout.orderPlaced": "Order placed successfully!",
   "checkout.emptyCart": "Your cart is empty",
   "checkout.loginRequired": "Please login to checkout",
+  "checkout.estimatedAmount": "Estimated amount, actual payment amount is subject to final settlement",
 
   // Orders
   "order.title": "My Orders",

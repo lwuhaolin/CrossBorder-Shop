@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crossborder.shop.mapper.ExchangeRateMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.ExchangeRate">
+        <id column="id" property="id"/>
+        <result column="from_currency" property="fromCurrency"/>
+        <result column="to_currency" property="toCurrency"/>
+        <result column="rate" property="rate"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 根据ID查询汇率 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_exchange_rate
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <!-- 根据货币对查询汇率 -->
+    <select id="selectByPair" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_exchange_rate
+        WHERE from_currency = #{fromCurrency} AND to_currency = #{toCurrency} AND deleted = 0
+    </select>
+
+    <!-- 分页查询汇率 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_exchange_rate
+        WHERE deleted = 0
+        <if test="fromCurrency != null and fromCurrency != ''">
+            AND from_currency LIKE CONCAT('%', #{fromCurrency}, '%')
+        </if>
+        <if test="toCurrency != null and toCurrency != ''">
+            AND to_currency LIKE CONCAT('%', #{toCurrency}, '%')
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 查询汇率总数 -->
+    <select id="countExchangeRates" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_exchange_rate
+        WHERE deleted = 0
+        <if test="fromCurrency != null and fromCurrency != ''">
+            AND from_currency LIKE CONCAT('%', #{fromCurrency}, '%')
+        </if>
+        <if test="toCurrency != null and toCurrency != ''">
+            AND to_currency LIKE CONCAT('%', #{toCurrency}, '%')
+        </if>
+    </select>
+
+    <!-- 插入汇率 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_exchange_rate (from_currency, to_currency, rate, create_time, update_time)
+        VALUES (#{fromCurrency}, #{toCurrency}, #{rate}, NOW(), NOW())
+    </insert>
+
+    <!-- 更新汇率 -->
+    <update id="updateById">
+        UPDATE tb_exchange_rate
+        <set>
+            <if test="fromCurrency != null">from_currency = #{fromCurrency},</if>
+            <if test="toCurrency != null">to_currency = #{toCurrency},</if>
+            <if test="rate != null">rate = #{rate},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 逻辑删除汇率 -->
+    <update id="deleteById">
+        UPDATE tb_exchange_rate
+        SET deleted = 1, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -197,6 +197,7 @@ const CartPage: React.FC = () => {
             <span>{t("cart.total")}:</span>
             <span>${calculateTotal().toFixed(2)}</span>
           </div>
+          <p className={styles.estimatedNote}>{t("cart.estimatedAmount")}</p>
           <Button
             type="primary"
             size="large"

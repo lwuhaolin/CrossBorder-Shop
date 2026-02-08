@@ -1,5 +1,6 @@
 package com.crossborder.shop.controller;
 
+import com.crossborder.shop.common.PageResult;
 import com.crossborder.shop.common.Result;
 import com.crossborder.shop.dto.UserLoginDTO;
 import com.crossborder.shop.dto.UserRegisterDTO;
@@ -102,5 +103,53 @@ public class UserController {
             @Parameter(description = "用户名") @PathVariable String username) {
         UserVO userVO = userService.getByUsername(username);
         return Result.success(userVO);
+    }
+
+    @Operation(summary = "获取当前用户信息", description = "根据Token获取当前登录用户信息（/info端点）")
+    @GetMapping("/info")
+    public Result<UserVO> getCurrentUserInfo() {
+        UserVO userVO = userService.getCurrentUser();
+        return Result.success(userVO);
+    }
+
+    @Operation(summary = "分页查询用户列表", description = "管理员分页查询用户列表，支持按用户名和状态搜索")
+    @GetMapping("/admin/list")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<PageResult<UserVO>> listUsers(
+            @Parameter(description = "页码", example = "1") @RequestParam(defaultValue = "1") Integer pageNum,
+            @Parameter(description = "每页数量", example = "20") @RequestParam(defaultValue = "20") Integer pageSize,
+            @Parameter(description = "用户名搜索（可选）") @RequestParam(required = false) String keyword,
+            @Parameter(description = "用户状态（可选）：0=禁用，1=正常，2=锁定") @RequestParam(required = false) Integer status) {
+        PageResult<UserVO> result = userService.listUsers(pageNum, pageSize, keyword, status);
+        return Result.success(result);
+    }
+
+    @Operation(summary = "管理员更新用户信息", description = "管理员更新指定用户的信息")
+    @PutMapping("/admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Void> updateUserByAdmin(
+            @Parameter(description = "用户ID") @PathVariable Long id,
+            @Valid @RequestBody UserUpdateDTO dto) {
+        userService.updateUserByAdmin(id, dto);
+        return Result.success();
+    }
+
+    @Operation(summary = "管理员删除用户", description = "管理员删除指定用户（逻辑删除）")
+    @DeleteMapping("/admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Void> deleteUser(
+            @Parameter(description = "用户ID") @PathVariable Long id) {
+        userService.deleteUser(id);
+        return Result.success();
+    }
+
+    @Operation(summary = "管理员更新用户状态", description = "管理员更新指定用户的状态（0=禁用，1=正常，2=锁定）")
+    @PutMapping("/admin/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Void> updateUserStatus(
+            @Parameter(description = "用户ID") @PathVariable Long id,
+            @Parameter(description = "新状态") @RequestParam Integer status) {
+        userService.updateUserStatus(id, status);
+        return Result.success();
     }
 }

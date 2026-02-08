@@ -1,6 +1,7 @@
 package com.crossborder.shop.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.crossborder.shop.common.PageResult;
 import com.crossborder.shop.common.ResultCode;
 import com.crossborder.shop.dto.UserLoginDTO;
 import com.crossborder.shop.dto.UserRegisterDTO;
@@ -278,5 +279,93 @@ public class UserServiceImpl implements UserService {
         vo.setRoles(roleVOs);
 
         return vo;
+    }
+
+    @Override
+    public PageResult<UserVO> listUsers(Integer pageNum, Integer pageSize, String username, Integer status) {
+        if (pageNum == null || pageNum < 1) {
+            pageNum = 1;
+        }
+        if (pageSize == null || pageSize < 1) {
+            pageSize = 20;
+        }
+
+        // 计算偏移量
+        long offset = (long) (pageNum - 1) * pageSize;
+
+        // 查询总数
+        long total = userMapper.countUsers(username, status);
+
+        // 查询数据
+        List<User> users = userMapper.selectPage(offset, pageSize, username, status);
+        List<UserVO> userVOs = users.stream()
+                .map(this::convertToUserVO)
+                .collect(Collectors.toList());
+
+        log.info("分页查询用户列表: pageNum={}, pageSize={}, username={}, status={}", pageNum, pageSize, username, status);
+
+        return PageResult.build(pageNum, pageSize, total, userVOs);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserByAdmin(Long userId, UserUpdateDTO dto) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        // 更新用户信息
+        User updateUser = new User();
+        updateUser.setId(userId);
+        BeanUtil.copyProperties(dto, updateUser);
+
+        int result = userMapper.updateById(updateUser);
+        if (result <= 0) {
+            throw new BusinessException("用户信息更新失败");
+        }
+
+        log.info("管理员更新用户信息: {}", userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUser(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        int result = userMapper.deleteById(userId);
+        if (result <= 0) {
+            throw new BusinessException("用户删除失败");
+        }
+
+        log.info("管理员删除用户: {}", userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserStatus(Long userId, Integer status) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        // 验证状态值
+        if (status == null || (status != 0 && status != 1 && status != 2)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "用户状态值不合法");
+        }
+
+        User updateUser = new User();
+        updateUser.setId(userId);
+        updateUser.setStatus(status);
+
+        int result = userMapper.updateById(updateUser);
+        if (result <= 0) {
+            throw new BusinessException("用户状态更新失败");
+        }
+
+        log.info("管理员更新用户状态: userId={}, status={}", userId, status);
     }
 }

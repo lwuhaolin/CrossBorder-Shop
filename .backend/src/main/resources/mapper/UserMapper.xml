@@ -90,4 +90,32 @@
         VALUES (#{userId}, #{roleId}, NOW())
     </insert>
 
+    <!-- 分页查询用户列表 -->
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_user
+        WHERE deleted = 0
+        <if test="username != null and username != ''">
+            AND username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 查询用户总数 -->
+    <select id="countUsers" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE deleted = 0
+        <if test="username != null and username != ''">
+            AND username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+    </select>
+
 </mapper>

@@ -25,16 +25,17 @@ export const removeUserInfo = () => localStorage.removeItem(USER_INFO_KEY);
 
 // Image URL helper - combine server URL with image path
 export const getImageUrl = (imagePath?: string): string => {
-  if (!imagePath) {
-    return 'https://via.placeholder.com/300x300?text=Product';
-  }
-  // If it's already a full URL, return as is
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return imagePath;
-  }
-  // Remove /api prefix if it exists, then combine with server base URL
-  const baseUrl = API_BASE_URL.replace('/api', '');
-  return `${baseUrl}${imagePath}`;
+  
+
+  
+
+ 
+  
+ 
+  
+  const fullUrl = `${API_BASE_URL}${imagePath}`;
+  
+  return fullUrl;
 };
 
 const instance = axios.create({
@@ -65,7 +66,9 @@ const isPublicEndpoint = (url?: string) => {
   return (
     url.includes('/user/login') ||
     url.includes('/user/register') ||
-    url.includes('/user/refresh')
+    url.includes('/user/refresh') ||
+    url.includes('/product/') ||
+    url.includes('/category/')
   );
 };
 

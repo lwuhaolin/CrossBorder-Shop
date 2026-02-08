@@ -25,10 +25,28 @@ const OrderListPage: React.FC = () => {
       setLoading(true);
       const response = await getOrderList({ page, pageSize });
       console.log("订单列表响应:", response);
-      if (response.data) {
-        setOrders(response.data.list || []);
-        setTotal(response.data.total || 0);
+
+      // Handle different response structures
+      let orderList: Order[] = [];
+      let totalCount = 0;
+      
+      if (Array.isArray(response)) {
+        // If response is directly an array
+        orderList = response;
+        totalCount = response.length;
+      } else if (Array.isArray(response.data)) {
+        // If response.data is an array
+        orderList = response.data;
+        totalCount = response.data.length;
+      } else if (response.data && response.data.list) {
+        // If response.data has list property
+        orderList = response.data.list;
+        totalCount = response.data.total || response.data.list.length;
       }
+      
+      setOrders(orderList);
+      setTotal(totalCount);
+      
     } catch (error) {
       console.error("Failed to load orders:", error);
       message.error(t("common.error"));
@@ -66,8 +84,8 @@ const OrderListPage: React.FC = () => {
   const columns = [
     {
       title: t("order.orderNo"),
-      dataIndex: "orderNo",
-      key: "orderNo",
+      dataIndex: "orderNumber",
+      key: "orderNumber",
       render: (orderNo: string) => orderNo || "-",
     },
     {
@@ -91,8 +109,8 @@ const OrderListPage: React.FC = () => {
     },
     {
       title: t("order.status"),
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "orderStatus",
+      key: "orderStatus",
       render: (status: number) => (
         <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
       ),

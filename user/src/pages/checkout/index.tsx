@@ -127,7 +127,9 @@ const CheckoutPage: React.FC = () => {
                     <br />
                     {address.detailAddress}, {address.city}, {address.province}
                     {address.isDefault && (
-                      <span className={styles.defaultBadge}>{t("address.default")}</span>
+                      <span className={styles.defaultBadge}>
+                        {t("address.default")}
+                      </span>
                     )}
                   </div>
                 </Radio>
@@ -265,6 +267,10 @@ const CheckoutPage: React.FC = () => {
                 <span>{t("cart.total")}:</span>
                 <span>${calculateTotal().toFixed(2)}</span>
               </div>
+              <Divider style={{ margin: "12px 0" }} />
+              <p className={styles.estimatedNote}>
+                {t("checkout.estimatedAmount")}
+              </p>
             </Card>
           </div>
         </div>

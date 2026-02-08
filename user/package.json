@@ -5,7 +5,7 @@
   "description": "User-facing frontend for cross-border daily goods ordering system",
   "author": "CrossBorder Shop",
   "scripts": {
-    "dev": "umi dev",
+    "dev": "umi dev --port 8001",
     "build": "umi build",
     "postinstall": "umi setup",
     "setup": "umi setup",

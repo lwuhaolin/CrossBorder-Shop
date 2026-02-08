@@ -1,11 +1,12 @@
-import React from 'react';
-import { Card, Button, message } from 'antd';
-import { ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
-import { useNavigate } from '@umijs/renderer-react';
-import { useTranslation } from 'react-i18next';
-import { getImageUrl } from '@/utils/request';
-import type { Product } from '@/models/product';
-import styles from './index.module.css';
+import React from "react";
+import { Card, Button, message } from "antd";
+import { ShoppingCartOutlined, EyeOutlined } from "@ant-design/icons";
+import { useNavigate } from "@umijs/renderer-react";
+import { useTranslation } from "react-i18next";
+import { getImageUrl, getToken } from "@/utils/request";
+import { addToCart } from "@/services/cart";
+import type { Product } from "@/models/product";
+import styles from "./index.module.css";
 
 const { Meta } = Card;
 
@@ -18,37 +19,58 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (product.stock === 0) {
-      message.warning(t('product.outOfStock'));
+      message.warning(t("product.outOfStock"));
       return;
     }
 
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find((item: any) => item.productId === product.id);
+    // Check if user is logged in
+    const token = getToken();
+    if (!token) {
+      message.warning(t("checkout.loginRequired"));
+      navigate("/user/login");
+      return;
+    }
 
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      cart.push({
+    try {
+      // Call backend API to add to cart
+      await addToCart({
         productId: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.mainImage,
         quantity: 1,
       });
+
+      // Also update local cart for offline support
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const existingItem = cart.find(
+        (item: any) => item.productId === product.id,
+      );
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.mainImage,
+          quantity: 1,
+        });
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+      message.success(t("common.addedToCart"));
+
+      if (onAddToCart) {
+        onAddToCart(product);
+      }
+
+      window.dispatchEvent(new Event("storage"));
+    } catch (error: any) {
+      message.error(error?.message || t("common.error"));
     }
-
-    localStorage.setItem('cart', JSON.stringify(cart));
-    message.success(t('common.addedToCart'));
-
-    if (onAddToCart) {
-      onAddToCart(product);
-    }
-
-    window.dispatchEvent(new Event('storage'));
   };
 
   const handleViewDetail = () => {
@@ -67,17 +89,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
             className={styles.image}
           />
           {product.stock === 0 && (
-            <div className={styles.outOfStock}>{t('product.outOfStock')}</div>
+            <div className={styles.outOfStock}>{t("product.outOfStock")}</div>
           )}
         </div>
       }
       actions={[
-        <Button
-          type="text"
-          icon={<EyeOutlined />}
-          onClick={handleViewDetail}
-        >
-          {t('product.view')}
+        <Button type="text" icon={<EyeOutlined />} onClick={handleViewDetail}>
+          {t("product.view")}
         </Button>,
         <Button
           type="text"
@@ -85,7 +103,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           onClick={handleAddToCart}
           disabled={product.stock === 0}
         >
-          {t('product.addToCart')}
+          {t("product.addToCart")}
         </Button>,
       ]}
       onClick={handleViewDetail}
@@ -100,7 +118,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           <div className={styles.description}>
             <div className={styles.price}>${product.price.toFixed(2)}</div>
             <div className={styles.stock}>
-              {t('product.stock')}: {product.stock}
+              {t("product.stock")}: {product.stock}
             </div>
           </div>
         }

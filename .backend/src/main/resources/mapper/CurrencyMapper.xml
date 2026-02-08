@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crossborder.shop.mapper.CurrencyMapper">
+
+    <resultMap id="BaseResultMap" type="com.crossborder.shop.entity.Currency">
+        <id column="id" property="id"/>
+        <result column="currency_code" property="currencyCode"/>
+        <result column="currency_name" property="currencyName"/>
+        <result column="symbol" property="symbol"/>
+        <result column="is_base" property="isBase"/>
+        <result column="status" property="status"/>
+        <result column="sort" property="sort"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 根据ID查询货币 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_currency
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <!-- 根据货币代码查询货币 -->
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_currency
+        WHERE currency_code = #{currencyCode} AND deleted = 0
+    </select>
+
+    <!-- 查询所有启用的货币 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_currency
+        WHERE status = 1 AND deleted = 0
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <!-- 插入货币 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_currency (currency_code, currency_name, symbol, is_base, status, sort, create_time, update_time)
+        VALUES (#{currencyCode}, #{currencyName}, #{symbol}, #{isBase}, #{status}, #{sort}, NOW(), NOW())
+    </insert>
+
+    <!-- 更新货币 -->
+    <update id="updateById">
+        UPDATE tb_currency
+        <set>
+            <if test="currencyCode != null">currency_code = #{currencyCode},</if>
+            <if test="currencyName != null">currency_name = #{currencyName},</if>
+            <if test="symbol != null">symbol = #{symbol},</if>
+            <if test="isBase != null">is_base = #{isBase},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 逻辑删除货币 -->
+    <update id="deleteById">
+        UPDATE tb_currency
+        SET deleted = 1, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

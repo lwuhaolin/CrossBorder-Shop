@@ -72,4 +72,25 @@ public interface UserMapper {
      * @return 影响行数
      */
     int insertUserRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    /**
+     * 分页查询用户列表
+     *
+     * @param offset 分页偏移量
+     * @param limit 分页大小
+     * @param username 搜索用户名（可选）
+     * @param status 用户状态（可选）
+     * @return 用户列表
+     */
+    List<User> selectPage(@Param("offset") long offset, @Param("limit") int limit,
+                          @Param("username") String username, @Param("status") Integer status);
+
+    /**
+     * 查询用户总数
+     *
+     * @param username 搜索用户名（可选）
+     * @param status 用户状态（可选）
+     * @return 总数
+     */
+    long countUsers(@Param("username") String username, @Param("status") Integer status);
 }
