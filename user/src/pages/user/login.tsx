@@ -3,7 +3,7 @@ import { Card, Form, Input, Button, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "@umijs/renderer-react";
 import { login } from "@/services/user";
-import { setToken, setUserInfo } from "@/utils/request";
+import { setToken, setRefreshToken, setUserInfo } from "@/utils/request";
 import styles from "./login.module.css";
 
 const LoginPage: React.FC = () => {
@@ -13,17 +13,19 @@ const LoginPage: React.FC = () => {
   const onFinish = async (values: any) => {
     try {
       setLoading(true);
+
       const response = await login(values);
 
-      setToken(response.data?.token || "");
-      if (response.data?.user) {
-        setUserInfo(response.data.user);
-      }
+      if (response?.data) {
+        setToken(response.data.accessToken);
+        setRefreshToken(response.data.refreshToken);
+        setUserInfo(response.data.userInfo);
 
-      message.success("Login successful!");
-      navigate("/");
+        message.success("登录成功");
+        navigate("/");
+      }
     } catch (error: any) {
-      message.error(error.message || "Login failed");
+      message.error(error.message || "登录失败，请检查用户名和密码");
     } finally {
       setLoading(false);
     }
@@ -46,13 +48,13 @@ const LoginPage: React.FC = () => {
             size="large"
           >
             <Form.Item
-              name="email"
+              name="username"
               rules={[
-                { required: true, message: "Please input your email!" },
-                { type: "email", message: "Please enter a valid email!" },
+                { required: true, message: "Please input your username!" },
+                { type: "string", message: "Please enter a valid username!" },
               ]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Email" />
+              <Input prefix={<UserOutlined />} placeholder="username" />
             </Form.Item>
 
             <Form.Item

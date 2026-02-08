@@ -20,7 +20,7 @@ export default function Login() {
     try {
       const response = await login(values);
       // const response = await axios.post('http://localhost:8080/api/user/login', values);
-      console.log(response);
+      
       
       if (response?.data) {
         
