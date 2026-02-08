@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Card, Radio, Button, message, Steps, Divider, List } from "antd";
 import { useNavigate } from "@umijs/renderer-react";
+import { useTranslation } from "react-i18next";
 import { getAddressList } from "@/services/address";
 import { createOrder } from "@/services/order";
+import { getImageUrl } from "@/utils/request";
 import type { Address } from "@/models/address";
 import styles from "./index.module.css";
 
@@ -17,6 +19,7 @@ interface CartItem {
 }
 
 const CheckoutPage: React.FC = () => {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number>();
@@ -46,7 +49,7 @@ const CheckoutPage: React.FC = () => {
   const loadCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (cart.length === 0) {
-      message.warning("Your cart is empty");
+      message.warning(t("checkout.emptyCart"));
       navigate("/cart");
       return;
     }
@@ -58,7 +61,7 @@ const CheckoutPage: React.FC = () => {
   };
 
   const calculateShipping = () => {
-    return 10; // Fixed shipping cost
+    return 10;
   };
 
   const calculateTotal = () => {
@@ -67,7 +70,7 @@ const CheckoutPage: React.FC = () => {
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      message.error("Please select a delivery address");
+      message.error(t("checkout.selectAddress"));
       return;
     }
 
@@ -87,15 +90,14 @@ const CheckoutPage: React.FC = () => {
 
       const order = await createOrder(orderData);
 
-      // Clear cart
       localStorage.setItem("cart", JSON.stringify([]));
       window.dispatchEvent(new Event("storage"));
 
-      message.success("Order placed successfully!");
+      message.success(t("checkout.orderPlaced"));
       navigate(`/user/orders/${order.id}`);
     } catch (error) {
       console.error("Failed to place order:", error);
-      message.error("Failed to place order");
+      message.error(t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -103,10 +105,10 @@ const CheckoutPage: React.FC = () => {
 
   const steps = [
     {
-      title: "Address",
+      title: t("checkout.step1"),
       content: (
         <div className={styles.stepContent}>
-          <h3>Select Delivery Address</h3>
+          <h3>{t("checkout.selectDeliveryAddress")}</h3>
           {addresses.length > 0 ? (
             <Radio.Group
               value={selectedAddress}
@@ -125,7 +127,7 @@ const CheckoutPage: React.FC = () => {
                     <br />
                     {address.detailAddress}, {address.city}, {address.province}
                     {address.isDefault && (
-                      <span className={styles.defaultBadge}>Default</span>
+                      <span className={styles.defaultBadge}>{t("address.default")}</span>
                     )}
                   </div>
                 </Radio>
@@ -133,12 +135,12 @@ const CheckoutPage: React.FC = () => {
             </Radio.Group>
           ) : (
             <div className={styles.noAddress}>
-              <p>No delivery address found</p>
+              <p>{t("checkout.noAddress")}</p>
               <Button
                 type="primary"
                 onClick={() => navigate("/user/addresses")}
               >
-                Add Address
+                {t("checkout.addAddress")}
               </Button>
             </div>
           )}
@@ -146,36 +148,36 @@ const CheckoutPage: React.FC = () => {
       ),
     },
     {
-      title: "Payment",
+      title: t("checkout.step2"),
       content: (
         <div className={styles.stepContent}>
-          <h3>Select Payment Method</h3>
+          <h3>{t("checkout.selectPaymentMethod")}</h3>
           <Radio.Group
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
             className={styles.paymentList}
           >
             <Radio value="credit_card" className={styles.paymentItem}>
-              Credit Card
+              {t("checkout.creditCard")}
             </Radio>
             <Radio value="debit_card" className={styles.paymentItem}>
-              Debit Card
+              {t("checkout.debitCard")}
             </Radio>
             <Radio value="paypal" className={styles.paymentItem}>
-              PayPal
+              {t("checkout.paypal")}
             </Radio>
             <Radio value="cash_on_delivery" className={styles.paymentItem}>
-              Cash on Delivery
+              {t("checkout.cashOnDelivery")}
             </Radio>
           </Radio.Group>
         </div>
       ),
     },
     {
-      title: "Review",
+      title: t("checkout.step3"),
       content: (
         <div className={styles.stepContent}>
-          <h3>Order Summary</h3>
+          <h3>{t("checkout.orderSummary")}</h3>
           <List<CartItem>
             dataSource={cartItems}
             renderItem={(item) => (
@@ -183,16 +185,13 @@ const CheckoutPage: React.FC = () => {
                 <List.Item.Meta
                   avatar={
                     <img
-                      src={
-                        item.image ||
-                        "https://via.placeholder.com/80x80?text=Product"
-                      }
+                      src={getImageUrl(item.image)}
                       alt={item.name}
                       style={{ width: 60, height: 60, objectFit: "cover" }}
                     />
                   }
                   title={item.name}
-                  description={`Quantity: ${item.quantity}`}
+                  description={`${t("checkout.quantity")}: ${item.quantity}`}
                 />
                 <div>${(item.price * item.quantity).toFixed(2)}</div>
               </List.Item>
@@ -206,7 +205,7 @@ const CheckoutPage: React.FC = () => {
   return (
     <div className={styles.checkoutPage}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Checkout</h1>
+        <h1 className={styles.title}>{t("checkout.title")}</h1>
 
         <div className={styles.content}>
           <div className={styles.main}>
@@ -226,7 +225,7 @@ const CheckoutPage: React.FC = () => {
                     style={{ margin: "0 8px" }}
                     onClick={() => setCurrentStep(currentStep - 1)}
                   >
-                    Previous
+                    {t("checkout.previous")}
                   </Button>
                 )}
                 {currentStep < steps.length - 1 && (
@@ -234,7 +233,7 @@ const CheckoutPage: React.FC = () => {
                     type="primary"
                     onClick={() => setCurrentStep(currentStep + 1)}
                   >
-                    Next
+                    {t("checkout.next")}
                   </Button>
                 )}
                 {currentStep === steps.length - 1 && (
@@ -243,7 +242,7 @@ const CheckoutPage: React.FC = () => {
                     onClick={handlePlaceOrder}
                     loading={loading}
                   >
-                    Place Order
+                    {t("checkout.placeOrder")}
                   </Button>
                 )}
               </div>
@@ -252,18 +251,18 @@ const CheckoutPage: React.FC = () => {
 
           <div className={styles.sidebar}>
             <Card className={styles.summaryCard}>
-              <h3>Order Total</h3>
+              <h3>{t("checkout.orderSummary")}</h3>
               <div className={styles.summaryRow}>
-                <span>Subtotal:</span>
+                <span>{t("cart.subtotal")}:</span>
                 <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               <div className={styles.summaryRow}>
-                <span>Shipping:</span>
+                <span>{t("cart.shipping")}:</span>
                 <span>${calculateShipping().toFixed(2)}</span>
               </div>
               <Divider />
               <div className={styles.summaryRow + " " + styles.total}>
-                <span>Total:</span>
+                <span>{t("cart.total")}:</span>
                 <span>${calculateTotal().toFixed(2)}</span>
               </div>
             </Card>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, message } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { updateUser } from '@/services/user';
 import { getUserInfo, setUserInfo } from '@/utils/request';
 import type { User } from '@/models/user';
 import styles from './index.module.css';
 
 const SettingsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
@@ -20,17 +22,16 @@ const SettingsPage: React.FC = () => {
     try {
       setLoading(true);
       await updateUser(values);
-      
-      // Update local storage
+
       const user = getUserInfo();
       if (user) {
         const updatedUser = { ...user, ...values };
         setUserInfo(updatedUser);
       }
-      
-      message.success('Profile updated successfully');
+
+      message.success(t('settings.updated'));
     } catch (error) {
-      message.error('Failed to update profile');
+      message.error(t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -39,11 +40,10 @@ const SettingsPage: React.FC = () => {
   const handlePasswordChange = async (values: any) => {
     try {
       setLoading(true);
-      // Call password change API here
-      message.success('Password changed successfully');
+      message.success(t('settings.passwordChanged'));
       form.resetFields(['currentPassword', 'newPassword', 'confirmPassword']);
     } catch (error) {
-      message.error('Failed to change password');
+      message.error(t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -52,9 +52,9 @@ const SettingsPage: React.FC = () => {
   return (
     <div className={styles.settingsPage}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Settings</h1>
+        <h1 className={styles.title}>{t('settings.title')}</h1>
 
-        <Card title="Profile Information" className={styles.card}>
+        <Card title={t('settings.profileInformation')} className={styles.card}>
           <Form
             form={form}
             layout="vertical"
@@ -62,66 +62,66 @@ const SettingsPage: React.FC = () => {
           >
             <Form.Item
               name="username"
-              label="Username"
-              rules={[{ required: true, message: 'Please enter username' }]}
+              label={t('settings.username')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="email"
-              label="Email"
+              label={t('settings.email')}
               rules={[
-                { required: true, message: 'Please enter email' },
-                { type: 'email', message: 'Please enter a valid email' },
+                { required: true, message: t('common.pleaseWait') },
+                { type: 'email', message: t('common.pleaseWait') },
               ]}
             >
               <Input />
             </Form.Item>
-            <Form.Item name="phone" label="Phone">
+            <Form.Item name="phone" label={t('settings.phone')}>
               <Input />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" loading={loading}>
-                Save Changes
+                {t('settings.saveChanges')}
               </Button>
             </Form.Item>
           </Form>
         </Card>
 
-        <Card title="Change Password" className={styles.card}>
+        <Card title={t('settings.changePassword')} className={styles.card}>
           <Form
             layout="vertical"
             onFinish={handlePasswordChange}
           >
             <Form.Item
               name="currentPassword"
-              label="Current Password"
-              rules={[{ required: true, message: 'Please enter current password' }]}
+              label={t('settings.currentPassword')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input.Password />
             </Form.Item>
             <Form.Item
               name="newPassword"
-              label="New Password"
+              label={t('settings.newPassword')}
               rules={[
-                { required: true, message: 'Please enter new password' },
-                { min: 6, message: 'Password must be at least 6 characters' },
+                { required: true, message: t('common.pleaseWait') },
+                { min: 6, message: t('settings.minPasswordLength') },
               ]}
             >
               <Input.Password />
             </Form.Item>
             <Form.Item
               name="confirmPassword"
-              label="Confirm Password"
+              label={t('settings.confirmPassword')}
               dependencies={['newPassword']}
               rules={[
-                { required: true, message: 'Please confirm password' },
+                { required: true, message: t('common.pleaseWait') },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue('newPassword') === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(new Error('Passwords do not match'));
+                    return Promise.reject(new Error(t('settings.passwordsNotMatch')));
                   },
                 }),
               ]}
@@ -130,7 +130,7 @@ const SettingsPage: React.FC = () => {
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" loading={loading}>
-                Change Password
+                {t('settings.changePasswordBtn')}
               </Button>
             </Form.Item>
           </Form>

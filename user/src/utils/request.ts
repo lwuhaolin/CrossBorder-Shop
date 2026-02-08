@@ -22,6 +22,21 @@ export const getUserInfo = (): any | null => {
 };
 export const setUserInfo = (userInfo: any) => localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
 export const removeUserInfo = () => localStorage.removeItem(USER_INFO_KEY);
+
+// Image URL helper - combine server URL with image path
+export const getImageUrl = (imagePath?: string): string => {
+  if (!imagePath) {
+    return 'https://via.placeholder.com/300x300?text=Product';
+  }
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  // Remove /api prefix if it exists, then combine with server base URL
+  const baseUrl = API_BASE_URL.replace('/api', '');
+  return `${baseUrl}${imagePath}`;
+};
+
 const instance = axios.create({
   baseURL: API_BASE_URL,
   timeout: TIMEOUT,
@@ -99,12 +114,14 @@ instance.interceptors.request.use(
       removeToken();
       removeRefreshToken();
       removeUserInfo();
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      // Only redirect to login if not already on login page
+      if (window.location.pathname !== '/user/login' && window.location.pathname !== '/user/register') {
+        window.location.href = '/user/login';
       }
       return Promise.reject(new Error('No access token'));
     }
 
+    // For public endpoints (login, register), allow request without token
     return config;
   },
   (error) => {
@@ -129,7 +146,7 @@ instance.interceptors.response.use(
           // TOKEN_EXPIRED - try to refresh
           console.log("开始刷新token");
 
-          return handleTokenExpired(data);
+          return handleTokenExpired(data, response.config);
         }
 
         // Handle other error responses
@@ -214,8 +231,8 @@ function handleTokenRefresh(error: AxiosError<any>, config: any) {
           removeRefreshToken();
           removeUserInfo();
           message.error('登录已过期，请重新登录');
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
+          if (window.location.pathname !== '/user/login') {
+            window.location.href = '/user/login';
           }
           processQueue(new Error('Token refresh failed'), null);
           return Promise.reject(error);
@@ -229,8 +246,8 @@ function handleTokenRefresh(error: AxiosError<any>, config: any) {
         removeRefreshToken();
         removeUserInfo();
         message.error('登录已过期，请重新登录');
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+        if (window.location.pathname !== '/user/login') {
+          window.location.href = '/user/login';
         }
         processQueue(err, null);
         return Promise.reject(err);
@@ -239,8 +256,8 @@ function handleTokenRefresh(error: AxiosError<any>, config: any) {
       removeToken();
       removeUserInfo();
       message.error('登录已过期，请重新登录');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      if (window.location.pathname !== '/user/login') {
+        window.location.href = '/user/login';
       }
       processQueue(new Error('No refresh token'), null);
       return Promise.reject(error);
@@ -261,7 +278,7 @@ function handleTokenRefresh(error: AxiosError<any>, config: any) {
 }
 
 // Handle token expired error (code 1007) in response body
-function handleTokenExpired(data: any) {
+function handleTokenExpired(data: any, config?: any) {
   if (!isRefreshing) {
     isRefreshing = true;
     const refreshToken = getRefreshToken();
@@ -288,14 +305,19 @@ function handleTokenExpired(data: any) {
           instance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
           processQueue(null, accessToken);
           message.success('Token已自动刷新，请重试');
-          return Promise.reject(data);
+          // 如果有 config，使用新 token 重试请求
+          if (config) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+            return instance(config);
+          }
+          return Promise.resolve(resData);
         } else {
           removeToken();
           removeRefreshToken();
           removeUserInfo();
           message.error('登录已过期，请重新登录');
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
+          if (window.location.pathname !== '/user/login') {
+            window.location.href = '/user/login';
           }
           processQueue(new Error('Token refresh failed'), null);
           return Promise.reject(data);
@@ -309,8 +331,8 @@ function handleTokenExpired(data: any) {
         removeRefreshToken();
         removeUserInfo();
         message.error('登录已过期，请重新登录');
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+        if (window.location.pathname !== '/user/login') {
+          window.location.href = '/user/login';
         }
         processQueue(err, null);
         return Promise.reject(data);
@@ -319,8 +341,8 @@ function handleTokenExpired(data: any) {
       removeToken();
       removeUserInfo();
       message.error('登录已过期，请重新登录');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      if (window.location.pathname !== '/user/login') {
+        window.location.href = '/user/login';
       }
       processQueue(new Error('No refresh token'), null);
       return Promise.reject(data);
@@ -331,6 +353,10 @@ function handleTokenExpired(data: any) {
     }).then(token => {
       if (token) {
         instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        if (config) {
+          config.headers.Authorization = `Bearer ${token}`;
+          return instance(config);
+        }
       }
       return Promise.reject(data);
     }).catch(err => {

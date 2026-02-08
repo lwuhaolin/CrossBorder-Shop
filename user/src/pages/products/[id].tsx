@@ -13,11 +13,14 @@ import {
   Empty,
 } from "antd";
 import { ShoppingCartOutlined, HeartOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import { getProductDetail } from "@/services/product";
+import { getImageUrl } from "@/utils/request";
 import type { Product } from "@/models/product";
 import styles from "./[id].module.css";
 
 const ProductDetailPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
@@ -37,7 +40,7 @@ const ProductDetailPage: React.FC = () => {
       setProduct(response.data);
     } catch (error) {
       console.error("Failed to load product:", error);
-      message.error("Failed to load product");
+      message.error(t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -47,12 +50,12 @@ const ProductDetailPage: React.FC = () => {
     if (!product) return;
 
     if (product.stock === 0) {
-      message.warning("Product is out of stock");
+      message.warning(t("product.outOfStock"));
       return;
     }
 
     if (quantity > product.stock) {
-      message.warning(`Only ${product.stock} items available`);
+      message.warning(`${t("common.loading")} ${product.stock} ${t("product.available")}`);
       return;
     }
 
@@ -74,7 +77,7 @@ const ProductDetailPage: React.FC = () => {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    message.success("Added to cart");
+    message.success(t("common.addedToCart"));
     window.dispatchEvent(new Event("storage"));
   };
 
@@ -102,7 +105,7 @@ const ProductDetailPage: React.FC = () => {
     });
 
     localStorage.setItem("favorites", JSON.stringify(favorites));
-    message.success("Added to favorites");
+    message.success(t("product.addToFavorite"));
   };
 
   if (loading) {
@@ -116,7 +119,7 @@ const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className={styles.empty}>
-        <Empty description="Product not found" />
+        <Empty description={t("product.noProducts")} />
       </div>
     );
   }
@@ -124,27 +127,27 @@ const ProductDetailPage: React.FC = () => {
   const tabItems = [
     {
       key: "description",
-      label: "Description",
+      label: t("product.description"),
       children: (
         <div className={styles.tabContent}>
-          <p>{product.description || "No description available."}</p>
+          <p>{product.description || t("product.noDescription")}</p>
         </div>
       ),
     },
     {
       key: "specifications",
-      label: "Specifications",
+      label: t("product.specifications"),
       children: (
         <div className={styles.tabContent}>
           <Descriptions bordered column={1}>
-            <Descriptions.Item label="Product ID">
+            <Descriptions.Item label={t("product.productId")}>
               {product.id}
             </Descriptions.Item>
-            <Descriptions.Item label="Category">
-              {product.categoryId}
+            <Descriptions.Item label={t("product.category")}>
+              {i18n.language === 'zh-CN' ? product.categoryName : product.categoryCode}
             </Descriptions.Item>
-            <Descriptions.Item label="Stock">{product.stock}</Descriptions.Item>
-            <Descriptions.Item label="Price">
+            <Descriptions.Item label={t("product.stock")}>{product.stock}</Descriptions.Item>
+            <Descriptions.Item label={t("product.price")}>
               ${product.price.toFixed(2)}
             </Descriptions.Item>
           </Descriptions>
@@ -153,10 +156,10 @@ const ProductDetailPage: React.FC = () => {
     },
     {
       key: "reviews",
-      label: "Reviews",
+      label: t("product.reviews"),
       children: (
         <div className={styles.tabContent}>
-          <Empty description="No reviews yet" />
+          <Empty description={t("product.noReviews")} />
         </div>
       ),
     },
@@ -171,10 +174,7 @@ const ProductDetailPage: React.FC = () => {
             <Col xs={24} md={12}>
               <div className={styles.imageWrapper}>
                 <img
-                  src={
-                    product.mainImage ||
-                    "https://via.placeholder.com/600x600?text=Product"
-                  }
+                  src={getImageUrl(product.mainImage)}
                   alt={product.name}
                   className={styles.image}
                 />
@@ -187,28 +187,28 @@ const ProductDetailPage: React.FC = () => {
                 <h1 className={styles.productName}>{product.name}</h1>
 
                 <div className={styles.price}>
-                  <span className={styles.priceLabel}>Price:</span>
+                  <span className={styles.priceLabel}>{t("product.price")}:</span>
                   <span className={styles.priceValue}>
                     ${product.price.toFixed(2)}
                   </span>
                 </div>
 
                 <div className={styles.stock}>
-                  <span className={styles.stockLabel}>Stock:</span>
+                  <span className={styles.stockLabel}>{t("product.stock")}:</span>
                   <span className={styles.stockValue}>
                     {product.stock > 0
-                      ? `${product.stock} available`
-                      : "Out of stock"}
+                      ? `${product.stock} ` + t("product.available")
+                      : t("product.outOfStock")}
                   </span>
                 </div>
 
                 <div className={styles.description}>
-                  <h3>Description</h3>
-                  <p>{product.description || "No description available."}</p>
+                  <h3>{t("product.description")}</h3>
+                  <p>{product.description || t("product.noDescription")}</p>
                 </div>
 
                 <div className={styles.quantity}>
-                  <span className={styles.quantityLabel}>Quantity:</span>
+                  <span className={styles.quantityLabel}>{t("product.quantity")}:</span>
                   <InputNumber
                     min={1}
                     max={product.stock}
@@ -227,7 +227,7 @@ const ProductDetailPage: React.FC = () => {
                     disabled={product.stock === 0}
                     block
                   >
-                    Add to Cart
+                    {t("product.addToCart")}
                   </Button>
                   <Button
                     size="large"
@@ -236,7 +236,7 @@ const ProductDetailPage: React.FC = () => {
                     block
                     style={{ marginTop: 16 }}
                   >
-                    Buy Now
+                    {t("product.buyNow")}
                   </Button>
                   <Button
                     size="large"
@@ -245,7 +245,7 @@ const ProductDetailPage: React.FC = () => {
                     block
                     style={{ marginTop: 16 }}
                   >
-                    Add to Favorites
+                    {t("product.addToFavorite")}
                   </Button>
                 </div>
               </div>

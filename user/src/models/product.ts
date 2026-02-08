@@ -8,6 +8,7 @@ export interface Product {
   stock: number;
   categoryId?: number;
   categoryName?: string;
+  categoryCode?: string;
   images?: string[];
   mainImage?: string;
   status: ProductStatus;

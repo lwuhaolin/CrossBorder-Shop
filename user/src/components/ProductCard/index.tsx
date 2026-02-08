@@ -1,7 +1,9 @@
 import React from 'react';
 import { Card, Button, message } from 'antd';
 import { ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
-import { history } from 'umi';
+import { useNavigate } from '@umijs/renderer-react';
+import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '@/utils/request';
 import type { Product } from '@/models/product';
 import styles from './index.module.css';
 
@@ -13,18 +15,20 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (product.stock === 0) {
-      message.warning('Product is out of stock');
+      message.warning(t('product.outOfStock'));
       return;
     }
 
-    // Add to cart in localStorage
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const existingItem = cart.find((item: any) => item.productId === product.id);
-    
+
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
@@ -36,20 +40,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         quantity: 1,
       });
     }
-    
+
     localStorage.setItem('cart', JSON.stringify(cart));
-    message.success('Added to cart');
-    
+    message.success(t('common.addedToCart'));
+
     if (onAddToCart) {
       onAddToCart(product);
     }
 
-    // Trigger storage event to update cart count in header
     window.dispatchEvent(new Event('storage'));
   };
 
   const handleViewDetail = () => {
-    history.push(`/products/${product.id}`);
+    navigate(`/products/${product.id}`);
   };
 
   return (
@@ -60,11 +63,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         <div className={styles.imageWrapper}>
           <img
             alt={product.name}
-            src={product.mainImage || 'https://via.placeholder.com/300x300?text=Product'}
+            src={getImageUrl(product.mainImage)}
             className={styles.image}
           />
           {product.stock === 0 && (
-            <div className={styles.outOfStock}>Out of Stock</div>
+            <div className={styles.outOfStock}>{t('product.outOfStock')}</div>
           )}
         </div>
       }
@@ -74,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           icon={<EyeOutlined />}
           onClick={handleViewDetail}
         >
-          View
+          {t('product.view')}
         </Button>,
         <Button
           type="text"
@@ -82,7 +85,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           onClick={handleAddToCart}
           disabled={product.stock === 0}
         >
-          Add to Cart
+          {t('product.addToCart')}
         </Button>,
       ]}
       onClick={handleViewDetail}
@@ -97,7 +100,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           <div className={styles.description}>
             <div className={styles.price}>${product.price.toFixed(2)}</div>
             <div className={styles.stock}>
-              Stock: {product.stock}
+              {t('product.stock')}: {product.stock}
             </div>
           </div>
         }

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, InputNumber, Button, message, Empty, Space } from "antd";
+import { Card, Table, InputNumber, Button, message, Empty } from "antd";
 import { DeleteOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@umijs/renderer-react";
+import { useTranslation } from "react-i18next";
+import { getImageUrl } from "@/utils/request";
 import styles from "./index.module.css";
 
 interface CartItem {
@@ -13,8 +15,8 @@ interface CartItem {
 }
 
 const CartPage: React.FC = () => {
+  const { t } = useTranslation();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,26 +46,26 @@ const CartPage: React.FC = () => {
     );
     setCartItems(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
-    message.success("Item removed from cart");
+    message.success(t("cart.removeItem"));
     window.dispatchEvent(new Event("storage"));
   };
 
   const clearCart = () => {
     setCartItems([]);
     localStorage.setItem("cart", JSON.stringify([]));
-    message.success("Cart cleared");
+    message.success(t("cart.clearCart"));
     window.dispatchEvent(new Event("storage"));
   };
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
-      message.warning("Your cart is empty");
+      message.warning(t("cart.empty"));
       return;
     }
 
     const token = localStorage.getItem("token");
     if (!token) {
-      message.warning("Please login to checkout");
+      message.warning(t("checkout.loginRequired"));
       navigate("/user/login");
       return;
     }
@@ -76,7 +78,7 @@ const CartPage: React.FC = () => {
   };
 
   const calculateShipping = () => {
-    return cartItems.length > 0 ? 10 : 0; // Fixed shipping cost
+    return cartItems.length > 0 ? 10 : 0;
   };
 
   const calculateTotal = () => {
@@ -85,15 +87,13 @@ const CartPage: React.FC = () => {
 
   const columns = [
     {
-      title: "Product",
+      title: t("cart.items"),
       dataIndex: "name",
       key: "name",
       render: (name: string, record: CartItem) => (
         <div className={styles.productCell}>
           <img
-            src={
-              record.image || "https://via.placeholder.com/80x80?text=Product"
-            }
+            src={getImageUrl(record.image)}
             alt={name}
             className={styles.productImage}
           />
@@ -102,13 +102,13 @@ const CartPage: React.FC = () => {
       ),
     },
     {
-      title: "Price",
+      title: t("cart.price"),
       dataIndex: "price",
       key: "price",
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
-      title: "Quantity",
+      title: t("cart.quantity"),
       dataIndex: "quantity",
       key: "quantity",
       render: (quantity: number, record: CartItem) => (
@@ -120,13 +120,13 @@ const CartPage: React.FC = () => {
       ),
     },
     {
-      title: "Subtotal",
+      title: t("cart.subtotal"),
       key: "subtotal",
       render: (record: CartItem) =>
         `$${(record.price * record.quantity).toFixed(2)}`,
     },
     {
-      title: "Action",
+      title: t("common.edit"),
       key: "action",
       render: (record: CartItem) => (
         <Button
@@ -135,7 +135,7 @@ const CartPage: React.FC = () => {
           icon={<DeleteOutlined />}
           onClick={() => removeItem(record.productId)}
         >
-          Remove
+          {t("cart.remove")}
         </Button>
       ),
     },
@@ -147,11 +147,11 @@ const CartPage: React.FC = () => {
         <div className={styles.container}>
           <Card>
             <Empty
-              description="Your cart is empty"
+              description={t("cart.empty")}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             >
               <Button type="primary" onClick={() => navigate("/products")}>
-                Start Shopping
+                {t("cart.startShopping")}
               </Button>
             </Empty>
           </Card>
@@ -163,7 +163,7 @@ const CartPage: React.FC = () => {
   return (
     <div className={styles.cartPage}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Shopping Cart</h1>
+        <h1 className={styles.title}>{t("cart.title")}</h1>
 
         <Card className={styles.card}>
           <Table
@@ -171,31 +171,30 @@ const CartPage: React.FC = () => {
             columns={columns}
             rowKey="productId"
             pagination={false}
-            loading={loading}
           />
 
           <div className={styles.actions}>
             <Button danger onClick={clearCart}>
-              Clear Cart
+              {t("cart.clearCart")}
             </Button>
             <Button onClick={() => navigate("/products")}>
-              Continue Shopping
+              {t("cart.continueShopping")}
             </Button>
           </div>
         </Card>
 
         <Card className={styles.summaryCard}>
-          <h2>Order Summary</h2>
+          <h2>{t("cart.orderSummary")}</h2>
           <div className={styles.summaryRow}>
-            <span>Subtotal:</span>
+            <span>{t("cart.subtotal")}:</span>
             <span>${calculateSubtotal().toFixed(2)}</span>
           </div>
           <div className={styles.summaryRow}>
-            <span>Shipping:</span>
+            <span>{t("cart.shipping")}:</span>
             <span>${calculateShipping().toFixed(2)}</span>
           </div>
           <div className={styles.summaryRow + " " + styles.total}>
-            <span>Total:</span>
+            <span>{t("cart.total")}:</span>
             <span>${calculateTotal().toFixed(2)}</span>
           </div>
           <Button
@@ -206,7 +205,7 @@ const CartPage: React.FC = () => {
             onClick={handleCheckout}
             className={styles.checkoutButton}
           >
-            Proceed to Checkout
+            {t("cart.proceedToCheckout")}
           </Button>
         </Card>
       </div>

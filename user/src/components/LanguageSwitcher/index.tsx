@@ -1,6 +1,6 @@
 import React from "react";
 import { Select } from "antd";
-import { useIntl } from "umi";
+import { useTranslation } from "react-i18next";
 import styles from "./index.module.css";
 
 interface LanguageSwitcherProps {
@@ -8,19 +8,18 @@ interface LanguageSwitcherProps {
 }
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
-  const intl = useIntl();
-  const currentLocale = intl.locale;
+  const { i18n } = useTranslation();
 
   const handleLanguageChange = (value: string) => {
     // Save language preference to localStorage
     localStorage.setItem("selectedLanguage", value);
-    // Reload page to apply language change
-    window.location.search = `?locale=${value}`;
+    // Change language
+    i18n.changeLanguage(value);
   };
 
   return (
     <Select
-      value={currentLocale}
+      value={i18n.language}
       onChange={handleLanguageChange}
       className={className || styles.switcher}
       style={{ width: 120 }}

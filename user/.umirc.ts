@@ -79,9 +79,4 @@ export default defineConfig({
   npmClient: "pnpm",
   favicons: ["/favicon.png"],
   title: "CrossBorder Shop",
-  locale: {
-    default: "zh-CN",
-    baseNavigator: true,
-    antd: true,
-  },
 });

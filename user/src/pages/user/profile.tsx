@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Card, Descriptions, Button, message, Avatar } from "antd";
 import { UserOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "@umijs/renderer-react";
+import { useTranslation } from "react-i18next";
 import { getCurrentUser } from "@/services/user";
 import type { User } from "@/models/user";
 import styles from "./profile.module.css";
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ const ProfilePage: React.FC = () => {
       setUser(response.data);
     } catch (error) {
       console.error("Failed to load profile:", error);
-      message.error("Failed to load profile");
+      message.error(t("profile.failedToLoad"));
     } finally {
       setLoading(false);
     }
@@ -31,7 +33,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div className={styles.profilePage}>
       <div className={styles.container}>
-        <h1 className={styles.title}>My Profile</h1>
+        <h1 className={styles.title}>{t("profile.myProfile")}</h1>
 
         <Card loading={loading} className={styles.card}>
           <div className={styles.header}>
@@ -44,20 +46,20 @@ const ProfilePage: React.FC = () => {
               icon={<EditOutlined />}
               onClick={() => navigate("/user/settings")}
             >
-              Edit Profile
+              {t("profile.editProfile")}
             </Button>
           </div>
 
           <Descriptions bordered column={1} style={{ marginTop: 24 }}>
-            <Descriptions.Item label="Username">
+            <Descriptions.Item label={t("profile.username")}>
               {user?.username}
             </Descriptions.Item>
-            <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
-            <Descriptions.Item label="Phone">
-              {user?.phone || "Not set"}
+            <Descriptions.Item label={t("profile.email")}>{user?.email}</Descriptions.Item>
+            <Descriptions.Item label={t("profile.phone")}>
+              {user?.phone || t("common.info")}
             </Descriptions.Item>
-            <Descriptions.Item label="Role">{user?.role}</Descriptions.Item>
-            <Descriptions.Item label="Member Since">
+            <Descriptions.Item label={t("profile.role")}>{user?.role}</Descriptions.Item>
+            <Descriptions.Item label={t("profile.memberSince")}>
               {user?.createdAt
                 ? new Date(user.createdAt).toLocaleDateString()
                 : "-"}

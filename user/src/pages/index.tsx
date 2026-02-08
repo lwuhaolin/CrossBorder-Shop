@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Carousel, Typography, Spin, Card } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { getProductList } from '@/services/product';
 import ProductCard from '@/components/ProductCard';
 import CategoryNav from '@/components/CategoryNav';
@@ -9,6 +10,7 @@ import styles from './index.module.css';
 const { Title } = Typography;
 
 const HomePage: React.FC = () => {
+  const { t } = useTranslation();
   const [hotProducts, setHotProducts] = useState<Product[]>([]);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ const HomePage: React.FC = () => {
           {/* Hot Products */}
           <section className={styles.section}>
             <Title level={2} className={styles.sectionTitle}>
-              🔥 Hot Products
+              🔥 {t('home.hotProducts')}
             </Title>
             <Row gutter={[16, 16]}>
               {hotProducts.map((product) => (
@@ -83,7 +85,7 @@ const HomePage: React.FC = () => {
           {/* New Arrivals */}
           <section className={styles.section}>
             <Title level={2} className={styles.sectionTitle}>
-              ✨ New Arrivals
+              ✨ {t('home.newArrivals')}
             </Title>
             <Row gutter={[16, 16]}>
               {newProducts.map((product) => (
@@ -100,22 +102,22 @@ const HomePage: React.FC = () => {
               <Col xs={24} sm={8}>
                 <Card className={styles.featureCard}>
                   <div className={styles.featureIcon}>🚚</div>
-                  <h3>Free Shipping</h3>
-                  <p>Free shipping on orders over $50</p>
+                  <h3>{t('home.freeShipping')}</h3>
+                  <p>{t('home.freeShippingDesc')}</p>
                 </Card>
               </Col>
               <Col xs={24} sm={8}>
                 <Card className={styles.featureCard}>
                   <div className={styles.featureIcon}>🔒</div>
-                  <h3>Secure Payment</h3>
-                  <p>100% secure payment processing</p>
+                  <h3>{t('home.securePayment')}</h3>
+                  <p>{t('home.securePaymentDesc')}</p>
                 </Card>
               </Col>
               <Col xs={24} sm={8}>
                 <Card className={styles.featureCard}>
                   <div className={styles.featureIcon}>🎁</div>
-                  <h3>Best Quality</h3>
-                  <p>High-quality products guaranteed</p>
+                  <h3>{t('home.bestQuality')}</h3>
+                  <p>{t('home.bestQualityDesc')}</p>
                 </Card>
               </Col>
             </Row>

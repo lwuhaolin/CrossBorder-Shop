@@ -7,7 +7,9 @@ import {
   MenuOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "@umijs/renderer-react";
+import { useTranslation } from "react-i18next";
 import { removeToken, removeUserInfo, getToken } from "@/utils/request";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import type { MenuProps } from "antd";
 import styles from "./index.module.css";
 
@@ -18,6 +20,7 @@ const Header: React.FC = () => {
   const [cartCount, setCartCount] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Check if user is logged in
@@ -39,27 +42,27 @@ const Header: React.FC = () => {
     ? [
         {
           key: "profile",
-          label: "Profile",
+          label: t("nav.profile"),
           onClick: () => navigate("/user/profile"),
         },
         {
           key: "orders",
-          label: "My Orders",
+          label: t("nav.orders"),
           onClick: () => navigate("/user/orders"),
         },
         {
           key: "addresses",
-          label: "Addresses",
+          label: t("nav.addresses"),
           onClick: () => navigate("/user/addresses"),
         },
         {
           key: "favorites",
-          label: "Favorites",
+          label: t("nav.favorites"),
           onClick: () => navigate("/user/favorites"),
         },
         {
           key: "settings",
-          label: "Settings",
+          label: t("nav.settings"),
           onClick: () => navigate("/user/settings"),
         },
         {
@@ -67,7 +70,7 @@ const Header: React.FC = () => {
         },
         {
           key: "logout",
-          label: "Logout",
+          label: t("nav.logout"),
           onClick: () => {
             removeToken();
             removeUserInfo();
@@ -79,12 +82,12 @@ const Header: React.FC = () => {
     : [
         {
           key: "login",
-          label: "Login",
+          label: t("nav.login"),
           onClick: () => navigate("/user/login"),
         },
         {
           key: "register",
-          label: "Register",
+          label: t("nav.register"),
           onClick: () => navigate("/user/register"),
         },
       ];
@@ -98,7 +101,7 @@ const Header: React.FC = () => {
 
         <div className={styles.search}>
           <Search
-            placeholder="Search products..."
+            placeholder={t("product.search")}
             allowClear
             enterButton={<SearchOutlined />}
             size="large"
@@ -108,6 +111,7 @@ const Header: React.FC = () => {
 
         <div className={styles.actions}>
           <Space size="large">
+            <LanguageSwitcher />
             <Badge count={cartCount} showZero>
               <ShoppingCartOutlined
                 className={styles.icon}
@@ -123,6 +127,7 @@ const Header: React.FC = () => {
 
         <div className={styles.mobileMenu}>
           <Space size="middle">
+            <LanguageSwitcher />
             <Badge count={cartCount} showZero>
               <ShoppingCartOutlined
                 className={styles.icon}

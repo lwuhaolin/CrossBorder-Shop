@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Pagination, Select, Spin, Empty, Input } from "antd";
 import { useSearchParams } from "@umijs/renderer-react";
+import { useTranslation } from "react-i18next";
 import { getProductList } from "@/services/product";
 import { getCategoryList } from "@/services/category";
 import ProductCard from "@/components/ProductCard";
@@ -12,6 +13,7 @@ const { Search } = Input;
 const { Option } = Select;
 
 const ProductListPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -110,6 +112,10 @@ const ProductListPage: React.FC = () => {
     setPage(1);
   };
 
+  const getCategoryLabel = (category: Category) => {
+    return i18n.language === 'zh-CN' ? category.categoryName : category.categoryCode;
+  };
+
   return (
     <div className={styles.productListPage}>
       <div className={styles.container}>
@@ -118,7 +124,7 @@ const ProductListPage: React.FC = () => {
           <Row gutter={16}>
             <Col xs={24} sm={12} md={8}>
               <Search
-                placeholder="Search products..."
+                placeholder={t("product.search")}
                 allowClear
                 enterButton
                 value={searchText}
@@ -128,7 +134,7 @@ const ProductListPage: React.FC = () => {
             </Col>
             <Col xs={12} sm={6} md={4}>
               <Select
-                placeholder="Category"
+                placeholder={t("product.category")}
                 allowClear
                 style={{ width: "100%" }}
                 value={categoryId}
@@ -136,23 +142,23 @@ const ProductListPage: React.FC = () => {
               >
                 {categories.map((category) => (
                   <Option key={category.id} value={category.id}>
-                    {category.name}
+                    {getCategoryLabel(category)}
                   </Option>
                 ))}
               </Select>
             </Col>
             <Col xs={12} sm={6} md={4}>
               <Select
-                placeholder="Sort by"
+                placeholder={t("product.sort")}
                 allowClear
                 style={{ width: "100%" }}
                 value={sortBy}
                 onChange={handleSortChange}
               >
-                <Option value="price-asc">Price: Low to High</Option>
-                <Option value="price-desc">Price: High to Low</Option>
-                <Option value="name-asc">Name: A to Z</Option>
-                <Option value="name-desc">Name: Z to A</Option>
+                <Option value="price-asc">{t("product.priceLowToHigh")}</Option>
+                <Option value="price-desc">{t("product.priceHighToLow")}</Option>
+                <Option value="name-asc">{t("product.nameAtoZ")}</Option>
+                <Option value="name-desc">{t("product.nameZtoA")}</Option>
               </Select>
             </Col>
           </Row>
@@ -178,13 +184,13 @@ const ProductListPage: React.FC = () => {
                   total={total}
                   onChange={(p) => setPage(p)}
                   showSizeChanger={false}
-                  showTotal={(total) => `Total ${total} products`}
+                  showTotal={(total) => t("product.totalProducts", { total })}
                 />
               </div>
             </>
           ) : (
             <Empty
-              description="No products found"
+              description={t("product.noProducts")}
               style={{ margin: "64px 0" }}
             />
           )}

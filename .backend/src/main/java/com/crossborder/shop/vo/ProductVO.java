@@ -36,6 +36,9 @@ public class ProductVO implements Serializable {
     @Schema(description = "分类名称", example = "鲜花")
     private String categoryName;
 
+    @Schema(description = "分类编码", example = "FLOWER")
+    private String categoryCode;
+
     @Schema(description = "卖家用户ID", example = "2001")
     private Long sellerId;
 

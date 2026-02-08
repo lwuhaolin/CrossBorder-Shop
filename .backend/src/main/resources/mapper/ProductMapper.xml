@@ -35,6 +35,7 @@
         <result column="product_code" property="productCode"/>
         <result column="category_id" property="categoryId"/>
         <result column="category_name" property="categoryName"/>
+        <result column="category_code" property="categoryCode"/>
         <result column="seller_id" property="sellerId"/>
         <result column="seller_name" property="sellerName"/>
         <result column="brand" property="brand"/>
@@ -102,9 +103,10 @@
     </select>
 
     <select id="selectVOById" resultMap="VOResultMap">
-        SELECT 
-            p.*, 
+        SELECT
+            p.*,
             c.category_name,
+            c.category_code,
             u.username AS seller_name,
             (SELECT image_url FROM tb_product_image WHERE product_id = p.id AND is_main = 1 AND deleted = 0 LIMIT 1) AS main_image
         FROM tb_product p
@@ -114,9 +116,10 @@
     </select>
 
     <select id="selectPageList" resultMap="VOResultMap">
-        SELECT 
-            p.*, 
+        SELECT
+            p.*,
             c.category_name,
+            c.category_code,
             u.username AS seller_name,
             (SELECT image_url FROM tb_product_image WHERE product_id = p.id AND is_main = 1 AND deleted = 0 LIMIT 1) AS main_image
         FROM tb_product p
@@ -133,7 +136,7 @@
             AND p.seller_id = #{sellerId}
         </if>
         <if test="keyword != null and keyword != ''">
-            AND (p.product_name LIKE CONCAT('%', #{keyword}, '%') 
+            AND (p.product_name LIKE CONCAT('%', #{keyword}, '%')
                  OR p.product_code LIKE CONCAT('%', #{keyword}, '%')
                  OR p.brand LIKE CONCAT('%', #{keyword}, '%'))
         </if>

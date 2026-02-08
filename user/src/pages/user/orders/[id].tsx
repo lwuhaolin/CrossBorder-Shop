@@ -10,6 +10,7 @@ import {
   Empty,
   message,
 } from "antd";
+import { useTranslation } from "react-i18next";
 import { getOrderDetail } from "@/services/order";
 import type { Order } from "@/models/order";
 import { OrderStatus } from "@/models/order";
@@ -18,6 +19,7 @@ import styles from "./[id].module.css";
 const { Step } = Steps;
 
 const OrderDetailPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ const OrderDetailPage: React.FC = () => {
       setOrder(response.data);
     } catch (error) {
       console.error("Failed to load order:", error);
-      message.error("Failed to load order");
+      message.error(t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -56,15 +58,15 @@ const OrderDetailPage: React.FC = () => {
 
   const getStatusText = (status: OrderStatus) => {
     const textMap: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING]: "PENDING",
-      [OrderStatus.PAID]: "PAID",
-      [OrderStatus.SHIPPED]: "SHIPPED",
-      [OrderStatus.COMPLETED]: "COMPLETED",
-      [OrderStatus.CANCELED]: "CANCELED",
-      [OrderStatus.REFUNDING]: "REFUNDING",
-      [OrderStatus.REFUNDED]: "REFUNDED",
+      [OrderStatus.PENDING]: t("order.pending"),
+      [OrderStatus.PAID]: t("order.paid"),
+      [OrderStatus.SHIPPED]: t("order.shipped"),
+      [OrderStatus.COMPLETED]: t("order.completed"),
+      [OrderStatus.CANCELED]: t("order.cancelled"),
+      [OrderStatus.REFUNDING]: t("order.refunding"),
+      [OrderStatus.REFUNDED]: t("order.refunded"),
     };
-    return textMap[status] || "UNKNOWN";
+    return textMap[status] || t("common.info");
   };
 
   const getStatusColor = (status: OrderStatus) => {
@@ -82,23 +84,23 @@ const OrderDetailPage: React.FC = () => {
 
   const columns = [
     {
-      title: "Product",
+      title: t("order.product"),
       dataIndex: "productName",
       key: "productName",
     },
     {
-      title: "Price",
+      title: t("product.price"),
       dataIndex: "price",
       key: "price",
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
-      title: "Quantity",
+      title: t("product.quantity"),
       dataIndex: "quantity",
       key: "quantity",
     },
     {
-      title: "Subtotal",
+      title: t("order.subtotal"),
       key: "subtotal",
       render: (record: any) =>
         `$${(record.price * record.quantity).toFixed(2)}`,
@@ -116,7 +118,7 @@ const OrderDetailPage: React.FC = () => {
   if (!order) {
     return (
       <div className={styles.empty}>
-        <Empty description="Order not found" />
+        <Empty description={t("order.notFound")} />
       </div>
     );
   }
@@ -124,20 +126,20 @@ const OrderDetailPage: React.FC = () => {
   return (
     <div className={styles.orderDetailPage}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Order Details</h1>
+        <h1 className={styles.title}>{t("order.orderInformation")}</h1>
 
         <Card className={styles.card}>
-          <Descriptions title="Order Information" bordered column={2}>
-            <Descriptions.Item label="Order ID">#{order.id}</Descriptions.Item>
-            <Descriptions.Item label="Status">
+          <Descriptions title={t("order.orderInformation")} bordered column={2}>
+            <Descriptions.Item label={t("order.orderId")}>#{order.id}</Descriptions.Item>
+            <Descriptions.Item label={t("order.status")}>
               <Tag color={getStatusColor(order.status)}>
                 {getStatusText(order.status)}
               </Tag>
             </Descriptions.Item>
-            <Descriptions.Item label="Order Date">
+            <Descriptions.Item label={t("order.createdAt")}>
               {new Date(order.createdAt).toLocaleString()}
             </Descriptions.Item>
-            <Descriptions.Item label="Total Amount">
+            <Descriptions.Item label={t("order.total")}>
               ${order.totalAmount.toFixed(2)}
             </Descriptions.Item>
           </Descriptions>
@@ -145,16 +147,16 @@ const OrderDetailPage: React.FC = () => {
           {order.status !== OrderStatus.CANCELED && (
             <div className={styles.steps}>
               <Steps current={getStatusStep(order.status)}>
-                <Step title="Pending" description="Order received" />
-                <Step title="Confirmed" description="Order confirmed" />
-                <Step title="Shipped" description="On the way" />
-                <Step title="Delivered" description="Completed" />
+                <Step title={t("order.pending")} description={t("common.info")} />
+                <Step title={t("order.paid")} description={t("common.info")} />
+                <Step title={t("order.shipped")} description={t("common.info")} />
+                <Step title={t("order.delivered")} description={t("common.info")} />
               </Steps>
             </div>
           )}
 
           <div className={styles.section}>
-            <h3>Order Items</h3>
+            <h3>{t("order.orderItems")}</h3>
             <Table
               dataSource={order.items}
               columns={columns}
@@ -165,7 +167,7 @@ const OrderDetailPage: React.FC = () => {
 
           {order.shippingAddress && (
             <div className={styles.section}>
-              <h3>Shipping Address</h3>
+              <h3>{t("order.shippingAddress")}</h3>
               <p>
                 {order.shippingAddress.receiverName} -{" "}
                 {order.shippingAddress.receiverPhone}

@@ -1,7 +1,9 @@
 // Category related types
 export interface Category {
   id: number;
-  name: string;
+  categoryName?: string;
+  name?: string;
+  categoryCode: string;
   parentId?: number;
   level: number;
   sort?: number;

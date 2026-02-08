@@ -5,7 +5,7 @@ import type { Result, PageResult } from '@/models/common';
 // Get order list
 export async function getOrderList(params: OrderListParams): Promise<Result<PageResult<Order>>> {
   return request({
-    url: '/order/list',
+    url: '/order/buyer/list',
     method: 'GET',
     params,
   });

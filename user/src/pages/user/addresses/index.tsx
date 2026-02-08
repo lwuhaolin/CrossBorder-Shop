@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Button, Modal, Form, Input, Switch, message, Space } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { getAddressList, createAddress, updateAddress, deleteAddress } from '@/services/address';
 import type { Address } from '@/models/address';
 import styles from './index.module.css';
 
 const AddressesPage: React.FC = () => {
+  const { t } = useTranslation();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,7 +25,7 @@ const AddressesPage: React.FC = () => {
       setAddresses(response.data);
     } catch (error) {
       console.error('Failed to load addresses:', error);
-      message.error('Failed to load addresses');
+      message.error(t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -44,25 +46,25 @@ const AddressesPage: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await deleteAddress(id);
-      message.success('Address deleted successfully');
+      message.success(t('address.deleted'));
       loadAddresses();
     } catch (error) {
-      message.error('Failed to delete address');
+      message.error(t('common.error'));
     }
   };
 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      
+
       if (editingAddress) {
         await updateAddress(editingAddress.id, values);
-        message.success('Address updated successfully');
+        message.success(t('address.updated'));
       } else {
         await createAddress(values);
-        message.success('Address created successfully');
+        message.success(t('address.created'));
       }
-      
+
       setModalVisible(false);
       loadAddresses();
     } catch (error) {
@@ -72,29 +74,29 @@ const AddressesPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('address.receiverName'),
       dataIndex: 'receiverName',
       key: 'receiverName',
     },
     {
-      title: 'Phone',
+      title: t('address.phone'),
       dataIndex: 'receiverPhone',
       key: 'receiverPhone',
     },
     {
-      title: 'Address',
+      title: t('address.detailAddress'),
       key: 'address',
       render: (record: Address) =>
         `${record.detailAddress}, ${record.city}, ${record.province}, ${record.country}`,
     },
     {
-      title: 'Default',
+      title: t('address.default'),
       dataIndex: 'isDefault',
       key: 'isDefault',
-      render: (isDefault: boolean) => (isDefault ? 'Yes' : 'No'),
+      render: (isDefault: boolean) => (isDefault ? t('common.yes') : t('common.no')),
     },
     {
-      title: 'Action',
+      title: t('common.edit'),
       key: 'action',
       render: (record: Address) => (
         <Space>
@@ -103,7 +105,7 @@ const AddressesPage: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
           >
-            Edit
+            {t('address.edit')}
           </Button>
           <Button
             type="link"
@@ -111,7 +113,7 @@ const AddressesPage: React.FC = () => {
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record.id)}
           >
-            Delete
+            {t('address.delete')}
           </Button>
         </Space>
       ),
@@ -122,9 +124,9 @@ const AddressesPage: React.FC = () => {
     <div className={styles.addressesPage}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1 className={styles.title}>My Addresses</h1>
+          <h1 className={styles.title}>{t('address.myAddresses')}</h1>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            Add Address
+            {t('address.addAddress')}
           </Button>
         </div>
 
@@ -139,7 +141,7 @@ const AddressesPage: React.FC = () => {
         </Card>
 
         <Modal
-          title={editingAddress ? 'Edit Address' : 'Add Address'}
+          title={editingAddress ? t('address.editAddress') : t('address.addAddress')}
           open={modalVisible}
           onOk={handleSubmit}
           onCancel={() => setModalVisible(false)}
@@ -148,60 +150,53 @@ const AddressesPage: React.FC = () => {
           <Form form={form} layout="vertical">
             <Form.Item
               name="receiverName"
-              label="Receiver Name"
-              rules={[{ required: true, message: 'Please enter receiver name' }]}
+              label={t('address.receiverName')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="receiverPhone"
-              label="Phone"
-              rules={[{ required: true, message: 'Please enter phone number' }]}
+              label={t('address.phone')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="country"
-              label="Country"
-              rules={[{ required: true, message: 'Please enter country' }]}
+              label={t('address.country')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="detailAddress"
-              label="Detail Address"
-              rules={[{ required: true, message: 'Please enter detail address' }]}
+              label={t('address.detailAddress')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="city"
-              label="City"
-              rules={[{ required: true, message: 'Please enter city' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="country"
-              label="Country"
-              rules={[{ required: true, message: 'Please enter country' }]}
+              label={t('address.city')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="province"
-              label="Province"
-              rules={[{ required: true, message: 'Please enter province' }]}
+              label={t('address.province')}
+              rules={[{ required: true, message: t('common.pleaseWait') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="district"
-              label="District"
+              label={t('address.district')}
             >
               <Input />
             </Form.Item>
-            <Form.Item name="isDefault" label="Set as Default" valuePropName="checked">
+            <Form.Item name="isDefault" label={t('address.setDefault')} valuePropName="checked">
               <Switch />
             </Form.Item>
           </Form>

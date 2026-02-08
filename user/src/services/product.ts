@@ -5,7 +5,7 @@ import type { Result, PageResult } from '@/models/common';
 // Get product list
 export async function getProductList(params: ProductListParams): Promise<Result<PageResult<Product>>> {
   return request({
-    url: '/product/list',
+    url: '/product/page',
     method: 'GET',
     params,
   });
