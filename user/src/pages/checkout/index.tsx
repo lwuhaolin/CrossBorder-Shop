@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Card, Radio, Button, message, Steps, Divider, List } from "antd";
+import {
+  Card,
+  Radio,
+  Button,
+  message,
+  Steps,
+  Divider,
+  List,
+  Select,
+} from "antd";
 import { useNavigate } from "@umijs/renderer-react";
 import { useTranslation } from "react-i18next";
 import { getAddressList } from "@/services/address";
 import { createOrder } from "@/services/order";
+import { getCurrencyList } from "@/services/exchange";
 import { getImageUrl } from "@/utils/request";
 import type { Address } from "@/models/address";
 import styles from "./index.module.css";
@@ -26,12 +36,37 @@ const CheckoutPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currencies, setCurrencies] = useState<any[]>([]);
+  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadAddresses();
     loadCart();
+    loadCurrencies();
   }, []);
+
+  const loadCurrencies = async () => {
+    try {
+      const response = await getCurrencyList();
+
+      if (response.data) {
+        setCurrencies(response.data);
+        // Set default to base currency (isBase: 1) or first currency
+        const baseCurrency = response.data.find((c: any) => c.isBase === 1);
+        if (baseCurrency) {
+          setSelectedCurrency(baseCurrency.currencyCode);
+        } else if (response.data.length > 0) {
+          setSelectedCurrency(response.data[0].currencyCode);
+        }
+        // Open dropdown by default
+        setCurrencyDropdownOpen(true);
+      }
+    } catch (error) {
+      console.error("Failed to load currencies:", error);
+    }
+  };
 
   const loadAddresses = async () => {
     try {
@@ -86,15 +121,16 @@ const CheckoutPage: React.FC = () => {
         })),
         totalAmount: calculateTotal(),
         paymentMethod,
+        targetCurrency: selectedCurrency,
       };
 
-      const order = await createOrder(orderData);
+      const response = await createOrder(orderData);
 
       localStorage.setItem("cart", JSON.stringify([]));
       window.dispatchEvent(new Event("storage"));
 
       message.success(t("checkout.orderPlaced"));
-      navigate(`/user/orders/${order.id}`);
+      navigate(`/user/orders/${response.data}`);
     } catch (error) {
       console.error("Failed to place order:", error);
       message.error(t("common.error"));
@@ -254,18 +290,51 @@ const CheckoutPage: React.FC = () => {
           <div className={styles.sidebar}>
             <Card className={styles.summaryCard}>
               <h3>{t("checkout.orderSummary")}</h3>
+
+              <div className={styles.currencySelector}>
+                <span>{t("checkout.currency")}:</span>
+                <Select
+                  value={selectedCurrency}
+                  onChange={(value) => {
+                    setSelectedCurrency(value);
+                    setCurrencyDropdownOpen(false);
+                  }}
+                  style={{ width: 150 }}
+                  placement="bottomLeft"
+                  open={currencyDropdownOpen}
+                  onOpenChange={setCurrencyDropdownOpen}
+                  options={currencies.map((curr) => ({
+                    label: `${curr.currencyCode} (${curr.symbol})`,
+                    value: curr.currencyCode,
+                  }))}
+                />
+              </div>
+              <Divider />
+
               <div className={styles.summaryRow}>
                 <span>{t("cart.subtotal")}:</span>
-                <span>${calculateSubtotal().toFixed(2)}</span>
+                <span>
+                  {currencies.find((c) => c.currencyCode === selectedCurrency)
+                    ?.symbol || "$"}
+                  {calculateSubtotal().toFixed(2)}
+                </span>
               </div>
               <div className={styles.summaryRow}>
                 <span>{t("cart.shipping")}:</span>
-                <span>${calculateShipping().toFixed(2)}</span>
+                <span>
+                  {currencies.find((c) => c.currencyCode === selectedCurrency)
+                    ?.symbol || "$"}
+                  {calculateShipping().toFixed(2)}
+                </span>
               </div>
               <Divider />
               <div className={styles.summaryRow + " " + styles.total}>
                 <span>{t("cart.total")}:</span>
-                <span>${calculateTotal().toFixed(2)}</span>
+                <span>
+                  {currencies.find((c) => c.currencyCode === selectedCurrency)
+                    ?.symbol || "$"}
+                  {calculateTotal().toFixed(2)}
+                </span>
               </div>
               <Divider style={{ margin: "12px 0" }} />
               <p className={styles.estimatedNote}>
