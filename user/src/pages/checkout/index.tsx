@@ -24,9 +24,9 @@ const { Step } = Steps;
 
 interface CartItem {
   productId: number;
-  name: string;
+  productName: string;
   price: number;
-  image: string;
+  productImage: string;
   quantity: number;
 }
 
@@ -250,22 +250,25 @@ const CheckoutPage: React.FC = () => {
           <h3>{t("checkout.orderSummary")}</h3>
           <List<CartItem>
             dataSource={cartItems}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={
-                    <img
-                      src={getImageUrl(item.image)}
-                      alt={item.name}
-                      style={{ width: 60, height: 60, objectFit: "cover" }}
-                    />
-                  }
-                  title={item.name}
-                  description={`${t("checkout.quantity")}: ${item.quantity}`}
-                />
-                <div>${(item.price * item.quantity).toFixed(2)}</div>
-              </List.Item>
-            )}
+            renderItem={(item) => {
+              console.log(item);
+              
+              return (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={
+                      <img
+                        src={getImageUrl(item.productImage)}
+                        alt={item.productName}
+                        style={{ width: 60, height: 60, objectFit: "cover" }}
+                      />
+                    }
+                    title={item.productName}
+                    description={`${t("checkout.quantity")}: ${item.quantity}`}
+                  />
+                  <div>${(item.price * item.quantity).toFixed(2)}</div>
+                </List.Item>
+              );}}
           />
         </div>
       ),
