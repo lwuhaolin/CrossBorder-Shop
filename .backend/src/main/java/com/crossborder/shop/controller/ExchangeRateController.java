@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -39,6 +40,15 @@ public class ExchangeRateController {
         return Result.success(currencies);
     }
 
+    @Operation(summary = "获取汇率", description = "根据源货币和目标货币获取汇率")
+    @GetMapping("/rate")
+    public Result<BigDecimal> getRate(
+            @Parameter(description = "源货币代码") @RequestParam String from,
+            @Parameter(description = "目标货币代码") @RequestParam String to) {
+        BigDecimal rate = exchangeRateService.getExchangeRate(from, to);
+        return Result.success(rate);
+    }
+
     @Operation(summary = "分页查询汇率", description = "管理员分页查询汇率列表，支持按源货币和目标货币搜索")
     @GetMapping("/list")
     @PreAuthorize("hasRole('ADMIN')")
@@ -47,7 +57,8 @@ public class ExchangeRateController {
             @Parameter(description = "每页数量", example = "20") @RequestParam(defaultValue = "20") Integer pageSize,
             @Parameter(description = "源货币代码（可选）") @RequestParam(required = false) String fromCurrency,
             @Parameter(description = "目标货币代码（可选）") @RequestParam(required = false) String toCurrency) {
-        PageResult<ExchangeRateVO> result = exchangeRateService.listExchangeRates(pageNum, pageSize, fromCurrency, toCurrency);
+        PageResult<ExchangeRateVO> result = exchangeRateService.listExchangeRates(pageNum, pageSize, fromCurrency,
+                toCurrency);
         return Result.success(result);
     }
 

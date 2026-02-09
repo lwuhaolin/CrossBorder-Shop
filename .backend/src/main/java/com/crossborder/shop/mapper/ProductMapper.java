@@ -16,65 +16,70 @@ import java.util.List;
 @Mapper
 public interface ProductMapper {
 
-    /**
-     * 插入商品
-     */
-    int insert(Product product);
+        /**
+         * 插入商品
+         */
+        int insert(Product product);
 
-    /**
-     * 根据ID删除商品（逻辑删除）
-     */
-    int deleteById(@Param("id") Long id);
+        /**
+         * 根据ID删除商品（逻辑删除）
+         */
+        int deleteById(@Param("id") Long id);
 
-    /**
-     * 更新商品
-     */
-    int updateById(Product product);
+        /**
+         * 更新商品
+         */
+        int updateById(Product product);
 
-    /**
-     * 根据ID查询商品
-     */
-    Product selectById(@Param("id") Long id);
+        /**
+         * 根据ID查询商品
+         */
+        Product selectById(@Param("id") Long id);
 
-    /**
-     * 查询商品详情VO
-     */
-    ProductVO selectVOById(@Param("id") Long id);
+        /**
+         * 查询商品详情VO
+         */
+        ProductVO selectVOById(@Param("id") Long id);
 
-    /**
-     * 分页查询商品列表
-     */
-    List<ProductVO> selectPageList(@Param("categoryId") Long categoryId,
-            @Param("status") Integer status,
-            @Param("sellerId") Long sellerId,
-            @Param("keyword") String keyword);
+        /**
+         * 分页查询商品列表
+         */
+        List<ProductVO> selectPageList(@Param("categoryId") Long categoryId,
+                        @Param("status") Integer status,
+                        @Param("sellerId") Long sellerId,
+                        @Param("keyword") String keyword);
 
-    /**
-     * 乐观锁扣减库存
-     */
-    int decreaseStock(@Param("id") Long id,
-            @Param("quantity") Integer quantity,
-            @Param("version") Integer version);
+        /**
+         * 乐观锁扣减库存
+         */
+        int decreaseStock(@Param("id") Long id,
+                        @Param("quantity") Integer quantity,
+                        @Param("version") Integer version);
 
-    /**
-     * 增加库存（取消订单时）
-     */
-    int increaseStock(@Param("id") Long id, @Param("quantity") Integer quantity);
+        /**
+         * 增加库存（取消订单时）
+         */
+        int increaseStock(@Param("id") Long id, @Param("quantity") Integer quantity);
 
-    /**
-     * 增加销量
-     */
-    int increaseSales(@Param("id") Long id, @Param("quantity") Integer quantity);
+        /**
+         * 增加销量
+         */
+        int increaseSales(@Param("id") Long id, @Param("quantity") Integer quantity);
 
-    /**
-     * 更新商品状态
-     */
-    int updateStatus(@Param("id") Long id,
-            @Param("status") Integer status,
-            @Param("sellerId") Long sellerId);
+        /**
+         * 更新商品状态
+         */
+        int updateStatus(@Param("id") Long id,
+                        @Param("status") Integer status,
+                        @Param("sellerId") Long sellerId);
 
-    /**
-     * 根据商品编码查询
-     */
-    Product selectByCode(@Param("productCode") String productCode);
+        /**
+         * 根据商品编码查询
+         */
+        Product selectByCode(@Param("productCode") String productCode);
+
+        /**
+         * 查询最新商品列表
+         */
+        List<ProductVO> selectLatestProducts(@Param("limit") Integer limit);
 }

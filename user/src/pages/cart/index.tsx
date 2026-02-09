@@ -1,27 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, InputNumber, Button, message, Empty } from "antd";
+import {
+  Card,
+  Table,
+  InputNumber,
+  Button,
+  message,
+  Empty,
+  Checkbox,
+} from "antd";
 import { DeleteOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "@umijs/renderer-react";
 import { useTranslation } from "react-i18next";
 import { getImageUrl, getUserInfo, getToken } from "@/utils/request";
-import { getCart } from "@/services/cart";
+import { getCart, updateCartItem } from "@/services/cart";
+import { getAppConfig } from "@/services/settings";
 import styles from "./index.module.css";
-
-interface CartItem {
-  productId: number;
-  productName: string;
-  price: number;
-  productImage: string;
-  quantity: number;
-}
+import type { CartItem } from "@/models/cart";
 
 const CartPage: React.FC = () => {
   const { t } = useTranslation();
-  const [cartItems, setCartItems] = useState<any>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const [shippingFee, setShippingFee] = useState<number>(10);
+  const [freeShippingThreshold, setFreeShippingThreshold] =
+    useState<number>(99);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadCart();
+    loadConfig();
   }, []);
 
   const loadCart = async () => {
@@ -36,7 +43,17 @@ const CartPage: React.FC = () => {
           const cartData = Array.isArray(response.data)
             ? response.data
             : response.data.items || [];
-          setCartItems(cartData);
+          setCartItems(cartData as CartItem[]);
+
+          // Initialize selected items from loaded data
+          const initialSelected = new Set<number>();
+          cartData.forEach((item: CartItem) => {
+            if (item.selected) {
+              initialSelected.add(item.productId);
+            }
+          });
+          setSelectedItems(initialSelected);
+
           // Sync with localStorage
           localStorage.setItem("cart", JSON.stringify(cartData));
           return;
@@ -49,6 +66,36 @@ const CartPage: React.FC = () => {
     // Fallback to localStorage if backend fails
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCartItems(cart);
+  };
+
+  const loadConfig = async () => {
+    try {
+      const response = await getAppConfig();
+      if (response.data) {
+        setShippingFee(response.data.shippingFee || 10);
+        setFreeShippingThreshold(response.data.freeshippingThreshold || 99);
+      }
+    } catch (error) {
+      console.error("Failed to load config:", error);
+    }
+  };
+
+  const toggleItem = (productId: number) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(productId)) {
+      newSelected.delete(productId);
+    } else {
+      newSelected.add(productId);
+    }
+    setSelectedItems(newSelected);
+  };
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedItems(new Set(cartItems.map((item) => item.productId)));
+    } else {
+      setSelectedItems(new Set());
+    }
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
@@ -68,6 +115,12 @@ const CartPage: React.FC = () => {
       (item) => item.productId !== productId,
     );
     setCartItems(updatedCart);
+
+    // Remove from selected items
+    const newSelected = new Set(selectedItems);
+    newSelected.delete(productId);
+    setSelectedItems(newSelected);
+
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     message.success(t("cart.removeItem"));
     window.dispatchEvent(new Event("storage"));
@@ -75,14 +128,15 @@ const CartPage: React.FC = () => {
 
   const clearCart = () => {
     setCartItems([]);
+    setSelectedItems(new Set());
     localStorage.setItem("cart", JSON.stringify([]));
     message.success(t("cart.clearCart"));
     window.dispatchEvent(new Event("storage"));
   };
 
-  const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      message.warning(t("cart.empty"));
+  const handleCheckout = async () => {
+    if (selectedItems.size === 0) {
+      message.warning("请先选择要购买的商品");
       return;
     }
 
@@ -93,38 +147,82 @@ const CartPage: React.FC = () => {
       return;
     }
 
+    // Update selected status for all items
+    try {
+      for (const item of cartItems) {
+        const isSelected = selectedItems.has(item.productId);
+        if (isSelected) {
+          await updateCartItem({
+            id: item.id,
+            quantity: item.quantity,
+            selected: true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to update cart items:", error);
+    }
+
     navigate("/checkout");
   };
 
   const calculateSubtotal = () => {
-    return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    return cartItems
+      .filter((item) => selectedItems.has(item.productId))
+      .reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
   const calculateShipping = () => {
-    return cartItems.length > 0 ? 10 : 0;
+    const subtotal = calculateSubtotal();
+    // 如果达到免运费门槛，返回0
+    if (subtotal >= freeShippingThreshold) {
+      return 0;
+    }
+    return shippingFee;
   };
 
   const calculateTotal = () => {
     return calculateSubtotal() + calculateShipping();
   };
 
+  const isAllSelected =
+    cartItems.length > 0 && selectedItems.size === cartItems.length;
+  const isIndeterminate =
+    selectedItems.size > 0 && selectedItems.size < cartItems.length;
+
   const columns = [
     {
+      title: (
+        <Checkbox
+          checked={isAllSelected}
+          indeterminate={isIndeterminate}
+          onChange={(e) => toggleSelectAll(e.target.checked)}
+        />
+      ),
+      key: "checkbox",
+      width: 50,
+      render: (record: CartItem) => (
+        <Checkbox
+          checked={selectedItems.has(record.productId)}
+          onChange={() => toggleItem(record.productId)}
+        />
+      ),
+    },
+    {
       title: t("cart.items"),
-      dataIndex: "name",
-      key: "name",
-      render: (name: string, record: CartItem) => (
+      dataIndex: "productName",
+      key: "productName",
+      render: (_: string, record: CartItem) => (
         <div className={styles.productCell}>
           <img
             src={getImageUrl(record.productImage)}
-            alt={name}
+            alt={record.productName}
             className={styles.productImage}
           />
           <span className={styles.productName}>{record.productName}</span>
         </div>
       ),
     },
-    {},
     {
       title: t("cart.price"),
       dataIndex: "price",
@@ -228,6 +326,7 @@ const CartPage: React.FC = () => {
             block
             icon={<ShoppingOutlined />}
             onClick={handleCheckout}
+            disabled={selectedItems.size === 0}
             className={styles.checkoutButton}
           >
             {t("cart.proceedToCheckout")}

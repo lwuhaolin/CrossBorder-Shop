@@ -3,9 +3,9 @@ export interface CartItem {
   id: number;
   userId: number;
   productId: number;
-  productName?: string;
-  productImage?: string;
-  price?: number;
+  productName: string;
+  productImage: string;
+  price: number;
   stock?: number;
   quantity: number;
   selected?: boolean;
@@ -27,6 +27,12 @@ export interface CartAddDTO {
 
 export interface CartUpdateDTO {
   quantity: number;
+}
+
+export interface UpdateCartItemDTO {
+  id: number;
+  quantity: number;
+  selected?: boolean;
 }
 
 export interface CartCalculateResponse {

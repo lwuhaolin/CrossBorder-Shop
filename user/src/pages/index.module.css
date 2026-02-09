@@ -4,13 +4,50 @@
 
 .hero {
   margin-bottom: 32px;
+  width: 100%;
 }
 
 .carousel {
-  height: 400px;
+  height: 500px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+
 .carouselItem {
+  height: 500px;
+  background: #f5f5f5;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.carouselBg {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.9);
+  z-index: 1;
+}
+
+.carouselImage {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.carouselEmpty {
   height: 400px;
   background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
   display: flex;
@@ -46,19 +83,51 @@
 }
 
 .sectionTitle {
-  margin-bottom: 24px !important;
-  font-weight: bold;
+  margin-bottom: 32px !important;
+  font-weight: 800;
+  font-size: 28px !important;
+  color: #333;
+  position: relative;
+  padding-left: 16px;
+}
+
+.sectionTitle::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: #1890ff;
+  border-radius: 2px;
 }
 
 .featureCard {
   text-align: center;
-  border-radius: 8px;
+  border-radius: 12px;
   height: 100%;
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: #1890ff;
 }
 
 .featureIcon {
   font-size: 48px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+  background: #f0f5ff;
+  width: 88px;
+  height: 88px;
+  line-height: 88px;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  color: #1890ff;
 }
 
 .featureCard h3 {
@@ -73,12 +142,25 @@
 }
 
 @media (max-width: 768px) {
+  .hero {
+    margin-bottom: 24px;
+  }
+
   .carousel {
-    height: 250px;
+    height: 300px;
+    border-radius: 4px;
   }
 
   .carouselItem {
-    height: 250px;
+    height: 300px;
+  }
+
+  .carouselImage {
+    object-fit: contain;
+  }
+
+  .carouselEmpty {
+    height: 300px;
   }
 
   .carouselContent h1 {

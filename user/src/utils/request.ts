@@ -25,16 +25,16 @@ export const removeUserInfo = () => localStorage.removeItem(USER_INFO_KEY);
 
 // Image URL helper - combine server URL with image path
 export const getImageUrl = (imagePath?: string): string => {
-  
 
-  
 
- 
-  
- 
-  
+
+
+
+
+
+
   const fullUrl = `${API_BASE_URL}${imagePath}`;
-  
+
   return fullUrl;
 };
 
@@ -67,6 +67,7 @@ const isPublicEndpoint = (url?: string) => {
     url.includes('/user/login') ||
     url.includes('/user/register') ||
     url.includes('/user/refresh') ||
+    url.includes('/settings/config') ||
     url.includes('/product/') ||
     url.includes('/category/')
   );

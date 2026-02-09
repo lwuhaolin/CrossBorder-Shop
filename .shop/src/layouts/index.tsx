@@ -36,6 +36,11 @@ const XinLayout: React.FC<ProLayoutProps> = (props) => {
 
   const adminRoutes = [
     {
+      name: "仪表盘",
+      path: "dashboard",
+      icon: <DashboardOutlined />,
+    },
+    {
       name: "用户管理",
       path: "admin/users",
       icon: <UserOutlined />,
@@ -117,6 +122,7 @@ const XinLayout: React.FC<ProLayoutProps> = (props) => {
 
   const allowedPrefixes = isAdmin
     ? [
+        "/dashboard",
         "/admin/users",
         "/products",
         "/admin/rates",

@@ -32,6 +32,15 @@ export async function getExchangeRate(id: number): Promise<Result<ExchangeRate>>
   });
 }
 
+// Get exchange rate by currency pair
+export async function getExchangeRateByPair(fromCurrency: string, toCurrency: string): Promise<Result<number>> {
+  return request({
+    url: '/exchange-rate/rate',
+    method: 'GET',
+    params: { from: fromCurrency, to: toCurrency },
+  });
+}
+
 // Create exchange rate
 export async function createExchangeRate(data: ExchangeRateDTO): Promise<Result<void>> {
   return request({

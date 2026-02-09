@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 应用配置VO
@@ -47,4 +48,10 @@ public class AppConfigVO {
 
     @Schema(description = "启用卖家注册")
     private Boolean enableSellerRegistration;
+
+    @Schema(description = "主页轮播图图片路径")
+    private List<String> carouselImages;
+
+    @Schema(description = "主页轮播图图片数量")
+    private Integer carouselImageCount;
 }

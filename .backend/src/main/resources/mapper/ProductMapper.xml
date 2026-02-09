@@ -182,4 +182,21 @@
         SELECT * FROM tb_product WHERE product_code = #{productCode} AND deleted = 0
     </select>
 
+    <!-- 查询最新商品列表 -->
+    <select id="selectLatestProducts" resultMap="VOResultMap">
+        SELECT
+            p.*,
+            c.category_name,
+            c.category_code,
+            u.username AS seller_name,
+            (SELECT image_url FROM tb_product_image WHERE product_id = p.id AND is_main = 1 AND deleted = 0 LIMIT 1) AS main_image
+        FROM tb_product p
+        LEFT JOIN tb_category c ON p.category_id = c.id
+        LEFT JOIN tb_user u ON p.seller_id = u.id
+        WHERE p.deleted = 0 
+          AND p.status = 1
+        ORDER BY p.create_time DESC
+        LIMIT #{limit}
+    </select>
+
 </mapper>

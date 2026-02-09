@@ -5,6 +5,7 @@ import com.crossborder.shop.dto.SystemSettingDTO;
 import com.crossborder.shop.vo.AppConfigVO;
 import com.crossborder.shop.vo.SystemSettingVO;
 import com.crossborder.shop.vo.SystemStatsVO;
+import com.crossborder.shop.vo.SellerStatsVO;
 
 import java.util.List;
 
@@ -27,6 +28,8 @@ public interface SettingsService {
     void updateAppConfig(AppConfigDTO dto);
 
     SystemStatsVO getSystemStats();
+
+    SellerStatsVO getSellerStats(Long sellerId);
 
     boolean getBooleanConfig(String key, boolean defaultValue);
 

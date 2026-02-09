@@ -17,6 +17,7 @@ import {
   uploadProductImages,
 } from "@/services/product";
 import { getCategoryList } from "@/services/category";
+import { getCurrencies, getExchangeRateByPair } from "@/services/rate";
 import type { ProductUpdateDTO, Product } from "@/models/product";
 import { ProductStatus } from "@/models/product";
 import type { UploadFile } from "antd";
@@ -31,6 +32,18 @@ const EditProduct: React.FC = () => {
   const formRef = useRef<ProFormInstance>();
   const [productData, setProductData] = useState<Product | null>(
     (location.state as any)?.product || null,
+  );
+  const [currencies, setCurrencies] = useState<
+    {
+      currencyCode: string;
+      currencyName: string;
+      symbol?: string;
+      isBase?: number;
+    }[]
+  >([]);
+  const [currencySymbol, setCurrencySymbol] = useState<string>("¥");
+  const [lastCurrency, setLastCurrency] = useState<string | undefined>(
+    undefined,
   );
   const apiBaseUrl =
     process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
@@ -92,7 +105,84 @@ const EditProduct: React.FC = () => {
         url: normalizeImageUrl(url),
       })),
     });
+    if (product.currency) {
+      setLastCurrency(product.currency);
+      const symbol = currencies.find(
+        (c) => c.currencyCode === product.currency,
+      )?.symbol;
+      setCurrencySymbol(symbol || "¥");
+    }
   }, [product]);
+
+  useEffect(() => {
+    const loadCurrencies = async () => {
+      try {
+        const response = await getCurrencies();
+        const list = response.data || [];
+        setCurrencies(list);
+        const currentCurrency =
+          formRef.current?.getFieldValue("currency") || product?.currency;
+        if (currentCurrency) {
+          const symbol = list.find(
+            (c) => c.currencyCode === currentCurrency,
+          )?.symbol;
+          setCurrencySymbol(symbol || "¥");
+        }
+      } catch (error) {
+        message.error("币种加载失败");
+      }
+    };
+
+    loadCurrencies();
+  }, [product]);
+
+  const handleCurrencyChange = async (nextCurrency: string) => {
+    if (!lastCurrency || lastCurrency === nextCurrency) {
+      setLastCurrency(nextCurrency);
+      const symbol = currencies.find(
+        (c) => c.currencyCode === nextCurrency,
+      )?.symbol;
+      setCurrencySymbol(symbol || "¥");
+      return;
+    }
+
+    try {
+      const response = await getExchangeRateByPair(lastCurrency, nextCurrency);
+      const rate = response.data;
+      const rateValue = Number(rate);
+      if (rate == null || Number.isNaN(rateValue)) {
+        message.error("获取汇率失败");
+        formRef.current?.setFieldsValue({ currency: lastCurrency });
+        return;
+      }
+
+      const currentPrice = formRef.current?.getFieldValue("price");
+      const currentOriginal = formRef.current?.getFieldValue("originalPrice");
+
+      const nextPrice =
+        typeof currentPrice === "number"
+          ? Number((currentPrice * rateValue).toFixed(2))
+          : currentPrice;
+      const nextOriginal =
+        typeof currentOriginal === "number"
+          ? Number((currentOriginal * rateValue).toFixed(2))
+          : currentOriginal;
+
+      formRef.current?.setFieldsValue({
+        price: nextPrice,
+        originalPrice: nextOriginal,
+      });
+
+      setLastCurrency(nextCurrency);
+      const symbol = currencies.find(
+        (c) => c.currencyCode === nextCurrency,
+      )?.symbol;
+      setCurrencySymbol(symbol || "¥");
+    } catch (error) {
+      message.error("获取汇率失败");
+      formRef.current?.setFieldsValue({ currency: lastCurrency });
+    }
+  };
 
   const handleSubmit = async (values: any) => {
     try {
@@ -220,7 +310,7 @@ const EditProduct: React.FC = () => {
           min={0}
           fieldProps={{
             precision: 2,
-            prefix: "¥",
+            prefix: currencySymbol,
           }}
           rules={[{ required: true, message: "请输入售价" }]}
         />
@@ -232,7 +322,7 @@ const EditProduct: React.FC = () => {
           min={0}
           fieldProps={{
             precision: 2,
-            prefix: "¥",
+            prefix: currencySymbol,
           }}
         />
 
@@ -240,13 +330,13 @@ const EditProduct: React.FC = () => {
           name="currency"
           label="币种"
           placeholder="请选择币种"
-          options={[
-            { label: "人民币 (CNY)", value: "CNY" },
-            { label: "美元 (USD)", value: "USD" },
-            { label: "欧元 (EUR)", value: "EUR" },
-            { label: "日元 (JPY)", value: "JPY" },
-          ]}
-          initialValue="CNY"
+          options={currencies.map((currency) => ({
+            label: `${currency.currencyName} (${currency.currencyCode})`,
+            value: currency.currencyCode,
+          }))}
+          fieldProps={{
+            onChange: handleCurrencyChange,
+          }}
         />
 
         <ProFormDigit

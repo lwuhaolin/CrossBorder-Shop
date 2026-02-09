@@ -29,6 +29,8 @@ export interface AppConfig {
   maxUploadSize?: number;
   enableUserRegistration?: boolean;
   enableSellerRegistration?: boolean;
+  carouselImages?: string[];
+  carouselImageCount?: number;
 }
 
 export interface SystemStats {
@@ -42,4 +44,16 @@ export interface SystemStats {
   totalRevenue: number;
   revenueToday: number;
   lastUpdateTime?: string;
+}
+
+export interface SellerStats {
+  totalProducts: number;
+  activeProducts: number;
+  totalOrders: number;
+  pendingOrders: number;
+  completedOrders: number;
+  totalRevenue: number;
+  revenueToday: number;
+  revenueThisMonth: number;
+  totalSales: number;
 }

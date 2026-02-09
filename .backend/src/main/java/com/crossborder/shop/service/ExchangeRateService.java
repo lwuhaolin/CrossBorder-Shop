@@ -5,6 +5,7 @@ import com.crossborder.shop.dto.ExchangeRateDTO;
 import com.crossborder.shop.vo.CurrencyVO;
 import com.crossborder.shop.vo.ExchangeRateVO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -25,13 +26,14 @@ public interface ExchangeRateService {
     /**
      * 分页查询汇率
      *
-     * @param pageNum 页码
-     * @param pageSize 每页数量
+     * @param pageNum      页码
+     * @param pageSize     每页数量
      * @param fromCurrency 源货币代码（可选搜索条件）
-     * @param toCurrency 目标货币代码（可选搜索条件）
+     * @param toCurrency   目标货币代码（可选搜索条件）
      * @return 分页结果
      */
-    PageResult<ExchangeRateVO> listExchangeRates(Integer pageNum, Integer pageSize, String fromCurrency, String toCurrency);
+    PageResult<ExchangeRateVO> listExchangeRates(Integer pageNum, Integer pageSize, String fromCurrency,
+            String toCurrency);
 
     /**
      * 根据ID查询汇率
@@ -51,7 +53,7 @@ public interface ExchangeRateService {
     /**
      * 更新汇率
      *
-     * @param id 汇率ID
+     * @param id  汇率ID
      * @param dto 汇率数据
      */
     void updateExchangeRate(Long id, ExchangeRateDTO dto);
@@ -62,4 +64,13 @@ public interface ExchangeRateService {
      * @param id 汇率ID
      */
     void deleteExchangeRate(Long id);
+
+    /**
+     * 根据币种对获取汇率
+     *
+     * @param fromCurrency 源货币代码
+     * @param toCurrency   目标货币代码
+     * @return 汇率
+     */
+    BigDecimal getExchangeRate(String fromCurrency, String toCurrency);
 }

@@ -11,10 +11,12 @@ import com.crossborder.shop.mapper.*;
 import com.crossborder.shop.service.DelayQueueService;
 import com.crossborder.shop.service.LogisticsService;
 import com.crossborder.shop.service.OrderService;
+import com.crossborder.shop.service.SettingsService;
 import com.crossborder.shop.util.OrderNumberGenerator;
 import com.crossborder.shop.vo.OrderAddressVO;
 import com.crossborder.shop.vo.OrderItemVO;
 import com.crossborder.shop.vo.OrderVO;
+import com.crossborder.shop.vo.SystemSettingVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,6 +68,7 @@ public class OrderServiceImpl implements OrderService {
     private final LogisticsService logisticsService;
     private final OrderNumberGenerator orderNumberGenerator;
     private final DelayQueueService delayQueueService;
+    private final SettingsService settingsService;
 
     @Value("${order.timeout-minutes:15}")
     private int orderTimeoutMinutes;
@@ -287,7 +290,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 6. 计算订单总金额（商品金额 + 运费 - 优惠）
-        BigDecimal freightAmount = BigDecimal.ZERO;
+        BigDecimal freightAmount = resolveFreightAmount(productAmount);
         BigDecimal discountAmount = BigDecimal.ZERO;
         BigDecimal totalAmount = productAmount.add(freightAmount).subtract(discountAmount);
 
@@ -359,6 +362,35 @@ public class OrderServiceImpl implements OrderService {
                 order.getId(), orderNumber, userId, totalAmount);
 
         return order.getId();
+    }
+
+    private BigDecimal resolveFreightAmount(BigDecimal productAmount) {
+        BigDecimal defaultFee = new BigDecimal("10");
+        BigDecimal freeThreshold = null;
+
+        try {
+            SystemSettingVO feeSetting = settingsService.getSettingByKey("shipping.fee");
+            if (feeSetting != null && feeSetting.getSettingValue() != null) {
+                defaultFee = new BigDecimal(feeSetting.getSettingValue());
+            }
+        } catch (Exception e) {
+            log.warn("获取运费配置失败，使用默认值: {}", defaultFee);
+        }
+
+        try {
+            SystemSettingVO thresholdSetting = settingsService.getSettingByKey("shipping.free.threshold");
+            if (thresholdSetting != null && thresholdSetting.getSettingValue() != null) {
+                freeThreshold = new BigDecimal(thresholdSetting.getSettingValue());
+            }
+        } catch (Exception e) {
+            log.warn("获取免邮阈值失败，将忽略免邮逻辑");
+        }
+
+        if (freeThreshold != null && productAmount != null && productAmount.compareTo(freeThreshold) >= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        return defaultFee;
     }
 
     /**

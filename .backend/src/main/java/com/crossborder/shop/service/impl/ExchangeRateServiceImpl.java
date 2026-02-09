@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     @Override
-    public PageResult<ExchangeRateVO> listExchangeRates(Integer pageNum, Integer pageSize, String fromCurrency, String toCurrency) {
+    public PageResult<ExchangeRateVO> listExchangeRates(Integer pageNum, Integer pageSize, String fromCurrency,
+            String toCurrency) {
         if (pageNum == null || pageNum < 1) {
             pageNum = 1;
         }
@@ -67,7 +69,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
 
-        log.info("分页查询汇率: pageNum={}, pageSize={}, fromCurrency={}, toCurrency={}", pageNum, pageSize, fromCurrency, toCurrency);
+        log.info("分页查询汇率: pageNum={}, pageSize={}, fromCurrency={}, toCurrency={}", pageNum, pageSize, fromCurrency,
+                toCurrency);
 
         return PageResult.build(pageNum, pageSize, total, exchangeRateVOs);
     }
@@ -147,6 +150,21 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         }
 
         log.info("汇率删除成功: id={}", id);
+    }
+
+    @Override
+    public BigDecimal getExchangeRate(String fromCurrency, String toCurrency) {
+        if (fromCurrency == null || toCurrency == null) {
+            throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "币种参数不能为空");
+        }
+        if (fromCurrency.equalsIgnoreCase(toCurrency)) {
+            return BigDecimal.ONE;
+        }
+        ExchangeRate exchangeRate = exchangeRateMapper.selectByPair(fromCurrency, toCurrency);
+        if (exchangeRate == null || exchangeRate.getRate() == null) {
+            throw new BusinessException(ResultCode.EXCHANGE_RATE_NOT_FOUND);
+        }
+        return exchangeRate.getRate();
     }
 
     /**

@@ -321,4 +321,12 @@ public class ProductServiceImpl implements ProductService {
 
         productImageMapper.batchInsert(images);
     }
+
+    @Override
+    public List<ProductVO> getLatestProducts(Integer limit) {
+        if (limit == null || limit <= 0) {
+            limit = 4;
+        }
+        return productMapper.selectLatestProducts(limit);
+    }
 }

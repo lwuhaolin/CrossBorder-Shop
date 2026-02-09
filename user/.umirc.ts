@@ -32,6 +32,34 @@ export default defineConfig({
           component: "checkout/index",
         },
         {
+          path: "/help",
+          component: "help/index",
+        },
+        {
+          path: "/shipping",
+          component: "shipping/index",
+        },
+        {
+          path: "/returns",
+          component: "returns/index",
+        },
+        {
+          path: "/contact",
+          component: "contact/index",
+        },
+        {
+          path: "/about",
+          component: "about/index",
+        },
+        {
+          path: "/privacy",
+          component: "privacy/index",
+        },
+        {
+          path: "/terms",
+          component: "terms/index",
+        },
+        {
           path: "/user",
           routes: [
             {

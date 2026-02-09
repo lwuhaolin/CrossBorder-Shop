@@ -73,3 +73,24 @@ export async function getProductDetail(id: number): Promise<Result<Product>> {
 
   return response;
 }
+
+// Get latest products
+export async function getLatestProducts(limit: number = 4): Promise<Result<Product[]>> {
+  const response: any = await request({
+    url: '/product/latest',
+    method: 'GET',
+    params: { limit },
+  });
+
+  // Transform the response data
+  if (response && response.data) {
+    const result: Result<Product[]> = {
+      code: response.code,
+      message: response.message,
+      data: response.data.map(transformProduct),
+    };
+    return result;
+  }
+
+  return response;
+}

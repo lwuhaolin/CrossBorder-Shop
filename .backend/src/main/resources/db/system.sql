@@ -59,7 +59,8 @@ INSERT INTO tb_system_config (config_key, config_value, config_type, description
 ('shipping.free.threshold', '0', 'number', '满额免运费金额', 'transaction'),
 ('shipping.fee', '10', 'number', '默认运费', 'transaction'),
 ('user.registration.enable', 'true', 'boolean', '启用用户注册', 'feature'),
-('seller.registration.enable', 'true', 'boolean', '启用卖家注册', 'feature');
+('seller.registration.enable', 'true', 'boolean', '启用卖家注册', 'feature'),
+('home.carousel.images', '', 'string', '主页轮播图图片路径，分号分隔', 'homepage');
 
 -- 每日销售统计表
 DROP TABLE IF EXISTS tb_daily_statistics;

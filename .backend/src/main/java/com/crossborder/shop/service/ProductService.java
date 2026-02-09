@@ -98,4 +98,12 @@ public interface ProductService {
      * @param productId 商品ID
      */
     void deleteProductCache(Long productId);
+
+    /**
+     * 获取最新商品列表
+     *
+     * @param limit 限制数量
+     * @return 最新商品列表
+     */
+    java.util.List<ProductVO> getLatestProducts(Integer limit);
 }

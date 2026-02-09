@@ -13,6 +13,7 @@ import {
   Col,
   Statistic,
   Space,
+  Upload,
 } from "antd";
 import {
   getAppConfig,
@@ -20,8 +21,10 @@ import {
   getSystemStats,
 } from "@/services/settings";
 import { getCurrencies } from "@/services/rate";
-import type { AppConfig, SystemStats } from "@/models/settings";
+import { uploadProductImages } from "@/services/product";
+import type { SystemStats } from "@/models/settings";
 import type { Currency } from "@/models/rate";
+import type { UploadFile } from "antd";
 import dayjs from "dayjs";
 
 const AdminSettings: React.FC = () => {
@@ -29,6 +32,35 @@ const AdminSettings: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [stats, setStats] = React.useState<SystemStats | null>(null);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [carouselFiles, setCarouselFiles] = useState<UploadFile[]>([]);
+
+  const getApiBaseUrl = () => {
+    const env =
+      process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
+    if (env.startsWith("http")) {
+      return env;
+    }
+    const normalized = env.startsWith("/") ? env : `/${env}`;
+    return `${window.location.origin}${normalized}`;
+  };
+
+  const normalizeImageUrl = (url?: string) => {
+    if (!url) return url;
+    if (url.startsWith("http")) return url;
+    const base = getApiBaseUrl();
+    const path = url.startsWith("/") ? url : `/${url}`;
+    return `${base}${path}`;
+  };
+
+  const normalizeImageForSave = (url?: string) => {
+    if (!url) return url;
+    const base = getApiBaseUrl();
+    if (url.startsWith(base)) {
+      const rest = url.slice(base.length);
+      return rest.startsWith("/") ? rest : `/${rest}`;
+    }
+    return url;
+  };
 
   useEffect(() => {
     loadSettings();
@@ -40,6 +72,15 @@ const AdminSettings: React.FC = () => {
     try {
       setLoading(true);
       const response = await getAppConfig();
+      const carouselImages = response.data?.carouselImages || [];
+      setCarouselFiles(
+        carouselImages.map((url, index) => ({
+          uid: `${index}`,
+          name: `carousel-${index}`,
+          status: "done",
+          url: normalizeImageUrl(url),
+        })),
+      );
       form.setFieldsValue(response.data);
     } catch (error) {
       message.error("加载配置失败");
@@ -71,8 +112,15 @@ const AdminSettings: React.FC = () => {
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
+      const carouselImages = carouselFiles
+        .map((file) => file.response?.data || file.url)
+        .map((url) => normalizeImageForSave(url))
+        .filter(Boolean) as string[];
       setLoading(true);
-      await updateAppConfig(values);
+      await updateAppConfig({
+        ...values,
+        carouselImages,
+      });
       message.success("配置已保存");
     } catch (error) {
       message.error("保存失败");
@@ -229,6 +277,33 @@ const AdminSettings: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
+
+          <Divider>首页配置</Divider>
+
+          <Form.Item label="主页轮播图" name="carouselImages">
+            <Upload
+              listType="picture-card"
+              fileList={carouselFiles}
+              onChange={({ fileList }) =>
+                setCarouselFiles(
+                  fileList.map((file) => ({
+                    ...file,
+                    url: normalizeImageUrl(file.url || file.response?.data),
+                  })),
+                )
+              }
+              customRequest={async ({ file, onSuccess, onError }) => {
+                try {
+                  const response = await uploadProductImages(file as File);
+                  onSuccess?.({ data: normalizeImageForSave(response.data) });
+                } catch (error) {
+                  onError?.(error as Error);
+                }
+              }}
+            >
+              {carouselFiles.length >= 8 ? null : "+"}
+            </Upload>
+          </Form.Item>
 
           <Form.Item>
             <Space>

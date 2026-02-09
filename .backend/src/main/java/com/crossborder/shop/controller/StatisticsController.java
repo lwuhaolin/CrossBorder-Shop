@@ -3,11 +3,14 @@ package com.crossborder.shop.controller;
 import com.crossborder.shop.common.Result;
 import com.crossborder.shop.service.SettingsService;
 import com.crossborder.shop.vo.SystemStatsVO;
+import com.crossborder.shop.vo.SellerStatsVO;
+import com.crossborder.shop.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +35,12 @@ public class StatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     public Result<SystemStatsVO> getSystemStats() {
         return Result.success(settingsService.getSystemStats());
+    }
+
+    @Operation(summary = "获取卖家统计信息", description = "卖家获取自己的统计数据")
+    @GetMapping("/seller")
+    @PreAuthorize("hasRole('SELLER')")
+    public Result<SellerStatsVO> getSellerStats(@AuthenticationPrincipal UserPrincipal principal) {
+        return Result.success(settingsService.getSellerStats(principal.getUserId()));
     }
 }

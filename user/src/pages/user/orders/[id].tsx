@@ -14,7 +14,13 @@ import {
   Modal,
 } from "antd";
 import { useTranslation } from "react-i18next";
-import { getOrderDetail, payOrder, cancelOrder, confirmOrder } from "@/services/order";
+import {
+  getOrderDetail,
+  payOrder,
+  cancelOrder,
+  confirmOrder,
+} from "@/services/order";
+import { clearCart } from "@/services/cart";
 import type { Order } from "@/models/order";
 import { OrderStatus } from "@/models/order";
 import styles from "./[id].module.css";
@@ -99,6 +105,19 @@ const OrderDetailPage: React.FC = () => {
         try {
           setActionLoading(true);
           await payOrder(order.id);
+
+          // 支付成功后清空购物车
+          localStorage.setItem("cart", JSON.stringify([]));
+          window.dispatchEvent(new Event("storage"));
+
+          // 调用后端API清空购物车
+          try {
+            await clearCart();
+          } catch (error) {
+            console.warn("Failed to clear cart on backend:", error);
+            // 不影响支付流程
+          }
+
           message.success(t("order.paymentSuccess"));
           // 刷新订单信息
           loadOrder();
@@ -179,7 +198,7 @@ const OrderDetailPage: React.FC = () => {
           loading={actionLoading}
         >
           {t("order.pay")}
-        </Button>
+        </Button>,
       );
       buttons.push(
         <Button
@@ -189,7 +208,7 @@ const OrderDetailPage: React.FC = () => {
           loading={actionLoading}
         >
           {t("order.cancel")}
-        </Button>
+        </Button>,
       );
     }
 
@@ -203,7 +222,7 @@ const OrderDetailPage: React.FC = () => {
           loading={actionLoading}
         >
           {t("order.confirmReceipt")}
-        </Button>
+        </Button>,
       );
     }
 
@@ -230,8 +249,7 @@ const OrderDetailPage: React.FC = () => {
     {
       title: t("order.subtotal"),
       key: "subtotal",
-      render: (record: any) =>
-        `$${(record.totalPrice).toFixed(2)}`,
+      render: (record: any) => `$${record.totalPrice.toFixed(2)}`,
     },
   ];
 
@@ -258,7 +276,9 @@ const OrderDetailPage: React.FC = () => {
 
         <Card className={styles.card}>
           <Descriptions title={t("order.orderInformation")} bordered column={2}>
-            <Descriptions.Item label={t("order.orderId")}>#{order.id}</Descriptions.Item>
+            <Descriptions.Item label={t("order.orderId")}>
+              {order.orderNumber ? `#${order.orderNumber}` : `#${order.id}`}
+            </Descriptions.Item>
             <Descriptions.Item label={t("order.status")}>
               <Tag color={getStatusColor(order.orderStatus)}>
                 {getStatusText(order.orderStatus)}
@@ -275,10 +295,19 @@ const OrderDetailPage: React.FC = () => {
           {order.orderStatus !== OrderStatus.CANCELED && (
             <div className={styles.steps}>
               <Steps current={getStatusStep(order.orderStatus)}>
-                <Step title={t("order.pending")} description={t("common.info")} />
+                <Step
+                  title={t("order.pending")}
+                  description={t("common.info")}
+                />
                 <Step title={t("order.paid")} description={t("common.info")} />
-                <Step title={t("order.shipped")} description={t("common.info")} />
-                <Step title={t("order.delivered")} description={t("common.info")} />
+                <Step
+                  title={t("order.shipped")}
+                  description={t("common.info")}
+                />
+                <Step
+                  title={t("order.delivered")}
+                  description={t("common.info")}
+                />
               </Steps>
             </div>
           )}
@@ -297,8 +326,7 @@ const OrderDetailPage: React.FC = () => {
             <div className={styles.section}>
               <h3>{t("order.shippingAddress")}</h3>
               <p>
-                {order.address.receiverName} -{" "}
-                {order.address.receiverPhone}
+                {order.address.receiverName} - {order.address.receiverPhone}
                 <br />
                 {order.address.detailAddress}
                 <br />
@@ -310,9 +338,7 @@ const OrderDetailPage: React.FC = () => {
 
           {/* 操作按钮区域 */}
           {getActionButtons() && (
-            <div className={styles.actions}>
-              {getActionButtons()}
-            </div>
+            <div className={styles.actions}>{getActionButtons()}</div>
           )}
         </Card>
       </div>

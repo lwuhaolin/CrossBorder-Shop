@@ -16,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 商品控制器
  *
@@ -112,5 +114,13 @@ public class ProductController {
         PageResult<ProductVO> pageResult = productService.getProductPage(
                 categoryId, status, userPrincipal.getUserId(), keyword, pageNum, pageSize);
         return Result.success(pageResult);
+    }
+
+    @GetMapping("/latest")
+    @Operation(summary = "获取最新商品", description = "获取最新添加的商品列表")
+    public Result<List<ProductVO>> getLatestProducts(
+            @Parameter(description = "限制数量，默认4") @RequestParam(defaultValue = "4") Integer limit) {
+        List<ProductVO> products = productService.getLatestProducts(limit);
+        return Result.success(products);
     }
 }

@@ -5,18 +5,106 @@ import {
   ProFormDigit,
   ProFormSelect,
   ProFormUploadButton,
+  type ProFormInstance,
 } from "@ant-design/pro-components";
 import { Card, message } from "antd";
 import { useNavigate } from "umi";
 import { createProduct, uploadProductImages } from "@/services/product";
 import { getCategoryList } from "@/services/category";
+import { getCurrencies, getExchangeRateByPair } from "@/services/rate";
 import type { ProductCreateDTO } from "@/models/product";
 import type { UploadFile } from "antd";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CreateProduct: React.FC = () => {
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
+  const [currencies, setCurrencies] = useState<
+    {
+      currencyCode: string;
+      currencyName: string;
+      symbol?: string;
+      isBase?: number;
+    }[]
+  >([]);
+  const [currencySymbol, setCurrencySymbol] = useState<string>("¥");
+  const [lastCurrency, setLastCurrency] = useState<string | undefined>(
+    undefined,
+  );
+  const formRef = useRef<ProFormInstance>();
+
+  useEffect(() => {
+    const loadCurrencies = async () => {
+      try {
+        const response = await getCurrencies();
+        const list = response.data || [];
+        setCurrencies(list);
+        if (list.length > 0) {
+          const baseCurrency = list.find((c) => c.isBase === 1);
+          const defaultCurrency =
+            baseCurrency?.currencyCode || list[0].currencyCode;
+          formRef.current?.setFieldsValue({ currency: defaultCurrency });
+          setLastCurrency(defaultCurrency);
+          const symbol = list.find(
+            (c) => c.currencyCode === defaultCurrency,
+          )?.symbol;
+          setCurrencySymbol(symbol || "¥");
+        }
+      } catch (error) {
+        message.error("币种加载失败");
+      }
+    };
+
+    loadCurrencies();
+  }, []);
+
+  const handleCurrencyChange = async (nextCurrency: string) => {
+    if (!lastCurrency || lastCurrency === nextCurrency) {
+      setLastCurrency(nextCurrency);
+      const symbol = currencies.find(
+        (c) => c.currencyCode === nextCurrency,
+      )?.symbol;
+      setCurrencySymbol(symbol || "¥");
+      return;
+    }
+
+    try {
+      const response = await getExchangeRateByPair(lastCurrency, nextCurrency);
+      const rate = response.data;
+      const rateValue = Number(rate);
+      if (rate == null || Number.isNaN(rateValue)) {
+        message.error("获取汇率失败");
+        formRef.current?.setFieldsValue({ currency: lastCurrency });
+        return;
+      }
+
+      const currentPrice = formRef.current?.getFieldValue("price");
+      const currentOriginal = formRef.current?.getFieldValue("originalPrice");
+
+      const nextPrice =
+        typeof currentPrice === "number"
+          ? Number((currentPrice * rateValue).toFixed(2))
+          : currentPrice;
+      const nextOriginal =
+        typeof currentOriginal === "number"
+          ? Number((currentOriginal * rateValue).toFixed(2))
+          : currentOriginal;
+
+      formRef.current?.setFieldsValue({
+        price: nextPrice,
+        originalPrice: nextOriginal,
+      });
+
+      setLastCurrency(nextCurrency);
+      const symbol = currencies.find(
+        (c) => c.currencyCode === nextCurrency,
+      )?.symbol;
+      setCurrencySymbol(symbol || "¥");
+    } catch (error) {
+      message.error("获取汇率失败");
+      formRef.current?.setFieldsValue({ currency: lastCurrency });
+    }
+  };
 
   const handleSubmit = async (values: any) => {
     try {
@@ -70,6 +158,7 @@ const CreateProduct: React.FC = () => {
   return (
     <Card title="创建商品" bordered={false}>
       <ProForm
+        formRef={formRef}
         onFinish={handleSubmit}
         submitter={{
           searchConfig: {
@@ -109,7 +198,7 @@ const CreateProduct: React.FC = () => {
           min={0}
           fieldProps={{
             precision: 2,
-            prefix: "¥",
+            prefix: currencySymbol,
           }}
           rules={[{ required: true, message: "请输入售价" }]}
         />
@@ -121,7 +210,7 @@ const CreateProduct: React.FC = () => {
           min={0}
           fieldProps={{
             precision: 2,
-            prefix: "¥",
+            prefix: currencySymbol,
           }}
         />
 
@@ -129,14 +218,14 @@ const CreateProduct: React.FC = () => {
           name="currency"
           label="币种"
           placeholder="请选择币种"
-          options={[
-            { label: "人民币 (CNY)", value: "CNY" },
-            { label: "美元 (USD)", value: "USD" },
-            { label: "欧元 (EUR)", value: "EUR" },
-            { label: "日元 (JPY)", value: "JPY" },
-          ]}
+          options={currencies.map((currency) => ({
+            label: `${currency.currencyName} (${currency.currencyCode})`,
+            value: currency.currencyCode,
+          }))}
+          fieldProps={{
+            onChange: handleCurrencyChange,
+          }}
           rules={[{ required: true, message: "请选择币种" }]}
-          initialValue="CNY"
         />
 
         <ProFormDigit

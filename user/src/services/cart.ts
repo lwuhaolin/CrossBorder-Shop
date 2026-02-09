@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import type { Cart, CartItem, CartAddDTO, CartUpdateDTO, CartCalculateResponse } from '@/models/cart';
+import type { Cart, CartAddDTO, UpdateCartItemDTO, CartCalculateResponse } from '@/models/cart';
 import type { Result } from '@/models/common';
 
 // Add to cart
@@ -19,10 +19,10 @@ export async function getCart(): Promise<Result<Cart>> {
   });
 }
 
-// Update cart item
-export async function updateCartItem(id: number, data: CartUpdateDTO): Promise<Result<void>> {
+// Update cart item (with quantity and selected status)
+export async function updateCartItem(data: UpdateCartItemDTO): Promise<Result<void>> {
   return request({
-    url: `/cart/item/${id}`,
+    url: `/cart/update`,
     method: 'PUT',
     data,
   });

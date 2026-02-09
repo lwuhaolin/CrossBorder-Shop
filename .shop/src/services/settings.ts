@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import type { SystemSetting, SystemSettingDTO, AppConfig, SystemStats } from '@/models/settings';
+import type { SystemSetting, SystemSettingDTO, AppConfig, SystemStats, SellerStats } from '@/models/settings';
 import type { Result } from '@/models/common';
 
 // Get all settings
@@ -48,6 +48,14 @@ export async function updateAppConfig(data: AppConfig): Promise<Result<void>> {
 export async function getSystemStats(): Promise<Result<SystemStats>> {
   return request({
     url: '/statistics',
+    method: 'GET',
+  });
+}
+
+// Get seller statistics
+export async function getSellerStats(): Promise<Result<SellerStats>> {
+  return request({
+    url: '/statistics/seller',
     method: 'GET',
   });
 }

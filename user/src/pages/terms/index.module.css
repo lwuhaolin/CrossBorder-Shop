@@ -1,0 +1,133 @@
+.terms {
+    min-height: calc(100vh - 64px - 200px);
+    background: #f5f5f5;
+}
+
+.banner {
+    background: linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%);
+    padding: 80px 24px;
+    text-align: center;
+    color: white;
+}
+
+.bannerIcon {
+    font-size: 64px;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.bannerTitle {
+    color: white !important;
+    margin-bottom: 16px !important;
+    font-size: 42px !important;
+}
+
+.bannerDesc {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.container {
+    max-width: 1200px;
+    margin: -40px auto 0;
+    padding: 0 24px 60px;
+    display: flex;
+    gap: 24px;
+}
+
+.content {
+    flex: 1;
+}
+
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+}
+
+.card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebarCard {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 80px;
+}
+
+.card h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 32px;
+    margin-bottom: 16px;
+    color: #333;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.card h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.card p {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 16px;
+}
+
+.card ul {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+.card li {
+    margin-bottom: 8px;
+}
+
+.card strong {
+    color: #333;
+}
+
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        order: -1;
+    }
+
+    .sidebarCard {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .banner {
+        padding: 60px 16px;
+    }
+
+    .bannerIcon {
+        font-size: 48px;
+    }
+
+    .bannerTitle {
+        font-size: 32px !important;
+    }
+
+    .bannerDesc {
+        font-size: 16px;
+    }
+
+    .container {
+        padding: 0 16px 40px;
+    }
+}

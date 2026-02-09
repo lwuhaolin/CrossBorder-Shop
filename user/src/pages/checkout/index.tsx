@@ -14,7 +14,9 @@ import { useTranslation } from "react-i18next";
 import { getAddressList } from "@/services/address";
 import { createOrder } from "@/services/order";
 import { getCurrencyList } from "@/services/exchange";
+import { getAppConfig } from "@/services/settings";
 import { getImageUrl } from "@/utils/request";
+import { clearCart } from "@/services/cart";
 import type { Address } from "@/models/address";
 import styles from "./index.module.css";
 
@@ -39,12 +41,16 @@ const CheckoutPage: React.FC = () => {
   const [currencies, setCurrencies] = useState<any[]>([]);
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
+  const [shippingFee, setShippingFee] = useState<number>(10);
+  const [freeShippingThreshold, setFreeShippingThreshold] =
+    useState<number>(99);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadAddresses();
     loadCart();
     loadCurrencies();
+    loadConfig();
   }, []);
 
   const loadCurrencies = async () => {
@@ -65,6 +71,18 @@ const CheckoutPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Failed to load currencies:", error);
+    }
+  };
+
+  const loadConfig = async () => {
+    try {
+      const response = await getAppConfig();
+      if (response.data) {
+        setShippingFee(response.data.shippingFee || 10);
+        setFreeShippingThreshold(response.data.freeshippingThreshold || 99);
+      }
+    } catch (error) {
+      console.error("Failed to load config:", error);
     }
   };
 
@@ -96,7 +114,12 @@ const CheckoutPage: React.FC = () => {
   };
 
   const calculateShipping = () => {
-    return 10;
+    const subtotal = calculateSubtotal();
+    // 如果达到免运费门槛，返回0
+    if (subtotal >= freeShippingThreshold) {
+      return 0;
+    }
+    return shippingFee;
   };
 
   const calculateTotal = () => {
@@ -126,8 +149,17 @@ const CheckoutPage: React.FC = () => {
 
       const response = await createOrder(orderData);
 
+      // 清空本地购物车
       localStorage.setItem("cart", JSON.stringify([]));
       window.dispatchEvent(new Event("storage"));
+
+      // 调用后端API清空购物车
+      try {
+        await clearCart();
+      } catch (error) {
+        console.warn("Failed to clear cart on backend:", error);
+        // 不影响订单创建的流程
+      }
 
       message.success(t("checkout.orderPlaced"));
       navigate(`/user/orders/${response.data}`);
