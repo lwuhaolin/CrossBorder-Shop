@@ -6,11 +6,11 @@
       <a-card :title="t('settings.profileInformation')" class="card">
         <a-form ref="formRef" :model="formData" layout="vertical" @finish="handleSubmit">
           <a-form-item
-            name="username"
+            name="nickname"
             :label="t('settings.username')"
             :rules="[{ required: true, message: t('common.required') }]"
           >
-            <a-input v-model:value="formData.username" />
+            <a-input v-model:value="formData.nickname" />
           </a-form-item>
           <a-form-item
             name="email"
@@ -91,7 +91,7 @@ const passwordFormRef = ref<FormInstance>()
 const loading = ref(false)
 
 const formData = ref<UserUpdateDTO>({
-  username: '',
+  nickname: '',
   email: '',
   phone: '',
 })
@@ -106,7 +106,7 @@ onMounted(() => {
   const user = getUserInfo()
   if (user) {
     formData.value = {
-      username: user.username || '',
+      nickname: user.name || user.username || '',  // 映射 user.name 到 nickname
       email: user.email || '',
       phone: user.phone || '',
     }

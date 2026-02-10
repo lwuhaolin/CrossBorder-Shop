@@ -1,14 +1,34 @@
 import request from '@/utils/request'
 import type { Order, OrderListParams, OrderStatusUpdateDTO, OrderShipDTO, RefundDTO } from '@/models/order'
 import type { Result, PageResult } from '@/models/common'
+import { mapOrderListToPageResult } from '@/utils/dataMapper'
 
 // Get order list
+// 注意：后端返回 List<OrderVO> 而不是分页结构，会在此处进行转换
 export async function getOrderList(params: OrderListParams): Promise<Result<PageResult<Order>>> {
-  return request({
+  // 后端只接收 orderStatus 参数，page 和 pageSize 在这里被忽略
+  const backendParams: any = {}
+  if (params.status !== undefined) {
+    backendParams.orderStatus = params.status
+  }
+
+  const response: any = await request({
     url: '/order/buyer/list',
     method: 'GET',
-    params,
+    params: backendParams,
   })
+
+  // 后端返回 List<OrderVO>，转换为 PageResult 格式
+  if (Array.isArray(response.data)) {
+    const pageResult = mapOrderListToPageResult(response.data)
+    return {
+      code: response.code,
+      message: response.message,
+      data: pageResult,
+    } as Result<PageResult<Order>>
+  }
+
+  return response as Result<PageResult<Order>>
 }
 
 // Get order detail

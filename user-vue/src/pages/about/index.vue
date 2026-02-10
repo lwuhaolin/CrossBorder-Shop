@@ -46,7 +46,14 @@
 
       <a-card class="card">
         <h2 class="section-title">{{ t('about.milestone') }}</h2>
-        <a-timeline :items="timelineItems" mode="left" class="timeline" />
+        <a-timeline class="timeline">
+          <a-timeline-item v-for="(milestone, index) in milestones" :key="index">
+            <p>
+              <strong>{{ milestone.year }}</strong> - {{ milestone.title }}
+            </p>
+            <p>{{ milestone.description }}</p>
+          </a-timeline-item>
+        </a-timeline>
       </a-card>
 
       <a-card class="card">
@@ -126,16 +133,6 @@ const milestones = [
     description: t('about.milestone2025Desc'),
   },
 ]
-
-const timelineItems = milestones.map((m) => ({
-  label: m.year,
-  children: [
-    {
-      title: m.title,
-      description: m.description,
-    },
-  ],
-}))
 </script>
 
 <style scoped>
@@ -144,7 +141,7 @@ const timelineItems = milestones.map((m) => ({
 }
 
 .banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1890ff 0%, #0050b3 100%);
   color: white;
   padding: 80px 24px;
   text-align: center;

@@ -136,15 +136,20 @@ const loadCarousel = async () => {
 
 <style scoped>
 .home-page {
-  min-height: calc(100vh - 64px - 200px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .hero {
-  margin-bottom: 32px;
-  width: 100%;
+  margin-bottom: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  flex-shrink: 0;
 }
 
 .carousel {
+  width: 100%;
   height: 500px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -208,10 +213,14 @@ const loadCarousel = async () => {
   margin: 0;
 }
 
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 24px;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1;
 }
 
 .section {
@@ -279,12 +288,13 @@ const loadCarousel = async () => {
 
 @media (max-width: 768px) {
   .hero {
-    margin-bottom: 24px;
+    margin-bottom: 0;
+    margin-left: calc(-50vw + 50%);
   }
 
   .carousel {
     height: 300px;
-    border-radius: 4px;
+    border-radius: 0;
   }
 
   .carousel-item {
@@ -313,6 +323,11 @@ const loadCarousel = async () => {
 
   .section-title {
     font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .feature-card {
+    margin-bottom: 16px;
   }
 }
 </style>

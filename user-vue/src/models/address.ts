@@ -9,8 +9,9 @@ export interface Address {
   city: string
   district: string
   detailAddress: string
+  postalCode?: string  // 新增：邮编字段
   isDefault?: boolean
-  label?: string
+  // label 字段已移除（后端不支持）
   createdAt?: string
   updatedAt?: string
 }
@@ -23,8 +24,9 @@ export interface AddressCreateDTO {
   city: string
   district: string
   detailAddress: string
+  postalCode?: string  // 新增：邮编字段
   isDefault?: boolean
-  label?: string
+  // label 字段已移除（后端不支持）
 }
 
 export interface AddressUpdateDTO extends AddressCreateDTO {

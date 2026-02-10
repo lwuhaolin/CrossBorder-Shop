@@ -9,7 +9,11 @@
     <div class="container">
       <a-card class="card">
         <h2 class="section-title">{{ t('help.faq') }}</h2>
-        <a-collapse :items="faqItems" accordion class="collapse" />
+        <a-collapse class="collapse">
+          <a-collapse-panel v-for="(faq, index) in faqs" :key="index" :header="faq.question">
+            {{ faq.answer }}
+          </a-collapse-panel>
+        </a-collapse>
       </a-card>
 
       <a-card class="card">
@@ -70,17 +74,6 @@ const faqs = [
     answer: t('help.a8'),
   },
 ]
-
-const faqItems = faqs.map((faq, index) => ({
-  key: index,
-  label: faq.question,
-  children: [
-    {
-      type: 'text',
-      content: faq.answer,
-    },
-  ],
-}))
 </script>
 
 <style scoped>
@@ -89,7 +82,7 @@ const faqItems = faqs.map((faq, index) => ({
 }
 
 .banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1890ff 0%, #0050b3 100%);
   color: white;
   padding: 80px 24px;
   text-align: center;

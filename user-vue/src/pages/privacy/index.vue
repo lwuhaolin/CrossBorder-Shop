@@ -46,7 +46,7 @@ const { t } = useI18n()
 }
 
 .banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1890ff 0%, #0050b3 100%);
   color: white;
   padding: 60px 24px;
   text-align: center;

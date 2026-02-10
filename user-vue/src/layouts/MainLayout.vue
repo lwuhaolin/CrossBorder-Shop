@@ -24,9 +24,9 @@ import Footer from '@/components/Footer.vue'
 
 .main {
   flex: 1;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
-  padding: 24px 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 </style>

@@ -27,7 +27,10 @@
           <a-badge :count="cartCount" :show-zero="true">
             <ShoppingCartOutlined class="icon" @click="handleGoToCart" />
           </a-badge>
-          <a-dropdown :menu="{ items: userMenuItems }" placement="bottomRight">
+          <a-dropdown>
+            <template #overlay>
+              <a-menu :items="userMenuItems" @click="handleUserMenuClick" />
+            </template>
             <UserOutlined class="icon" />
           </a-dropdown>
         </a-space>
@@ -40,7 +43,10 @@
           <a-badge :count="cartCount" :show-zero="true">
             <ShoppingCartOutlined class="icon" @click="handleGoToCart" />
           </a-badge>
-          <a-dropdown :menu="{ items: userMenuItems }" placement="bottomRight">
+          <a-dropdown>
+            <template #overlay>
+              <a-menu :items="userMenuItems" @click="handleUserMenuClick" />
+            </template>
             <MenuOutlined class="icon" />
           </a-dropdown>
         </a-space>
@@ -113,33 +119,58 @@ const handleLogout = () => {
   router.push('/')
 }
 
+const handleUserMenuClick = (e: any) => {
+  const { key } = e
+  switch (key) {
+    case 'profile':
+      router.push('/user/profile')
+      break
+    case 'orders':
+      router.push('/user/orders')
+      break
+    case 'addresses':
+      router.push('/user/addresses')
+      break
+    case 'favorites':
+      router.push('/user/favorites')
+      break
+    case 'settings':
+      router.push('/user/settings')
+      break
+    case 'logout':
+      handleLogout()
+      break
+    case 'login':
+      router.push('/user/login')
+      break
+    case 'register':
+      router.push('/user/register')
+      break
+  }
+}
+
 const userMenuItems = computed<MenuProps['items']>(() => {
   if (isLoggedIn.value) {
     return [
       {
         key: 'profile',
         label: t('nav.profile'),
-        onClick: () => router.push('/user/profile'),
       },
       {
         key: 'orders',
         label: t('nav.orders'),
-        onClick: () => router.push('/user/orders'),
       },
       {
         key: 'addresses',
         label: t('nav.addresses'),
-        onClick: () => router.push('/user/addresses'),
       },
       {
         key: 'favorites',
         label: t('nav.favorites'),
-        onClick: () => router.push('/user/favorites'),
       },
       {
         key: 'settings',
         label: t('nav.settings'),
-        onClick: () => router.push('/user/settings'),
       },
       {
         type: 'divider',
@@ -147,7 +178,6 @@ const userMenuItems = computed<MenuProps['items']>(() => {
       {
         key: 'logout',
         label: t('nav.logout'),
-        onClick: handleLogout,
       },
     ]
   } else {
@@ -155,12 +185,10 @@ const userMenuItems = computed<MenuProps['items']>(() => {
       {
         key: 'login',
         label: t('nav.login'),
-        onClick: () => router.push('/user/login'),
       },
       {
         key: 'register',
         label: t('nav.register'),
-        onClick: () => router.push('/user/register'),
       },
     ]
   }

@@ -102,10 +102,10 @@
             <div class="currency-selector">
               <span>{{ t('checkout.currency') }}:</span>
               <a-select
+                ref="currencySelect"
                 v-model:value="selectedCurrency"
                 style="width: 150px"
-                :open="currencyDropdownOpen"
-                @openChange="(open: boolean) => (currencyDropdownOpen = open)"
+                @change="handleCurrencyChange"
               >
                 <a-select-option v-for="curr in currencies" :key="curr.currencyCode" :value="curr.currencyCode">
                   {{ curr.currencyCode }} ({{ curr.symbol }})
@@ -179,7 +179,6 @@ const cartItems = ref<CartItem[]>([])
 const loading = ref(false)
 const currencies = ref<any[]>([])
 const selectedCurrency = ref('USD')
-const currencyDropdownOpen = ref(false)
 const shippingFee = ref<number>(10)
 const freeShippingThreshold = ref<number>(99)
 
@@ -210,8 +209,6 @@ const loadCurrencies = async () => {
       } else if (response.data.length > 0) {
         selectedCurrency.value = response.data[0]?.currencyCode || 'USD'
       }
-      // Open dropdown by default
-      currencyDropdownOpen.value = true
     }
   } catch (error) {
     console.error('Failed to load currencies:', error)
@@ -264,6 +261,11 @@ const calculateTotal = () => {
 const getCurrencySymbol = () => {
   const curr = currencies.value.find((c) => c.currencyCode === selectedCurrency.value)
   return curr?.symbol || '$'
+}
+
+const handleCurrencyChange = () => {
+  // 币种变更后，下拉菜单会自动关闭
+  // 无需额外操作
 }
 
 const goToPreviousStep = () => {
