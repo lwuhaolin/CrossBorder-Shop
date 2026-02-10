@@ -93,10 +93,12 @@ public class ProductController {
             @Parameter(description = "卖家ID") @RequestParam(required = false) Long sellerId,
             @Parameter(description = "关键字搜索") @RequestParam(required = false) String keyword,
             @Parameter(description = "页码") @RequestParam(defaultValue = "1") int pageNum,
-            @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int pageSize) {
+            @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int pageSize,
+            @Parameter(description = "排序字段：price, name") @RequestParam(required = false) String sortBy,
+            @Parameter(description = "排序顺序：asc, desc") @RequestParam(required = false) String sortOrder) {
 
         PageResult<ProductVO> pageResult = productService.getProductPage(
-                categoryId, status, sellerId, keyword, pageNum, pageSize);
+                categoryId, status, sellerId, keyword, pageNum, pageSize, sortBy, sortOrder);
         return Result.success(pageResult);
     }
 
@@ -112,7 +114,7 @@ public class ProductController {
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         PageResult<ProductVO> pageResult = productService.getProductPage(
-                categoryId, status, userPrincipal.getUserId(), keyword, pageNum, pageSize);
+                categoryId, status, userPrincipal.getUserId(), keyword, pageNum, pageSize, null, null);
         return Result.success(pageResult);
     }
 

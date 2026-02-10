@@ -39,6 +39,12 @@ export default {
   "register.loginNow": "Login now",
   "register.success": "Registration successful",
   "register.error": "Registration failed",
+  "register.role": "Select Role",
+  "register.roleSeller": "Seller",
+  "register.roleBuyer": "Buyer",
+  "register.roleRequired": "Please select a role",
+  "register.sellerRegistered": "Congratulations! You have successfully registered as a seller",
+  "register.redirectToSeller": "Redirect to Seller Admin Panel now?",
 
   // Home Page
   "home.hotProducts": "Hot Products",

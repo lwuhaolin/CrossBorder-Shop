@@ -189,9 +189,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public PageResult<ProductVO> getProductPage(Long categoryId, Integer status, Long sellerId,
-            String keyword, int pageNum, int pageSize) {
+            String keyword, int pageNum, int pageSize, String sortBy, String sortOrder) {
         PageHelper.startPage(pageNum, pageSize);
-        List<ProductVO> list = productMapper.selectPageList(categoryId, status, sellerId, keyword);
+        List<ProductVO> list = productMapper.selectPageList(categoryId, status, sellerId, keyword, sortBy, sortOrder);
         PageInfo<ProductVO> pageInfo = new PageInfo<>(list);
 
         PageResult<ProductVO> pageResult = new PageResult<>();

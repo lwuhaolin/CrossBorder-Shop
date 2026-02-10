@@ -39,6 +39,12 @@ export default {
   "register.loginNow": "立即登录",
   "register.success": "注册成功",
   "register.error": "注册失败",
+  "register.role": "选择角色",
+  "register.roleSeller": "卖家",
+  "register.roleBuyer": "买家",
+  "register.roleRequired": "请选择角色",
+  "register.sellerRegistered": "恭喜！您已成功注册为卖家",
+  "register.redirectToSeller": "现在跳转到卖家管理后台？",
 
   // Home Page
   "home.hotProducts": "热销产品",

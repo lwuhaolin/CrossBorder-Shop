@@ -82,7 +82,9 @@ public class SecurityConfig {
                                                 // 公共接口
                                                 .requestMatchers(
                                                                 "/exchange-rate/currencies",
-                                                                "/settings/config")
+                                                                "/settings/config",
+                                                                "/product/**",
+                                                                "/category/**")
                                                 .permitAll()
                                                 // ???????????
                                                 .anyRequest().authenticated())

@@ -140,7 +140,18 @@
                  OR p.product_code LIKE CONCAT('%', #{keyword}, '%')
                  OR p.brand LIKE CONCAT('%', #{keyword}, '%'))
         </if>
-        ORDER BY p.create_time DESC
+        ORDER BY
+        <choose>
+            <when test="sortBy == 'price'">
+                p.price <choose><when test="sortOrder == 'asc'">ASC</when><otherwise>DESC</otherwise></choose>
+            </when>
+            <when test="sortBy == 'name'">
+                p.product_name <choose><when test="sortOrder == 'asc'">ASC</when><otherwise>DESC</otherwise></choose>
+            </when>
+            <otherwise>
+                p.create_time DESC
+            </otherwise>
+        </choose>
     </select>
 
     <!-- 乐观锁扣减库存 -->

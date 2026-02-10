@@ -47,7 +47,9 @@ public interface ProductMapper {
         List<ProductVO> selectPageList(@Param("categoryId") Long categoryId,
                         @Param("status") Integer status,
                         @Param("sellerId") Long sellerId,
-                        @Param("keyword") String keyword);
+                        @Param("keyword") String keyword,
+                        @Param("sortBy") String sortBy,
+                        @Param("sortOrder") String sortOrder);
 
         /**
          * 乐观锁扣减库存

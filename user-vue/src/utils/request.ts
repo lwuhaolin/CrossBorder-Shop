@@ -109,11 +109,6 @@ instance.interceptors.request.use(
       removeToken()
       removeRefreshToken()
       removeUserInfo()
-      // Only redirect to login if not already on login page
-      const currentPath = window.location.pathname
-      if (currentPath !== '/user/login' && currentPath !== '/user/register') {
-        window.location.href = '/user/login'
-      }
       return Promise.reject(new Error('No access token'))
     }
 

@@ -55,6 +55,18 @@
           </a-form-item>
 
           <a-form-item
+            name="roleId"
+            :rules="[
+              { required: true, message: t('register.roleRequired') },
+            ]"
+          >
+            <a-select v-model:value="formData.roleId" :placeholder="t('register.role')">
+              <a-select-option :value="2">{{ t('register.roleSeller') }}</a-select-option>
+              <a-select-option :value="3">{{ t('register.roleBuyer') }}</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <a-form-item
             name="password"
             :rules="[
               { required: true, message: t('login.passwordRequired') },
@@ -130,6 +142,7 @@ const formData = reactive({
   phone: '',
   password: '',
   confirmPassword: '',
+  roleId: 3, // Default: Buyer
 })
 
 const validatePassword = (_: any, value: string) => {
@@ -145,7 +158,25 @@ const onFinish = async () => {
     await register(formData)
 
     message.success(t('register.success'))
-    router.push('/user/login')
+
+    // If registered as seller, show modal with link to seller admin
+    if (formData.roleId === 2) {
+      const sellerAdminUrl = import.meta.env.VITE_SELLER_ADMIN_URL || 'http://localhost:8000'
+      setTimeout(() => {
+        const userConfirm = window.confirm(
+          t('register.sellerRegistered') + '\n\n' +
+          t('register.redirectToSeller') + '\n' +
+          sellerAdminUrl
+        )
+        if (userConfirm) {
+          window.location.href = sellerAdminUrl
+        } else {
+          router.push('/user/login')
+        }
+      }, 500)
+    } else {
+      router.push('/user/login')
+    }
   } catch (error: any) {
     message.error(error.message || t('register.error'))
   } finally {

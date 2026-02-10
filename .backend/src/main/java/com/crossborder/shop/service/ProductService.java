@@ -73,7 +73,7 @@ public interface ProductService {
      * @return 商品分页结果
      */
     PageResult<ProductVO> getProductPage(Long categoryId, Integer status, Long sellerId,
-            String keyword, int pageNum, int pageSize);
+            String keyword, int pageNum, int pageSize, String sortBy, String sortOrder);
 
     /**
      * 扣减库存（乐观锁+重试�?
