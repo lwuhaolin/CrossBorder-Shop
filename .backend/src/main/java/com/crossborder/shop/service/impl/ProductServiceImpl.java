@@ -14,50 +14,33 @@ import com.crossborder.shop.vo.ProductImageVO;
 import com.crossborder.shop.vo.ProductVO;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * 商品服务实现类
- * 演示：乐观锁扣库存、延迟双删、缓存策略
  *
  * @author CrossBorder Shop
  * @since 2026-02-04
  */
 @Slf4j
 @Service
-
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductMapper productMapper;
     private final ProductImageMapper productImageMapper;
-    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${order.stock-retry-times:3}")
     private int stockRetryTimes;
-
-    @Value("${cache.delay-delete-millis:500}")
-    private long delayDeleteMillis;
-
-    private static final String PRODUCT_CACHE_KEY = "product:";
-    private static final long PRODUCT_CACHE_EXPIRE = 30; // 分钟
-
-    public ProductServiceImpl(ProductMapper productMapper, ProductImageMapper productImageMapper,
-            RedisTemplate<String, Object> redisTemplate) {
-        this.productMapper = productMapper;
-        this.productImageMapper = productImageMapper;
-        this.redisTemplate = redisTemplate;
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -104,9 +87,6 @@ public class ProductServiceImpl implements ProductService {
         productImageMapper.deleteByProductId(product.getId());
         saveProductImages(product.getId(), productDTO.getImageUrls(), productDTO.getMainImageIndex());
 
-        // 4. 延迟双删缓存
-        deleteProductCache(product.getId());
-
         log.info("商品更新成功: productId={}", product.getId());
     }
 
@@ -124,9 +104,6 @@ public class ProductServiceImpl implements ProductService {
         productMapper.deleteById(id);
         productImageMapper.deleteByProductId(id);
 
-        // 延迟双删缓存
-        deleteProductCache(id);
-
         log.info("商品删除成功: productId={}", id);
     }
 
@@ -142,35 +119,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductVO getProductDetail(Long id) {
-        // 1. 尝试从缓存获取
-        String cacheKey = PRODUCT_CACHE_KEY + id;
-        ProductVO productVO = (ProductVO) redisTemplate.opsForValue().get(cacheKey);
-
-        if (productVO != null) {
-            log.debug("从缓存获取商品详情: productId={}", id);
-            // 如果缓存中没有图片列表，则补充加载图片并回写缓存
-            if (productVO.getImages() == null || productVO.getImages().isEmpty()) {
-                List<ProductImage> images = productImageMapper.selectByProductId(id);
-                if (images != null && !images.isEmpty()) {
-                    List<ProductImageVO> imageVOs = images.stream().map(image -> {
-                        ProductImageVO vo = new ProductImageVO();
-                        BeanUtil.copyProperties(image, vo);
-                        return vo;
-                    }).collect(Collectors.toList());
-                    productVO.setImages(imageVOs);
-                    redisTemplate.opsForValue().set(cacheKey, productVO, PRODUCT_CACHE_EXPIRE, TimeUnit.MINUTES);
-                }
-            }
-            return productVO;
-        }
-
-        // 2. 从数据库查询
-        productVO = productMapper.selectVOById(id);
+        // 从数据库查询
+        ProductVO productVO = productMapper.selectVOById(id);
         if (productVO == null) {
             throw new BusinessException(ResultCode.PRODUCT_NOT_EXISTS);
         }
 
-        // 3. 查询商品图片
+        // 查询商品图片
         List<ProductImage> images = productImageMapper.selectByProductId(id);
         if (images != null && !images.isEmpty()) {
             List<ProductImageVO> imageVOs = images.stream().map(image -> {
@@ -180,9 +135,6 @@ public class ProductServiceImpl implements ProductService {
             }).collect(Collectors.toList());
             productVO.setImages(imageVOs);
         }
-
-        // 4. 缓存商品信息
-        redisTemplate.opsForValue().set(cacheKey, productVO, PRODUCT_CACHE_EXPIRE, TimeUnit.MINUTES);
 
         return productVO;
     }
@@ -215,8 +167,6 @@ public class ProductServiceImpl implements ProductService {
             int result = productMapper.decreaseStock(productId, quantity, product.getVersion());
             if (result > 0) {
                 log.info("库存扣减成功: productId={}, quantity={}, retry={}", productId, quantity, i);
-                // 延迟双删缓存
-                deleteProductCache(productId);
                 return true;
             }
 
@@ -243,35 +193,11 @@ public class ProductServiceImpl implements ProductService {
     public void releaseStock(Long productId, Integer quantity) {
         productMapper.increaseStock(productId, quantity);
         log.info("库存释放成功: productId={}, quantity={}", productId, quantity);
-
-        // 延迟双删缓存
-        deleteProductCache(productId);
     }
 
     @Override
     public void deleteProductCache(Long productId) {
-        String cacheKey = PRODUCT_CACHE_KEY + productId;
-
-        // 第一次删除
-        redisTemplate.delete(cacheKey);
-
-        // 异步延迟第二次删除
-        asyncDeleteCache(cacheKey);
-    }
-
-    /**
-     * 异步延迟删除缓存
-     */
-    @Async
-    public void asyncDeleteCache(String cacheKey) {
-        try {
-            Thread.sleep(delayDeleteMillis);
-            redisTemplate.delete(cacheKey);
-            log.debug("延迟双删缓存完成: key={}", cacheKey);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("延迟删除缓存失败: key={}", cacheKey, e);
-        }
+        // No-op: Redis cache removed
     }
 
     /**
@@ -282,9 +208,6 @@ public class ProductServiceImpl implements ProductService {
         if (result == 0) {
             throw new BusinessException(ResultCode.PRODUCT_NOT_EXISTS);
         }
-
-        // 延迟双删缓存
-        deleteProductCache(id);
 
         log.info("商品状态更新: productId={}, status={}", id, status);
     }

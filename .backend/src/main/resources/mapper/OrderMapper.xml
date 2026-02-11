@@ -128,4 +128,12 @@
           AND deleted = 0
     </update>
 
+    <select id="selectExpiredPendingOrders" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_order
+        WHERE order_status = 0
+          AND deleted = 0
+          AND create_time &lt;= #{deadline}
+    </select>
+
 </mapper>

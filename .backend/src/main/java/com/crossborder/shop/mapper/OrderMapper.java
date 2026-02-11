@@ -4,6 +4,7 @@ import com.crossborder.shop.entity.Order;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -49,4 +50,9 @@ public interface OrderMapper {
      * 更新订单状�?
      */
     int updateStatus(@Param("id") Long id, @Param("orderStatus") Integer orderStatus);
+
+    /**
+     * 查询超时未支付的待付款订单
+     */
+    List<Order> selectExpiredPendingOrders(@Param("deadline") LocalDateTime deadline);
 }

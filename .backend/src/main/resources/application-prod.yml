@@ -27,43 +27,6 @@ spring:
       stat-view-servlet:
         enabled: false
 
-  # Redis配置
-  data:
-    redis:
-      host: your-redis-host
-      port: 6379
-      password: your-redis-password
-      database: 0
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 500
-          max-wait: -1ms
-          max-idle: 20
-          min-idle: 5
-
-# Redisson配置（哨兵模式，可根据需要切换为集群模式）
-redisson:
-  # 哨兵模式
-  sentinel-servers-config:
-    master-name: mymaster
-    sentinel-addresses:
-      - redis://your-sentinel-host1:26379
-      - redis://your-sentinel-host2:26379
-      - redis://your-sentinel-host3:26379
-    database: 0
-    password: your-redis-password
-    connection-pool-size: 128
-    connection-minimum-idle-size: 20
-  # 集群模式（如需使用，注释掉哨兵模式，取消以下注释）
-  # cluster-servers-config:
-  #   node-addresses:
-  #     - redis://your-cluster-node1:6379
-  #     - redis://your-cluster-node2:6379
-  #     - redis://your-cluster-node3:6379
-  #   password: your-redis-password
-  #   scan-interval: 2000
-
 # 日志配置
 logging:
   level:

@@ -15,14 +15,12 @@ import com.crossborder.shop.vo.SystemStatsVO;
 import com.crossborder.shop.vo.SellerStatsVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -49,13 +47,9 @@ public class SettingsServiceImpl implements SettingsService {
     private static final String KEY_ENABLE_SELLER_REGISTRATION = "seller.registration.enable";
     private static final String KEY_HOME_CAROUSEL_IMAGES = "home.carousel.images";
 
-    private static final String APP_CONFIG_CACHE_KEY = "app:config";
-    private static final long APP_CONFIG_CACHE_TTL_DAYS = 7;
-
     private final SystemConfigMapper systemConfigMapper;
     private final SystemStatsMapper systemStatsMapper;
     private final SellerStatsMapper sellerStatsMapper;
-    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public List<SystemSettingVO> getAllSettings() {
@@ -90,14 +84,7 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public AppConfigVO getAppConfig() {
-        Object cached = redisTemplate.opsForValue().get(APP_CONFIG_CACHE_KEY);
-        if (cached instanceof AppConfigVO) {
-            return (AppConfigVO) cached;
-        }
-
-        AppConfigVO vo = buildAppConfig();
-        redisTemplate.opsForValue().set(APP_CONFIG_CACHE_KEY, vo, APP_CONFIG_CACHE_TTL_DAYS, TimeUnit.DAYS);
-        return vo;
+        return buildAppConfig();
     }
 
     @Override
@@ -147,9 +134,6 @@ public class SettingsServiceImpl implements SettingsService {
             String joined = String.join(";", dto.getCarouselImages());
             upsertConfig(KEY_HOME_CAROUSEL_IMAGES, joined, "string", "homepage", "主页轮播图图片路径，分号分隔");
         }
-
-        AppConfigVO refreshed = buildAppConfig();
-        redisTemplate.opsForValue().set(APP_CONFIG_CACHE_KEY, refreshed, APP_CONFIG_CACHE_TTL_DAYS, TimeUnit.DAYS);
     }
 
     @Override

@@ -4,11 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import com.crossborder.shop.common.ResultCode;
 import com.crossborder.shop.dto.CreateOrderDTO;
 import com.crossborder.shop.dto.OrderShipDTO;
-import com.crossborder.shop.dto.OrderTimeoutTask;
 import com.crossborder.shop.entity.*;
 import com.crossborder.shop.exception.BusinessException;
 import com.crossborder.shop.mapper.*;
-import com.crossborder.shop.service.DelayQueueService;
 import com.crossborder.shop.service.LogisticsService;
 import com.crossborder.shop.service.OrderService;
 import com.crossborder.shop.service.SettingsService;
@@ -29,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -54,8 +51,6 @@ public class OrderServiceImpl implements OrderService {
     private static final int PAYMENT_STATUS_PAID = 1;
     private static final int PAYMENT_STATUS_REFUNDED = 2;
 
-    private static final String ORDER_TIMEOUT_QUEUE = "order:timeout:queue";
-
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final OrderAddressMapper orderAddressMapper;
@@ -67,11 +62,7 @@ public class OrderServiceImpl implements OrderService {
     private final ExchangeRateMapper exchangeRateMapper;
     private final LogisticsService logisticsService;
     private final OrderNumberGenerator orderNumberGenerator;
-    private final DelayQueueService delayQueueService;
     private final SettingsService settingsService;
-
-    @Value("${order.timeout-minutes:15}")
-    private int orderTimeoutMinutes;
 
     @Value("${order.stock-retry-times:3}")
     private int stockRetryTimes;
@@ -338,18 +329,9 @@ public class OrderServiceImpl implements OrderService {
         orderAddress.setUpdateBy(userId);
         orderAddressMapper.insert(orderAddress);
 
-        // 9. 加入延迟队列（15分钟超时）
-        OrderTimeoutTask timeoutTask = new OrderTimeoutTask();
-        timeoutTask.setOrderId(order.getId());
-        timeoutTask.setOrderNumber(orderNumber);
-        timeoutTask.setUserId(userId);
-        timeoutTask.setCreateTime(LocalDateTime.now());
+        // 9. 超时取消由定时任务自动扫描处理
 
-        delayQueueService.offer(ORDER_TIMEOUT_QUEUE, timeoutTask, orderTimeoutMinutes, TimeUnit.MINUTES);
-
-        // 10. TODO: 保存超时任务记录到数据库（可选，用于持久化）
-
-        // 11. 清空购物车选中商品
+        // 10. 清空购物车选中商品
         if (!useProductIds) {
             for (CartItem item : cartItems) {
                 cartItemMapper.deleteById(item.getId());
@@ -469,11 +451,6 @@ public class OrderServiceImpl implements OrderService {
         order.setCancelReason(reason);
         orderMapper.updateById(order);
 
-        // 移除超时任务
-        OrderTimeoutTask task = new OrderTimeoutTask();
-        task.setOrderId(orderId);
-        delayQueueService.remove(ORDER_TIMEOUT_QUEUE, task);
-
         log.info("买家取消订单成功: orderId={}, userId={}, reason={}", orderId, userId, reason);
     }
 
@@ -505,11 +482,6 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentStatus(PAYMENT_STATUS_PAID);
         order.setPaymentTime(LocalDateTime.now());
         orderMapper.updateById(order);
-
-        // 支付成功后可触发发货、通知等后续操作
-        OrderTimeoutTask task = new OrderTimeoutTask();
-        task.setOrderId(orderId);
-        delayQueueService.remove(ORDER_TIMEOUT_QUEUE, task);
 
         log.info("订单支付成功: orderId={}, userId={}", orderId, userId);
     }
@@ -601,11 +573,6 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(ORDER_STATUS_COMPLETED);
         order.setCompleteTime(LocalDateTime.now());
         orderMapper.updateById(order);
-
-        // 移除超时任务（确保不会再次处理）
-        OrderTimeoutTask task = new OrderTimeoutTask();
-        task.setOrderId(orderId);
-        delayQueueService.remove(ORDER_TIMEOUT_QUEUE, task);
 
         log.info("订单确认收货成功: orderId={}, userId={}", orderId, userId);
     }

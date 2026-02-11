@@ -1,84 +1,76 @@
 package com.crossborder.shop.util;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * ??????
- * ??: yyyyMMddHHmmss + userId?4? + Redis???3?
- * ??: 20260204123456789001
+ * 订单号生成器
+ * 格式: yyyyMMddHHmmss + userId后4位 + 自增序列3位
+ * 示例: 20260204123456789001
  *
  * @author CrossBorder Shop
  * @since 2026-02-04
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class OrderNumberGenerator {
 
-    private final StringRedisTemplate stringRedisTemplate;
-
     /**
-     * Redis key??
+     * 内存自增序列号
      */
-    private static final String ORDER_SEQ_KEY_PREFIX = "order:seq:";
+    private final AtomicLong sequence = new AtomicLong(0);
 
     /**
-     * ????????2??
+     * 当前日期标记，用于按天重置序列号
      */
-    private static final long EXPIRE_DAYS = 2;
+    private volatile String currentDate = "";
 
     /**
-     * ?????
+     * 生成订单号
      *
-     * @param userId ??ID
-     * @return ???
+     * @param userId 用户ID
+     * @return 订单号
      */
     public String generateOrderNumber(Long userId) {
-        // 1. ????????yyyyMMddHHmmss?
+        // 1. 获取当前时间戳（yyyyMMddHHmmss）
         String timestamp = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
                 .format(java.time.LocalDateTime.now());
 
-        // 2. ??userId?4????4????0?
+        // 2. 取userId后4位（不足4位左补0）
         String userIdSuffix = String.format("%04d", userId % 10000);
 
-        // 3. ??Redis?????????
-        String dateKey = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String redisKey = ORDER_SEQ_KEY_PREFIX + dateKey;
-
-        // Redis???????
-        Long sequence = stringRedisTemplate.opsForValue().increment(redisKey);
-        if (sequence == null) {
-            sequence = 1L;
+        // 3. 获取自增序列号（按天重置）
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        if (!today.equals(currentDate)) {
+            synchronized (this) {
+                if (!today.equals(currentDate)) {
+                    sequence.set(0);
+                    currentDate = today;
+                }
+            }
         }
+        long seq = sequence.incrementAndGet();
 
-        // ?????????????
-        if (sequence == 1) {
-            stringRedisTemplate.expire(redisKey, EXPIRE_DAYS, TimeUnit.DAYS);
-        }
+        // 序列号取后3位（不足3位左补0，超过3位取模）
+        String sequenceSuffix = String.format("%03d", seq % 1000);
 
-        // ???????3????3????0???3???3??
-        String sequenceSuffix = String.format("%03d", sequence % 1000);
-
-        // 4. ?????
+        // 4. 拼接订单号
         String orderNumber = timestamp + userIdSuffix + sequenceSuffix;
 
-        log.debug("?????: userId={}, orderNumber={}, sequence={}", userId, orderNumber, sequence);
+        log.debug("生成订单号: userId={}, orderNumber={}, sequence={}", userId, orderNumber, seq);
 
         return orderNumber;
     }
 
     /**
-     * ?????????ID?4?
+     * 从订单号解析用户ID后4位
      *
-     * @param orderNumber ???
-     * @return userId?4?
+     * @param orderNumber 订单号
+     * @return userId后4位
      */
     public String parseUserIdSuffix(String orderNumber) {
         if (orderNumber == null || orderNumber.length() < 21) {
@@ -88,10 +80,10 @@ public class OrderNumberGenerator {
     }
 
     /**
-     * ??????????
+     * 从订单号解析序列号
      *
-     * @param orderNumber ???
-     * @return ???
+     * @param orderNumber 订单号
+     * @return 序列号
      */
     public String parseSequence(String orderNumber) {
         if (orderNumber == null || orderNumber.length() < 21) {
@@ -101,10 +93,10 @@ public class OrderNumberGenerator {
     }
 
     /**
-     * ??????????
+     * 从订单号解析时间戳
      *
-     * @param orderNumber ???
-     * @return ???????yyyyMMddHHmmss?
+     * @param orderNumber 订单号
+     * @return 时间戳字符串（yyyyMMddHHmmss）
      */
     public String parseTimestamp(String orderNumber) {
         if (orderNumber == null || orderNumber.length() < 14) {

@@ -1,7 +1,5 @@
 package com.crossborder.shop.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.json.JSONUtil;
 import com.crossborder.shop.common.ResultCode;
 import com.crossborder.shop.dto.AddCartDTO;
 import com.crossborder.shop.dto.UpdateCartItemDTO;
@@ -19,17 +17,12 @@ import com.crossborder.shop.vo.CartItemVO;
 import com.crossborder.shop.vo.CartVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -40,20 +33,6 @@ public class CartServiceImpl implements CartService {
     private final CartItemMapper cartItemMapper;
     private final ProductMapper productMapper;
     private final ProductImageMapper productImageMapper;
-    private final RedissonClient redissonClient;
-
-    @Value("${cache.delay-delete-millis:500}")
-    private long delayDeleteMillis;
-
-    /**
-     * 缓存Key前缀
-     */
-    private static final String CART_KEY_PREFIX = "cart:";
-
-    /**
-     * 缓存过期时间（秒）
-     */
-    private static final long CART_CACHE_TTL = 7 * 24 * 60 * 60;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -73,9 +52,6 @@ public class CartServiceImpl implements CartService {
         if (product.getStock() < dto.getQuantity()) {
             throw new BusinessException(ResultCode.PRODUCT_STOCK_NOT_ENOUGH);
         }
-
-        // 延迟双删第一步：删除缓存
-        deleteCartCache(userId);
 
         // 查询或创建购物车
         Cart cart = cartMapper.selectByUserId(userId);
@@ -107,17 +83,11 @@ public class CartServiceImpl implements CartService {
             cartItem.setSelected(true);
             cartItemMapper.insert(cartItem);
         }
-
-        // 添加商品后刷新缓存
-        refreshCartCache(userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCartItem(Long userId, UpdateCartItemDTO dto) {
-        // 延迟双删第一步
-        deleteCartCache(userId);
-
         // 查询购物车明细
         CartItem cartItem = cartItemMapper.selectById(dto.getId());
         if (cartItem == null) {
@@ -141,78 +111,43 @@ public class CartServiceImpl implements CartService {
         }
 
         cartItemMapper.updateById(cartItem);
-
-        // 延迟双删第二步
-        asyncDeleteCartCache(userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeCartItem(Long userId, Long itemId) {
-        // 延迟双删第一步
-        deleteCartCache(userId);
-
         CartItem cartItem = cartItemMapper.selectById(itemId);
         if (cartItem != null) {
             cartItemMapper.deleteById(itemId);
         }
-
-        // 延迟双删第二步
-        asyncDeleteCartCache(userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void clearCart(Long userId) {
-        // 延迟双删第一步
-        deleteCartCache(userId);
-
         Cart cart = cartMapper.selectByUserId(userId);
         if (cart != null) {
             cartItemMapper.deleteByCartId(cart.getId());
         }
-
-        // 延迟双删第二步
-        asyncDeleteCartCache(userId);
     }
 
     @Override
     public CartVO getCart(Long userId) {
-        // 先查Redis缓存
-        String cacheKey = CART_KEY_PREFIX + userId;
-        RBucket<String> bucket = redissonClient.getBucket(cacheKey);
-        String cachedData = bucket.get();
-
-        if (cachedData != null) {
-            log.debug("购物车缓存命中: userId={}", userId);
-            return JSONUtil.toBean(cachedData, CartVO.class);
-        }
-
-        // 缓存未命中，查询数据库并刷新缓存
-        return refreshCartCache(userId);
+        return buildCartVO(userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateAllSelected(Long userId, Boolean selected) {
-        // 延迟双删第一步
-        deleteCartCache(userId);
-
         Cart cart = cartMapper.selectByUserId(userId);
         if (cart != null) {
             cartItemMapper.updateSelectedByCartId(cart.getId(), selected);
         }
-
-        // 延迟双删第二步
-        asyncDeleteCartCache(userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeSelectedItems(Long userId) {
-        // 延迟双删第一步
-        deleteCartCache(userId);
-
         Cart cart = cartMapper.selectByUserId(userId);
         if (cart != null) {
             List<CartItem> selectedItems = cartItemMapper.selectSelectedByCartId(cart.getId());
@@ -220,18 +155,12 @@ public class CartServiceImpl implements CartService {
                 cartItemMapper.deleteById(item.getId());
             }
         }
-
-        // 延迟双删第二步
-        asyncDeleteCartCache(userId);
     }
 
-    // 不再持久化总价/总数，统一在 getCart 中动态计算
-
     /**
-     * 刷新购物车缓存
+     * 构建购物车VO（直接查询数据库）
      */
-    private CartVO refreshCartCache(Long userId) {
-        log.debug("刷新购物车缓存: userId={}", userId);
+    private CartVO buildCartVO(Long userId) {
         Cart cart = cartMapper.selectByUserId(userId);
         if (cart == null) {
             return null;
@@ -277,33 +206,6 @@ public class CartServiceImpl implements CartService {
         cartVO.setTotalQuantity(totalQuantity);
         cartVO.setItems(itemVOList);
 
-        String cacheKey = CART_KEY_PREFIX + userId;
-        redissonClient.getBucket(cacheKey).set(JSONUtil.toJsonStr(cartVO), CART_CACHE_TTL, TimeUnit.SECONDS);
-        log.debug("购物车数据已缓存: userId={}", userId);
         return cartVO;
-    }
-
-    /**
-     * 删除购物车缓存
-     */
-    private void deleteCartCache(Long userId) {
-        String cacheKey = CART_KEY_PREFIX + userId;
-        redissonClient.getBucket(cacheKey).delete();
-        log.debug("删除购物车缓存: userId={}", userId);
-    }
-
-    /**
-     * 异步延迟删除缓存（延迟双删第二步）
-     */
-    @Async
-    public void asyncDeleteCartCache(Long userId) {
-        try {
-            Thread.sleep(delayDeleteMillis);
-            deleteCartCache(userId);
-            log.debug("异步延迟删除购物车缓存完成: userId={}, delay={}ms", userId, delayDeleteMillis);
-        } catch (InterruptedException e) {
-            log.error("异步延迟删除缓存失败", e);
-            Thread.currentThread().interrupt();
-        }
     }
 }

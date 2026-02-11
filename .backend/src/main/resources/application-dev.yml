@@ -50,36 +50,6 @@ spring:
         login-username: admin
         login-password: admin123
 
-  # Redis配置
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password:
-      database: 0
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 200
-          max-wait: -1ms
-          max-idle: 10
-          min-idle: 0
-      # 注意：Redis AOF持久化需要在 redis.conf 中配置
-      # appendonly yes
-      # appendfsync everysec
-
-# Redisson配置（单机模式）
-redisson:
-  single-server-config:
-    address: redis://localhost:6379
-    database: 0
-    connection-pool-size: 64
-    connection-minimum-idle-size: 10
-    idle-connection-timeout: 10000
-    timeout: 3000
-    retry-attempts: 3
-    retry-interval: 1500
-
 # 日志配置
 logging:
   level:

@@ -104,11 +104,6 @@ file:
     # 文件访问路径前缀
     prefix: /upload
 
-# 缓存配置
-cache:
-  # 延迟双删时间间隔（毫秒）
-  delay-delete-millis: 500
-
 # 订单配置
 order:
   # 订单超时时间（分钟）

@@ -186,7 +186,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void logout() {
-        // TODO: Token登出时需要从Redis中删除
         log.info("用户登出");
     }
 
