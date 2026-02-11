@@ -170,7 +170,7 @@ const loadCurrencies = async () => {
     currencies.value = response.data || []
     if (currencies.value.length > 0) {
       const baseCurrency = currencies.value.find(c => c.isBase === 1)
-      const defaultCode = baseCurrency?.currencyCode || currencies.value[0].currencyCode
+      const defaultCode = baseCurrency?.currencyCode || currencies.value[0]!.currencyCode
       formState.currency = defaultCode
       lastCurrency.value = defaultCode
       currencySymbol.value = currencies.value.find(c => c.currencyCode === defaultCode)?.symbol || '¥'

@@ -118,17 +118,49 @@ const router = createRouter({
 })
 
 // Navigation guard
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const token = localStorage.getItem('access_token')
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
+  // Logged-in user visiting /login -> redirect to dashboard
+  if (to.path === '/login' && token) {
+    next('/dashboard')
+    return
+  }
+
+  // Unauthenticated user visiting protected page -> redirect to login
   if (requiresAuth && !token) {
     next('/login')
-  } else if (to.path === '/login' && token) {
-    next('/dashboard')
-  } else {
-    next()
+    return
   }
+
+  // Token exists but user info not loaded -> fetch it
+  if (token && requiresAuth) {
+    const { useUserStore } = await import('@/stores/user')
+    const userStore = useUserStore()
+
+    if (!userStore.currentUser) {
+      try {
+        await userStore.fetchCurrentUser()
+      } catch {
+        // Token expired or invalid, redirect to login
+        next('/login')
+        return
+      }
+    }
+
+    // Role-based access control for /admin/* routes
+    const requiredRoles = to.meta.roles as string[] | undefined
+    if (requiredRoles && requiredRoles.length > 0) {
+      const hasRole = requiredRoles.some(role => userStore.roles.includes(role))
+      if (!hasRole) {
+        next('/dashboard')
+        return
+      }
+    }
+  }
+
+  next()
 })
 
 export default router

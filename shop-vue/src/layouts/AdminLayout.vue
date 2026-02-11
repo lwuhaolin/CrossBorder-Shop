@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, h } from 'vue'
+import { ref, computed, watch, onMounted, h } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import {
@@ -119,6 +119,18 @@ const openKeys = ref<string[]>([])
 
 const currentUser = computed(() => userStore.currentUser)
 const isAdmin = computed(() => userStore.isAdmin)
+
+// Auto-fetch user info if not loaded
+onMounted(async () => {
+  if (!userStore.currentUser) {
+    try {
+      await userStore.fetchCurrentUser()
+    } catch {
+      message.error('登录信息已过期，请重新登录')
+      router.push('/login')
+    }
+  }
+})
 
 const themeConfig = {
   token: {
