@@ -13,12 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * 物流相关接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-07
- */
+
 @RestController
 @RequestMapping("/logistics")
 @RequiredArgsConstructor

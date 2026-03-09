@@ -5,12 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * 商品分类实体
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Category extends BaseEntity {

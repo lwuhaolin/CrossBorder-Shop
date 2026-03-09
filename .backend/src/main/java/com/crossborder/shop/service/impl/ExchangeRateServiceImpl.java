@@ -21,12 +21,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 汇率服务实现
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

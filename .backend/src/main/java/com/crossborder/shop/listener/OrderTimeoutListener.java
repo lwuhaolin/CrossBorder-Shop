@@ -16,8 +16,7 @@ import java.util.List;
  * 订单超时定时任务
  * 定期扫描数据库中超时未支付的订单并自动取消
  *
- * @author CrossBorder Shop
- * @since 2026-02-04
+
  */
 @Slf4j
 @Component

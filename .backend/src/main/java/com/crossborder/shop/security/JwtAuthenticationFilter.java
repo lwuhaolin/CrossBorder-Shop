@@ -24,8 +24,7 @@ import java.util.List;
  * JWT 认证过滤器
  * 用于解析并验证 JWT Token，设置 Spring Security 上下文
  *
- * @author CrossBorder Team
- * @since 2026-02-04
+
  */
 @Slf4j
 @Component

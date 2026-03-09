@@ -20,12 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * 文件服务实现类
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Slf4j
 @Service
 public class FileServiceImpl implements FileService {

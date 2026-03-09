@@ -9,12 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 商品视图对象
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Data
 @Schema(description = "商品视图对象")
 public class ProductVO implements Serializable {

@@ -7,14 +7,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * 订单号生成器
- * 格式: yyyyMMddHHmmss + userId后4位 + 自增序列3位
- * 示例: 20260204123456789001
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Slf4j
 @Component
 public class OrderNumberGenerator {

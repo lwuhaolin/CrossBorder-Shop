@@ -6,12 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * 订单明细Mapper接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Mapper
 public interface OrderItemMapper {
 

@@ -5,12 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * 更新购物车明细DTO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @Schema(description = "更新购物车明细请求")
 public class UpdateCartItemDTO {

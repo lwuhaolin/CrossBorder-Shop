@@ -4,12 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-/**
- * 用户注册DTO
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Data
 @Schema(description = "用户注册DTO")
 public class UserRegisterDTO {

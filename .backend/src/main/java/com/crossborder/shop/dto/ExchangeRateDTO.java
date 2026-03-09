@@ -8,12 +8,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
-/**
- * 汇率数据传输对象
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
+
 @Data
 public class ExchangeRateDTO {
 

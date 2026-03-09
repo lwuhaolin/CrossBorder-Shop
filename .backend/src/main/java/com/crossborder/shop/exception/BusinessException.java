@@ -3,12 +3,7 @@ package com.crossborder.shop.exception;
 import com.crossborder.shop.common.ResultCode;
 import lombok.Getter;
 
-/**
- * 自定义业务异常类
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Getter
 public class BusinessException extends RuntimeException {
 

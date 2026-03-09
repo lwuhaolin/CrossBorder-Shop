@@ -17,12 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 系统设置控制器
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/settings")

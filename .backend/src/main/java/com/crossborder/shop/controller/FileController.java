@@ -19,12 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- * 文件控制器
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/file")

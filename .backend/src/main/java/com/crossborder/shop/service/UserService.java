@@ -7,12 +7,6 @@ import com.crossborder.shop.dto.UserUpdateDTO;
 import com.crossborder.shop.vo.LoginVO;
 import com.crossborder.shop.vo.UserVO;
 
-/**
- * 用户服务接口
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 public interface UserService {
 
     /**

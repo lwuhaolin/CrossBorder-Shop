@@ -4,12 +4,7 @@ import com.crossborder.shop.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * 角色实体类
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Role extends BaseEntity {

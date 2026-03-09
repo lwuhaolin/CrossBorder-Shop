@@ -4,12 +4,6 @@ import com.crossborder.shop.entity.LogisticsCompany;
 
 import java.util.List;
 
-/**
- * 物流服务
- *
- * @author CrossBorder Shop
- * @since 2026-02-07
- */
 public interface LogisticsService {
 
     /**

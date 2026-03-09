@@ -6,12 +6,6 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * 分页结果封装�?
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Data
 @Schema(description = "分页结果")
 public class PageResult<T> implements Serializable {

@@ -9,12 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * 订单实体
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

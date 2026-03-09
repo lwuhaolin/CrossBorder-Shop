@@ -16,12 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 收货地址服务实现类
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

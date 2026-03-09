@@ -16,12 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 分类服务实现类
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

@@ -6,12 +6,6 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * 汇率视图对象
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
 @Data
 public class ExchangeRateVO {
 

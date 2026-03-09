@@ -6,13 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 登录响应VO
- * 支持双Token机制（AccessToken + RefreshToken�?
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Data
 @Builder
 @NoArgsConstructor

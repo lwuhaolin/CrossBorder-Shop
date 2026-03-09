@@ -5,12 +5,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 
-/**
- * 卖家统计Mapper
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
+
 @Mapper
 public interface SellerStatsMapper {
 

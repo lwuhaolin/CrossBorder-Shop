@@ -7,12 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 订单Mapper接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Mapper
 public interface OrderMapper {
 

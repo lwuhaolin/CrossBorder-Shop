@@ -3,12 +3,6 @@ package com.crossborder.shop.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * 货币视图对象
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
 @Data
 public class CurrencyVO {
 

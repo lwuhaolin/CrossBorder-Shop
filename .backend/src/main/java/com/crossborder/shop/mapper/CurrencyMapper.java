@@ -6,12 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * 货币数据映射接口
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
+
 @Mapper
 public interface CurrencyMapper {
 

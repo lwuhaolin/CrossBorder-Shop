@@ -9,12 +9,6 @@ import com.crossborder.shop.vo.SellerStatsVO;
 
 import java.util.List;
 
-/**
- * 系统设置服务
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
 public interface SettingsService {
 
     List<SystemSettingVO> getAllSettings();

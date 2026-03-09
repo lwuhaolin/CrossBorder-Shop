@@ -6,12 +6,6 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * 系统统计信息VO
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
 @Data
 @Schema(description = "系统统计信息")
 public class SystemStatsVO {

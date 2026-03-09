@@ -7,13 +7,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-/**
- * 跨域配置�?
- * 允许前端跨域访问后端API
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Configuration
 public class CorsConfig {
 

@@ -5,12 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 订单地址VO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

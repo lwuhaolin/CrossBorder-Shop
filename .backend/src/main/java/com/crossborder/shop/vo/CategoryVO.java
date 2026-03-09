@@ -8,12 +8,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 分类视图对象（树形结构）
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Data
 @Schema(description = "分类视图对象")
 public class CategoryVO implements Serializable {

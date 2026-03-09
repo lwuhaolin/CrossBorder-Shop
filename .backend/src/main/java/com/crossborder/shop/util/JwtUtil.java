@@ -17,13 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * JWT工具类
- * 支持AccessToken和RefreshToken双Token机制
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Slf4j
 @Component
 public class JwtUtil {

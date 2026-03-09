@@ -8,12 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 用户信息VO
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Data
 @Schema(description = "用户信息VO")
 public class UserVO {

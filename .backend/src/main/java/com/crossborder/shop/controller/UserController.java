@@ -18,12 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 用户控制器
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Tag(name = "用户管理", description = "用户相关接口")
 @RestController
 @RequestMapping("/user")

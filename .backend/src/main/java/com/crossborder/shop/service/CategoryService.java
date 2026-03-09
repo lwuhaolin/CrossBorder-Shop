@@ -5,12 +5,6 @@ import com.crossborder.shop.vo.CategoryVO;
 
 import java.util.List;
 
-/**
- * 分类服务接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 public interface CategoryService {
 
     /**

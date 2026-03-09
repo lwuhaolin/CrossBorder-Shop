@@ -18,12 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 商品控制器
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/product")

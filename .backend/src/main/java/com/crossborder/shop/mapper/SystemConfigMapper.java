@@ -6,12 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * 系统配置Mapper接口
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
+
 @Mapper
 public interface SystemConfigMapper {
 

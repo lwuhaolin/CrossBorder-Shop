@@ -7,13 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 健康检查控制器
- * 用于系统健康检查和测试接口连通�?
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @RestController
 @RequestMapping("/health")
 @Tag(name = "系统健康检查", description = "系统健康检查相关接口")

@@ -150,6 +150,7 @@ const adminMenuItems: MenuItem[] = [
   { path: '/dashboard', label: '仪表盘', icon: h(DashboardOutlined) },
   { path: '/admin/users', label: '用户管理', icon: h(UserOutlined) },
   { path: '/products', label: '商品管理', icon: h(ShoppingOutlined) },
+  { path: '/admin/categories', label: '分类管理', icon: h(AppstoreOutlined) },
   { path: '/admin/rates', label: '汇率管理', icon: h(LinkOutlined) },
   { path: '/admin/settings', label: '系统配置', icon: h(SettingOutlined) },
   {
@@ -166,7 +167,6 @@ const adminMenuItems: MenuItem[] = [
 const sellerMenuItems: MenuItem[] = [
   { path: '/dashboard', label: '仪表盘', icon: h(DashboardOutlined) },
   { path: '/products', label: '商品管理', icon: h(ShoppingOutlined) },
-  { path: '/categories', label: '分类管理', icon: h(AppstoreOutlined) },
   { path: '/orders', label: '订单管理', icon: h(ShoppingCartOutlined) },
   { path: '/addresses', label: '地址管理', icon: h(EnvironmentOutlined) },
   {

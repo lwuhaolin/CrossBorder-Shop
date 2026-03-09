@@ -15,12 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 系统统计控制器
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/statistics")

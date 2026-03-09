@@ -5,12 +5,6 @@ import com.crossborder.shop.vo.ShippingAddressVO;
 
 import java.util.List;
 
-/**
- * 收货地址服务接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 public interface ShippingAddressService {
 
     /**

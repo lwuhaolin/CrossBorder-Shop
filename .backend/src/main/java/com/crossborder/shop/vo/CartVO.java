@@ -8,12 +8,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * 购物车VO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

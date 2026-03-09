@@ -5,12 +5,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * 统一响应结果封装�?
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Data
 @Schema(description = "统一响应结果")
 public class Result<T> implements Serializable {

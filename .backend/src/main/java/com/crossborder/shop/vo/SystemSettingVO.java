@@ -5,12 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * 系统设置VO
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
 @Data
 @Schema(description = "系统设置VO")
 public class SystemSettingVO {

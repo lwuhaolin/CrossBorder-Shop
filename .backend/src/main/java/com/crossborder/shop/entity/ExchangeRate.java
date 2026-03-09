@@ -7,12 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 
-/**
- * 汇率实体
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ExchangeRate extends BaseEntity {

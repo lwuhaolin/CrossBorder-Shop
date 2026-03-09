@@ -5,12 +5,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * 商品图片视图对象
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Data
 @Schema(description = "商品图片视图对象")
 public class ProductImageVO implements Serializable {

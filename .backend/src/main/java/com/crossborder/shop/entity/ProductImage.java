@@ -4,12 +4,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * 商品图片实体
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 public class ProductImage {
 

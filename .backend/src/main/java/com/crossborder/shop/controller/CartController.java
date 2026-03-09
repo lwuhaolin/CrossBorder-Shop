@@ -14,12 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 购物车控制器
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/cart")

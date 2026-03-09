@@ -6,12 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/**
- * 订单地址实体（收货地址快照）
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

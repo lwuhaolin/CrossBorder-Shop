@@ -4,12 +4,7 @@ import com.crossborder.shop.entity.Cart;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-/**
- * 购物车Mapper接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Mapper
 public interface CartMapper {
 

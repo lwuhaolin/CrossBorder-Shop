@@ -10,13 +10,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
-/**
- * 异步任务配置�?
- * 用于延迟双删等异步操�?
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Slf4j
 @EnableAsync
 @EnableScheduling

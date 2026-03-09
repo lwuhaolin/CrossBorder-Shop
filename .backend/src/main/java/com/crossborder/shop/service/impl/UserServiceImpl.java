@@ -28,12 +28,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 用户服务实现
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

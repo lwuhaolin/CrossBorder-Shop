@@ -6,12 +6,6 @@ import com.crossborder.shop.vo.OrderVO;
 
 import java.util.List;
 
-/**
- * 订单服务接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 public interface OrderService {
 
     /**

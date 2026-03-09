@@ -25,12 +25,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * 商品服务实现类
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

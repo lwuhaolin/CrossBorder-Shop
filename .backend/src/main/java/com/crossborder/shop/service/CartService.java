@@ -4,12 +4,6 @@ import com.crossborder.shop.dto.AddCartDTO;
 import com.crossborder.shop.dto.UpdateCartItemDTO;
 import com.crossborder.shop.vo.CartVO;
 
-/**
- * 购物车服务接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 public interface CartService {
 
     /**

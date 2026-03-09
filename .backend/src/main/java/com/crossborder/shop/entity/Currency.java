@@ -5,12 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * 货币实体
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Currency extends BaseEntity {

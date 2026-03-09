@@ -7,12 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * 用户Mapper接口
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Mapper
 public interface UserMapper {
 

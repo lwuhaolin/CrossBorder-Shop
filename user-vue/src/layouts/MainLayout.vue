@@ -6,13 +6,11 @@
       <router-view />
     </a-layout-content>
 
-    <Footer />
   </a-layout>
 </template>
 
 <script setup lang="ts">
 import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
 </script>
 
 <style scoped>

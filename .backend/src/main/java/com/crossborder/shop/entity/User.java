@@ -7,12 +7,6 @@ import lombok.EqualsAndHashCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * 用户实体类
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseEntity {

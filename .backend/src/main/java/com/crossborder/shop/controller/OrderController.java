@@ -17,12 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 订单控制
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/order")

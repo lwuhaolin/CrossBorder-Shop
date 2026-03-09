@@ -14,13 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-/**
- * Spring Security ?????
- * ?????????????????
- *
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

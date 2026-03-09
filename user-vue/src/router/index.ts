@@ -18,13 +18,6 @@ import OrderDetail from '../pages/user/orders/OrderDetail.vue'
 import Addresses from '../pages/user/addresses/index.vue'
 import Favorites from '../pages/user/favorites/index.vue'
 import Settings from '../pages/user/settings/index.vue'
-import Help from '../pages/help/index.vue'
-import Shipping from '../pages/shipping/index.vue'
-import Returns from '../pages/returns/index.vue'
-import Contact from '../pages/contact/index.vue'
-import About from '../pages/about/index.vue'
-import Privacy from '../pages/privacy/index.vue'
-import Terms from '../pages/terms/index.vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -85,41 +78,6 @@ export const routes: RouteRecordRaw[] = [
         path: 'user/settings',
         component: Settings,
         meta: { title: 'Settings', requiresAuth: true }
-      },
-      {
-        path: 'help',
-        component: Help,
-        meta: { title: 'Help' }
-      },
-      {
-        path: 'shipping',
-        component: Shipping,
-        meta: { title: 'Shipping' }
-      },
-      {
-        path: 'returns',
-        component: Returns,
-        meta: { title: 'Returns' }
-      },
-      {
-        path: 'contact',
-        component: Contact,
-        meta: { title: 'Contact' }
-      },
-      {
-        path: 'about',
-        component: About,
-        meta: { title: 'About' }
-      },
-      {
-        path: 'privacy',
-        component: Privacy,
-        meta: { title: 'Privacy' }
-      },
-      {
-        path: 'terms',
-        component: Terms,
-        meta: { title: 'Terms' }
       }
     ]
   },

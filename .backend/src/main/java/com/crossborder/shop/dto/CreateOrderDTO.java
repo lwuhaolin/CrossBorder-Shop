@@ -6,12 +6,7 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * 创建订单DTO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @Schema(description = "创建订单请求")
 public class CreateOrderDTO {

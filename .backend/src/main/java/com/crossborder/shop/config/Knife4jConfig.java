@@ -10,13 +10,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Knife4j OpenAPI 配置类
- * 适用于 Spring Boot 3.x + Knife4j 4.x
- *
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Configuration
 public class Knife4jConfig {
     

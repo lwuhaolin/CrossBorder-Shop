@@ -23,12 +23,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * 系统设置服务实现
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

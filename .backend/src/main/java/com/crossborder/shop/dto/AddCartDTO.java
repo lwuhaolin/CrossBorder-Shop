@@ -5,12 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * 添加购物车DTO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @Schema(description = "添加购物车请求")
 public class AddCartDTO {

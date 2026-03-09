@@ -18,12 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * 汇率控制器
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
+
 @Slf4j
 @RestController
 @RequestMapping("/exchange-rate")

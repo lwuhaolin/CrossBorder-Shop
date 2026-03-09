@@ -20,13 +20,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.stream.Collectors;
 
-/**
- * 全局异常处理器
- * 统一处理各类异常并返回标准格式的错误响应
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Slf4j
 @RestControllerAdvice
 @Hidden

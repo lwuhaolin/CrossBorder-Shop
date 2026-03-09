@@ -3,12 +3,6 @@ package com.crossborder.shop.common;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 统一响应状态码枚举
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
 @Getter
 @AllArgsConstructor
 public enum ResultCode {

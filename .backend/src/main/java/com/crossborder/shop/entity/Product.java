@@ -6,12 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 
-/**
- * 商品实体
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Product extends BaseEntity {

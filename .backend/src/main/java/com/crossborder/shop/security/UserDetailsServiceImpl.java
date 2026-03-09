@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Spring Security 用户详情服务
  *
- * @author CrossBorder Team
- * @since 2026-02-04
+
  */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

@@ -58,11 +58,11 @@ export const routes: RouteRecordRaw[] = [
         component: ProductEdit,
         meta: { title: '编辑商品', requiresAuth: true },
       },
-      // Category routes
+      // Category routes (Admin only)
       {
-        path: 'categories',
+        path: 'admin/categories',
         component: CategoryList,
-        meta: { title: '分类管理', requiresAuth: true },
+        meta: { title: '分类管理', requiresAuth: true, roles: ['ADMIN'] },
       },
       // Order routes
       {

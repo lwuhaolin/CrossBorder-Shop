@@ -9,12 +9,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 订单VO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

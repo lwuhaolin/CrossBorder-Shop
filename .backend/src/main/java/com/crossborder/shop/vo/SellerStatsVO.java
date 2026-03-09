@@ -5,12 +5,6 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
-/**
- * 卖家统计信息VO
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
 @Data
 @Schema(description = "卖家统计信息")
 public class SellerStatsVO {

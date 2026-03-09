@@ -4,12 +4,6 @@ import com.crossborder.shop.common.PageResult;
 import com.crossborder.shop.dto.ProductDTO;
 import com.crossborder.shop.vo.ProductVO;
 
-/**
- * 商品服务接口
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 public interface ProductService {
 
     /**

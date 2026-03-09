@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Spring Security 用户主体
  *
- * @author CrossBorder Team
- * @since 2026-02-04
+
  */
 @Data
 @NoArgsConstructor

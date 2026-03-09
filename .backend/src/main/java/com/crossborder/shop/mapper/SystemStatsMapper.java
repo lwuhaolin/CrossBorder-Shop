@@ -4,12 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.math.BigDecimal;
 
-/**
- * 系统统计Mapper
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
+
 @Mapper
 public interface SystemStatsMapper {
 

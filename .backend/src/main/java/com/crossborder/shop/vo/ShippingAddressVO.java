@@ -7,12 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * 收货地址VO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

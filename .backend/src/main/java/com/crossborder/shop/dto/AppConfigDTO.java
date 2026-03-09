@@ -6,12 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * 应用配置DTO
- *
- * @author CrossBorder Team
- * @since 2026-02-09
- */
+
 @Data
 @Schema(description = "应用配置DTO")
 public class AppConfigDTO {

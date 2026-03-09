@@ -8,12 +8,6 @@ import com.crossborder.shop.vo.ExchangeRateVO;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * 汇率服务接口
- *
- * @author CrossBorder Team
- * @since 2026-02-08
- */
 public interface ExchangeRateService {
 
     /**

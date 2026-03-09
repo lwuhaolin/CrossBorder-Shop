@@ -5,12 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
-/**
- * 收货地址DTO
- *
- * @author CrossBorder Shop
- * @since 2026-02-04
- */
+
 @Data
 @Schema(description = "收货地址请求")
 public class ShippingAddressDTO {

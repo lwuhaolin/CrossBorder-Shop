@@ -7,12 +7,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-/**
- * 用户更新DTO
- * 
- * @author CrossBorder Team
- * @since 2026-02-04
- */
+
 @Data
 @Schema(description = "用户更新DTO")
 public class UserUpdateDTO {
