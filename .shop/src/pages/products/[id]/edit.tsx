@@ -209,6 +209,7 @@ const EditProduct: React.FC = () => {
         currency: values.currency,
         stock: values.stock,
         categoryId: values.categoryId,
+        status: values.status,
         imageUrls,
         mainImageIndex: 0,
       };

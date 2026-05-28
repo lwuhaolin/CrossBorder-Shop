@@ -346,6 +346,7 @@ const handleSubmit = async () => {
       currency: formState.currency,
       stock: formState.stock!,
       categoryId: formState.categoryId,
+      status: formState.status,
       imageUrls,
       mainImageIndex: 0,
     }

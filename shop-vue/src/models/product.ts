@@ -34,6 +34,7 @@ export interface ProductCreateDTO {
   currency?: string
   stock: number
   categoryId?: number
+  status?: ProductStatus
   imageUrls?: string[]
   mainImageIndex?: number
 }

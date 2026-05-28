@@ -74,8 +74,13 @@ public class ProductServiceImpl implements ProductService {
 
         // 2. 更新商品信息
         BeanUtil.copyProperties(productDTO, product, "id", "productCode", "sellerId", "sales", "version");
-        product.setVersion(productDTO.getVersion()); // 乐观锁版本号
-        productMapper.updateById(product);
+        if (productDTO.getVersion() != null) {
+            product.setVersion(productDTO.getVersion());
+        }
+        int updated = productMapper.updateById(product);
+        if (updated == 0) {
+            throw new BusinessException(ResultCode.CONFLICT, "商品信息已被修改，请刷新后重试");
+        }
 
         // 3. 更新图片
         productImageMapper.deleteByProductId(product.getId());

@@ -68,6 +68,11 @@ public class ProductDTO implements Serializable {
     @Schema(description = "商品详情", example = "包含卡片与礼盒包装")
     private String detail;
 
+    @Schema(description = "商品状态：0-草稿，1-上架，2-下架，3-售罄", example = "1")
+    @Min(value = 0, message = "商品状态不合法")
+    @Max(value = 3, message = "商品状态不合法")
+    private Integer status;
+
     @Schema(description = "商品图片URL列表", example = "['https://example.com/1.jpg']")
     @NotEmpty(message = "商品图片不能为空")
     private List<String> imageUrls;
